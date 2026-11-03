@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=qzapret
+Comment=Unofficial Qt6 GUI for zapret2
+Exec=qzapret
+Icon=preferences-system-network
+Categories=Network;Settings;
+Terminal=false
