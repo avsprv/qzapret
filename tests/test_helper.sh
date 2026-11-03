@@ -1,0 +1,38 @@
+#!/bin/sh
+# Проверка валидации аргументов qzapret-helper (до любых привилегированных действий).
+H="${1:?usage: test_helper.sh /path/to/qzapret-helper}"
+fail=0
+
+expect_reject() {
+    out=$("$H" "$@" 2>&1); rc=$?
+    if [ "$rc" -ne 2 ]; then
+        echo "FAIL (rc=$rc, expected 2): $*"; echo "  $out"; fail=1
+    else
+        echo "ok: rejected: $*"
+    fi
+}
+
+expect_reject
+expect_reject bogus
+expect_reject unit
+expect_reject unit restart
+expect_reject unit "start;id"
+expect_reject blockcheck --domains 'a.org;id'
+expect_reject blockcheck --domains '$(id)'
+expect_reject blockcheck --domains '-rf'
+expect_reject blockcheck --domains '.hidden'
+expect_reject blockcheck --domains 'a b c d e f g h i j k'
+expect_reject blockcheck --ipvs 5
+expect_reject blockcheck --http 2
+expect_reject blockcheck --tls13 yes
+expect_reject blockcheck --repeats 0
+expect_reject blockcheck --repeats 99
+expect_reject blockcheck --repeats 1x
+expect_reject blockcheck --scanlevel insane
+expect_reject blockcheck --unknown 1
+expect_reject blockcheck --domains
+
+# blockcheck-cancel без запущенного blockcheck — не ошибка
+"$H" blockcheck-cancel >/dev/null 2>&1 || { echo "FAIL: cancel should exit 0"; fail=1; }
+
+exit $fail

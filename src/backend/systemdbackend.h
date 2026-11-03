@@ -1,11 +1,12 @@
 #pragma once
 
 #include <QStringList>
+#include <functional>
 
 #include "zapretbackend.h"
 
-// Управляет апстримным юнитом zapret2.service через systemctl.
-// Чтение статуса идёт без привилегий, start/stop — через pkexec (polkit).
+// Управляет апстримным юнитом zapret2.service.
+// Чтение статуса — без привилегий; start/stop/enable/disable — через qzapret-helper (polkit).
 class SystemdBackend : public ZapretBackend
 {
     Q_OBJECT
@@ -15,9 +16,11 @@ public:
     void refresh() override;
     void start() override;
     void stop() override;
+    void setBootEnabled(bool enabled) override;
 
 private:
-    void runSystemctl(const QStringList &args, bool privileged);
+    void runUnitAction(const QString &action);
+    void query(const QString &verb, const std::function<void(const QString &)> &onResult);
 
     QString m_unit;
 };

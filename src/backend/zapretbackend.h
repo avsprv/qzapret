@@ -15,12 +15,14 @@ public:
     using QObject::QObject;
     ~ZapretBackend() override = default;
 
-    virtual void refresh() = 0; // асинхронно, результат придёт в stateChanged
+    virtual void refresh() = 0; // асинхронно, результат придёт в сигналах
     virtual void start() = 0;
     virtual void stop() = 0;
+    virtual void setBootEnabled(bool enabled) = 0; // автозапуск сервиса при загрузке системы
     // TODO: applyProfile(const Profile &) — запись конфига через привилегированный хелпер
 
 signals:
     void stateChanged(ZapretBackend::State state);
+    void bootEnabledChanged(bool enabled);
     void errorOccurred(const QString &message);
 };
