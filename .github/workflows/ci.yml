@@ -9,7 +9,7 @@ jobs:
     container: fedora:latest
     steps:
       - name: Install deps
-        run: dnf install -y git cmake ninja-build gcc-c++ qt6-qtbase-devel
+        run: dnf install -y git cmake ninja-build gcc-c++ qt6-qtbase-devel qt6-qttools-devel
       - uses: actions/checkout@v4
         with:
           submodules: recursive

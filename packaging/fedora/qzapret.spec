@@ -9,10 +9,12 @@ Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  cmake >= 3.21
 BuildRequires:  ninja-build
 BuildRequires:  gcc-c++
-BuildRequires:  cmake(Qt6Widgets)
-BuildRequires:  cmake(Qt6Test)
+BuildRequires:  cmake(Qt6Widgets) >= 6.8
+BuildRequires:  cmake(Qt6LinguistTools) >= 6.8
+BuildRequires:  cmake(Qt6Test) >= 6.8
 BuildRequires:  desktop-file-utils
 Requires:       polkit
+Recommends:     qt6-qttranslations
 
 %description
 Qt6 graphical front-end for zapret2: service control, strategy selection

@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QCommandLineParser>
 
+#include "i18n.h"
 #include "mainwindow.h"
 
 int main(int argc, char *argv[])
@@ -11,13 +12,16 @@ int main(int argc, char *argv[])
     QApplication::setDesktopFileName(QStringLiteral("qzapret"));
     // Окно прячется в трей, поэтому закрытие последнего окна не должно завершать приложение.
     QApplication::setQuitOnLastWindowClosed(false);
+    I18n::install(app);
 
     QCommandLineParser parser;
-    parser.setApplicationDescription(QStringLiteral("Unofficial Qt6 GUI for zapret2"));
+    parser.setApplicationDescription(
+        QCoreApplication::translate("main", "Неофициальная Qt6-оболочка для zapret2"));
     parser.addHelpOption();
     parser.addVersionOption();
-    QCommandLineOption minimized(QStringLiteral("minimized"),
-                                 QStringLiteral("Start hidden in the system tray"));
+    QCommandLineOption minimized(
+        QStringLiteral("minimized"),
+        QCoreApplication::translate("main", "Запустить скрытым в системном трее"));
     parser.addOption(minimized);
     parser.process(app);
 

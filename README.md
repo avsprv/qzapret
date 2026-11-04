@@ -11,6 +11,8 @@ Unofficial Qt6 GUI for [bol-van/zapret2](https://github.com/bol-van/zapret2).
   крестик окна сворачивает в трей, выход — через меню трея.
 - **Автозапуск:** сервис zapret2 при загрузке системы (`systemctl enable/disable`) и сам qzapret при входе
   в сеанс (`~/.config/autostart/qzapret.desktop`, запуск с `--minimized`).
+- **Локализация:** русский и английский. Язык выбирается по локали системы; для любого языка, кроме
+  русского, без собственного перевода показывается английский.
 
 ## Принципы
 
@@ -21,15 +23,20 @@ Unofficial Qt6 GUI for [bol-van/zapret2](https://github.com/bol-van/zapret2).
 - Вся работа с апстримом изолирована в `src/backend/` (интерфейс `ZapretBackend`).
 - Апстрим подключён как submodule и **не правится**; версия закреплена тегом.
 
+## Версия Qt
+
+Минимум — **Qt 6.8 LTS** (проверяется в `CMakeLists.txt`, переменная `QZAPRET_QT_MIN`). API новее 6.8 не
+используются. Сборка проверена на Qt 6.8.4; на Qt 6.12 LTS проверим, когда он появится в дистрибутивах.
+
 ## Сборка (Fedora)
 
 ```bash
-sudo dnf install cmake ninja-build gcc-c++ qt6-qtbase-devel polkit
+sudo dnf install cmake ninja-build gcc-c++ qt6-qtbase-devel qt6-qttools-devel polkit
 git clone --recurse-submodules https://github.com/avsprv/qzapret.git
 cd qzapret
 cmake -S . -B build -G Ninja
 cmake --build build
-ctest --test-dir build --output-on-failure   # парсер, конвейер runner, валидация хелпера
+ctest --test-dir build --output-on-failure   # парсер, конвейер runner, валидация хелпера, переводы
 ./build/qzapret
 ```
 
@@ -47,7 +54,8 @@ zapret2 должен быть установлен отдельно (по док
 ## Структура
 
 ```
-src/                 Qt6-код GUI
+src/                 Qt6-код GUI (src/i18n.* — подключение переводов)
+i18n/                переводы (.ts)
 src/backend/         адаптер к zapret2 (systemd), запуск blockcheck2
 packaging/helper/    qzapret-helper — привилегированная часть (polkit)
 data/                .desktop и шаблон polkit-политики
@@ -55,6 +63,19 @@ tests/               QtTest и shell-тест хелпера
 packaging/fedora/    spec для COPR (заготовка)
 third_party/zapret2/ апстрим, submodule
 ```
+
+## Переводы
+
+Исходные строки в коде — русские (`tr("…")`), перевод на английский лежит в `i18n/qzapret_en.ts` и
+вшивается в бинарник. После правки строк:
+
+```bash
+cmake --build build --target update_translations   # lupdate: обновит .ts
+# дописать переводы в i18n/qzapret_en.ts (Qt Linguist или любой редактор), затем:
+ctest --test-dir build -R i18n                      # нет пустых/незавершённых, плейсхолдеры %1 совпадают
+```
+
+Новый язык: добавить `i18n/qzapret_<код>.ts` в `qt_add_translations()` в `CMakeLists.txt`.
 
 ## Обновление апстрима
 

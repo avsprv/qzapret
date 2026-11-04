@@ -1,0 +1,32 @@
+#include "i18n.h"
+
+#include <QCoreApplication>
+#include <QLibraryInfo>
+#include <QTranslator>
+
+QList<QTranslator *> I18n::install(QCoreApplication &app, const QLocale &locale)
+{
+    QList<QTranslator *> installed;
+
+    // Кнопки стандартных диалогов, QFileDialog и т.п. (пакет qt6-qttranslations)
+    auto *qtbase = new QTranslator(&app);
+    if (qtbase->load(locale, QStringLiteral("qtbase"), QStringLiteral("_"),
+                     QLibraryInfo::path(QLibraryInfo::TranslationsPath))) {
+        app.installTranslator(qtbase);
+        installed << qtbase;
+    } else {
+        delete qtbase;
+    }
+
+    if (locale.language() != QLocale::Russian) {
+        auto *own = new QTranslator(&app);
+        if (own->load(locale, QStringLiteral("qzapret"), QStringLiteral("_"), QStringLiteral(":/i18n"))
+            || own->load(QStringLiteral(":/i18n/qzapret_en.qm"))) {
+            app.installTranslator(own);
+            installed << own;
+        } else {
+            delete own;
+        }
+    }
+    return installed;
+}
