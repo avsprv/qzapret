@@ -23,10 +23,12 @@ mock -r fedora-$(rpm -E %fedora)-x86_64 ~/rpmbuild/SRPMS/zapret2applet-0.3.0-1.*
 
 ## DEB (Debian / Ubuntu)
 
-Собирается прямо из дерева репозитория (формат `3.0 (native)`, архив-оригинал не нужен).
+Файлы лежат в `packaging/debian/`, а `dpkg-buildpackage` ищет каталог `debian/` в корне, поэтому перед
+сборкой делается симлинк (он добавлен в `.gitignore`). Формат `3.0 (native)`: архив-оригинал не нужен.
 В чистом контейнере:
 ```bash
 docker run --rm -v "$PWD":/src -w /src debian:trixie bash -euxc '
+  ln -sfn packaging/debian debian
   apt-get update
   apt-get install -y --no-install-recommends build-essential devscripts equivs
   mk-build-deps -ir -t "apt-get -y --no-install-recommends" debian/control
@@ -36,10 +38,11 @@ docker run --rm -v "$PWD":/src -w /src debian:trixie bash -euxc '
 Или на самой машине (Debian 13 / Ubuntu 25.04+):
 ```bash
 sudo apt install build-essential devscripts equivs
+ln -sfn packaging/debian debian
 sudo mk-build-deps -ir debian/control
 dpkg-buildpackage -us -uc -b                # .deb окажется на уровень выше
 ```
-Смена версии: `debian/changelog` (`dch -v 0.3.1 "..."`), `project(VERSION)` в `CMakeLists.txt`, `Version:` в spec.
+Смена версии: `packaging/debian/changelog` (`dch -v 0.3.1 "..."`), `project(VERSION)` в `CMakeLists.txt`, `Version:` в spec.
 Если понадобится PPA или Debian-архив — перевести на `3.0 (quilt)` с отдельным `.orig.tar.gz`.
 
 ## Проверка готовых пакетов

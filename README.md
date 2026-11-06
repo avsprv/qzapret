@@ -1,90 +1,80 @@
-Unofficial Qt6 GUI for [bol-van/zapret2](https://github.com/bol-van/zapret2).
+# zapret2applet
 
-> Статус: ранняя версия (v0.2.0). Применение найденных стратегий в конфиг zapret2 пока не реализовано.
+Графическая оболочка для [zapret2](https://github.com/bol-van/zapret2) — инструмента обхода блокировок DPI.
+Включить и выключить, подобрать рабочие настройки и обновиться можно из окна или значка в трее, без терминала.
 
-## Возможности
+> Неофициальный проект, с автором zapret2 не связан. Это ранняя версия: найденные стратегии пока нужно
+> переносить в конфиг zapret2 вручную.
 
-- Статус, запуск и остановка `zapret2.service`.
-- **Подбор стратегий:** вкладка-обёртка над `blockcheck2.sh` (домены, IPv4/IPv6, HTTP/TLS1.2/TLS1.3/QUIC,
-  уровень сканирования), найденные стратегии собираются списком, их можно скопировать.
-- **Системный апплет:** иконка в трее (Plasma/Wayland через StatusNotifierItem), меню запуска/остановки;
-  крестик окна сворачивает в трей, выход — через меню трея.
-- **Автозапуск:** сервис zapret2 при загрузке системы (`systemctl enable/disable`) и сам zapret2applet при входе
-  в сеанс (`~/.config/autostart/zapret2applet.desktop`, запуск с `--minimized`).
-- **Локализация:** русский и английский. Язык выбирается по локали системы; для любого языка, кроме
-  русского, без собственного перевода показывается английский.
+## Что умеет
 
-## Принципы
+- Показывает, работает ли zapret2, и включает или выключает его одной кнопкой.
+- **Подбирает стратегии.** Проверяет выбранные сайты (HTTP, HTTPS, QUIC; IPv4 и IPv6) и показывает, что
+  работает у твоего провайдера. Найденное копируется одним щелчком.
+- **Живёт в трее.** Закрыл окно — программа осталась рядом с часами, запуск и остановка есть в меню значка.
+- **Запускается сама.** Можно включить zapret2 при загрузке компьютера и саму программу при входе в сеанс
+  (она сразу свернётся в трей).
+- **Следит за обновлениями.** Раз в сутки заглядывает на GitHub и обновляет установленный zapret2 до
+  последнего релиза. Скачанные файлы проверяются по контрольным суммам.
+- Интерфейс на русском и английском — по языку системы.
 
-- GUI работает **без root**. Привилегированные действия выполняет `zapret2applet-helper`
-  (`/usr/libexec/zapret2applet/`) через `pkexec` и polkit-действие `org.zapret2applet.helper`.
-- Хелпер принимает только фиксированный набор команд (`unit start|stop|enable|disable`, `blockcheck`,
-  `blockcheck-cancel`), строго валидирует аргументы и запускает blockcheck2 с чистым окружением.
-- Вся работа с апстримом изолирована в `src/backend/` (интерфейс `ZapretBackend`).
-- Апстрим подключён как submodule и **не правится**; версия закреплена тегом.
+## Установка
 
-## Версия Qt
+Подойдут Fedora 41 и новее, Debian 13 и новее, Ubuntu 25.04 и новее.
 
-Минимум — **Qt 6.8 LTS** (проверяется в `CMakeLists.txt`, переменная `QZAPRET_QT_MIN`). API новее 6.8 не
-используются. Сборка проверена на Qt 6.8.4; на Qt 6.12 LTS проверим, когда он появится в дистрибутивах.
+1. Установи zapret2 по [инструкции проекта](https://github.com/bol-van/zapret2) (обычно в `/opt/zapret2`).
+   Программа управляет им и обновляет, но первую установку не делает.
+2. Скачай пакет на странице [Releases](https://github.com/avsprv/zapret2applet/releases) и поставь:
+   ```bash
+   sudo dnf install ./zapret2applet-*.rpm       # Fedora
+   sudo apt install ./zapret2applet_*.deb       # Debian, Ubuntu
+   ```
+3. Запусти **zapret2applet** из меню приложений.
 
-## Сборка (Fedora)
+Нет пакета для твоего дистрибутива — собери из исходников (ниже).
+
+## Как пользоваться
+
+- **Статус** — кнопки «Запустить» и «Остановить», автозапуск службы и самой программы.
+- **Подбор стратегий** — впиши домены, которые не открываются, и нажми «Начать подбор». На время подбора
+  zapret2 придётся остановить, программа спросит. Подбор может идти несколько минут.
+- **Обновления** — «Проверить обновления» и «Обновить». Автоматическую проверку можно отключить.
+
+### Когда просит пароль
+
+Сама программа работает от обычного пользователя. Запуск и остановка службы, подбор стратегий и обновление
+выполняет маленький вспомогательный модуль, и система сначала спрашивает пароль администратора.
+Обновление спрашивает его каждый раз: оно заменяет файлы, которые потом запускаются с правами root.
+
+## Сборка из исходников
+
+Зависимости:
 
 ```bash
-sudo dnf install cmake ninja-build gcc-c++ qt6-qtbase-devel qt6-qttools-devel polkit
-git clone --recurse-submodules https://github.com/avsprv/zapret2applet.git
+sudo dnf install cmake ninja-build gcc-c++ qt6-qtbase-devel qt6-qttools-devel polkit            # Fedora
+sudo apt install build-essential cmake ninja-build qt6-base-dev qt6-tools-dev qt6-l10n-tools pkexec  # Debian, Ubuntu
+```
+
+Сборка и установка:
+
+```bash
+git clone https://github.com/avsprv/zapret2applet.git
 cd zapret2applet
 cmake -S . -B build -G Ninja
 cmake --build build
-ctest --test-dir build --output-on-failure   # парсер, конвейер runner, валидация хелпера, переводы
-./build/zapret2applet
+sudo cmake --install build --prefix /usr
 ```
 
-Для запуска из каталога сборки (без установки) хелпер находится по `../packaging/helper/zapret2applet-helper`;
-путь можно переопределить переменной `QZAPRET_HELPER`. Для установленной версии с нормальным
-polkit-диалогом: `sudo cmake --install build --prefix /usr`.
+Запустить можно и без установки: `./build/zapret2applet`. Но тогда окно с паролем будет безликим, а с установкой —
+с понятным описанием действия.
 
-Если забыл `--recurse-submodules`: `git submodule update --init --recursive`.
+Собрать готовые пакеты `.deb` и `.rpm` — в [packaging/README.md](packaging/README.md).
 
-## Требования на машине
+## Помощь и ошибки
 
-zapret2 должен быть установлен отдельно (по документации апстрима, по умолчанию в
-`/opt/zapret2`) и иметь юнит `zapret2.service`. zapret2applet его не устанавливает.
-
-## Структура
-
-```
-src/                 Qt6-код GUI (src/i18n.* — подключение переводов)
-i18n/                переводы (.ts)
-src/backend/         адаптер к zapret2 (systemd), запуск blockcheck2
-packaging/helper/    zapret2applet-helper — привилегированная часть (polkit)
-data/                .desktop и шаблон polkit-политики
-tests/               QtTest и shell-тест хелпера
-packaging/fedora/    spec для COPR (заготовка)
-third_party/zapret2/ апстрим, submodule
-```
-
-## Переводы
-
-Исходные строки в коде — русские (`tr("…")`), перевод на английский лежит в `i18n/zapret2applet_en.ts` и
-вшивается в бинарник. После правки строк:
-
-```bash
-cmake --build build --target update_translations   # lupdate: обновит .ts
-# дописать переводы в i18n/zapret2applet_en.ts (Qt Linguist или любой редактор), затем:
-ctest --test-dir build -R i18n                      # нет пустых/незавершённых, плейсхолдеры %1 совпадают
-```
-
-Новый язык: добавить `i18n/zapret2applet_<код>.ts` в `qt_add_translations()` в `CMakeLists.txt`.
-
-## Обновление апстрима
-
-```bash
-git -C third_party/zapret2 fetch --tags
-git -C third_party/zapret2 checkout <тег>
-git add third_party/zapret2 && git commit -m "Bump zapret2 to <тег>"
-```
+Нашёл ошибку или есть идея — [открой issue](https://github.com/avsprv/zapret2applet/issues).
+Разработчикам: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
 ## Лицензия
 
-MIT (см. `LICENSE`). Лицензия и авторство zapret2 — в `NOTICE.md`.
+MIT, см. `LICENSE`. zapret2 — проект bol-van, тоже MIT; подробности в `NOTICE.md`.

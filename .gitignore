@@ -6,3 +6,6 @@ CMakeUserPresets.json
 *.autosave
 .vscode/
 .idea/
+
+# симлинк для сборки .deb (см. packaging/README.md)
+/debian
