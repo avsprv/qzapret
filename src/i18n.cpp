@@ -20,8 +20,8 @@ QList<QTranslator *> I18n::install(QCoreApplication &app, const QLocale &locale)
 
     if (locale.language() != QLocale::Russian) {
         auto *own = new QTranslator(&app);
-        if (own->load(locale, QStringLiteral("qzapret"), QStringLiteral("_"), QStringLiteral(":/i18n"))
-            || own->load(QStringLiteral(":/i18n/qzapret_en.qm"))) {
+        if (own->load(locale, QStringLiteral("zapret2applet"), QStringLiteral("_"), QStringLiteral(":/i18n"))
+            || own->load(QStringLiteral(":/i18n/zapret2applet_en.qm"))) {
             app.installTranslator(own);
             installed << own;
         } else {

@@ -7,9 +7,9 @@
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    QApplication::setApplicationName(QStringLiteral("qzapret"));
+    QApplication::setApplicationName(QStringLiteral("zapret2applet"));
     QApplication::setApplicationVersion(QStringLiteral(QZAPRET_VERSION));
-    QApplication::setDesktopFileName(QStringLiteral("qzapret"));
+    QApplication::setDesktopFileName(QStringLiteral("zapret2applet"));
     // Окно прячется в трей, поэтому закрытие последнего окна не должно завершать приложение.
     QApplication::setQuitOnLastWindowClosed(false);
     I18n::install(app);

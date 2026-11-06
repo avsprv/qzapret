@@ -5,6 +5,7 @@
 #include "backend/zapretbackend.h"
 
 class BlockcheckPage;
+class UpdatePage;
 class QCheckBox;
 class QLabel;
 class QPushButton;
@@ -31,6 +32,7 @@ private:
 
     ZapretBackend *m_backend;
     BlockcheckPage *m_blockcheck = nullptr;
+    UpdatePage *m_update = nullptr;
     QLabel *m_status = nullptr;
     QPushButton *m_startBtn = nullptr;
     QPushButton *m_stopBtn = nullptr;

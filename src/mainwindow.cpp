@@ -17,19 +17,22 @@
 #include "autostart.h"
 #include "backend/systemdbackend.h"
 #include "blockcheckpage.h"
+#include "updatepage.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , m_backend(new SystemdBackend(this))
     , m_poll(new QTimer(this))
 {
-    setWindowTitle(QStringLiteral("qzapret"));
+    setWindowTitle(QStringLiteral("zapret2applet"));
     resize(760, 640);
 
     auto *tabs = new QTabWidget(this);
     tabs->addTab(buildStatusPage(), tr("Статус"));
     m_blockcheck = new BlockcheckPage(m_backend, this);
     tabs->addTab(m_blockcheck, tr("Подбор стратегий"));
+    m_update = new UpdatePage(m_backend, this);
+    tabs->addTab(m_update, tr("Обновления"));
     setCentralWidget(tabs);
 
     connect(m_backend, &ZapretBackend::stateChanged, this, &MainWindow::onStateChanged);
@@ -44,8 +47,13 @@ MainWindow::MainWindow(QWidget *parent)
     buildTray();
     connect(m_blockcheck, &BlockcheckPage::scanFinished, this, [this](int found, bool canceled) {
         if (m_tray && !isVisible() && !canceled)
-            m_tray->showMessage(QStringLiteral("qzapret"),
+            m_tray->showMessage(QStringLiteral("zapret2applet"),
                                 tr("Подбор завершён, найдено стратегий: %1").arg(found));
+    });
+
+    connect(m_update, &UpdatePage::updateAvailable, this, [this](const QString &tag) {
+        if (m_tray && !isVisible())
+            m_tray->showMessage(QStringLiteral("zapret2applet"), tr("Доступна новая версия zapret2: %1").arg(tag));
     });
 
     m_poll->setInterval(3000);
@@ -60,7 +68,7 @@ QWidget *MainWindow::buildStatusPage()
     m_startBtn = new QPushButton(tr("Запустить"));
     m_stopBtn = new QPushButton(tr("Остановить"));
     m_bootCheck = new QCheckBox(tr("Запускать zapret2 при загрузке системы"));
-    m_guiCheck = new QCheckBox(tr("Запускать qzapret при входе в сеанс (в трей)"));
+    m_guiCheck = new QCheckBox(tr("Запускать zapret2applet при входе в сеанс (в трей)"));
     m_guiCheck->setChecked(Autostart::isEnabled());
 
     connect(m_startBtn, &QPushButton::clicked, m_backend, &ZapretBackend::start);
@@ -69,7 +77,7 @@ QWidget *MainWindow::buildStatusPage()
     connect(m_bootCheck, &QCheckBox::clicked, m_backend, &ZapretBackend::setBootEnabled);
     connect(m_guiCheck, &QCheckBox::clicked, this, [this](bool on) {
         if (!Autostart::setEnabled(on)) {
-            QMessageBox::warning(this, tr("Ошибка"), tr("Не удалось изменить автозапуск qzapret."));
+            QMessageBox::warning(this, tr("Ошибка"), tr("Не удалось изменить автозапуск zapret2applet."));
             const QSignalBlocker block(m_guiCheck);
             m_guiCheck->setChecked(Autostart::isEnabled());
         }
@@ -98,7 +106,7 @@ void MainWindow::buildTray()
     m_tray = new QSystemTrayIcon(this);
     m_tray->setIcon(QIcon::fromTheme(QStringLiteral("security-low"),
                                      style()->standardIcon(QStyle::SP_ComputerIcon)));
-    m_tray->setToolTip(QStringLiteral("qzapret"));
+    m_tray->setToolTip(QStringLiteral("zapret2applet"));
 
     auto *menu = new QMenu(this);
     auto *show = menu->addAction(tr("Показать / скрыть окно"));
@@ -141,7 +149,7 @@ void MainWindow::onStateChanged(ZapretBackend::State state)
 
     if (m_tray) {
         m_tray->setIcon(QIcon::fromTheme(iconName, style()->standardIcon(QStyle::SP_ComputerIcon)));
-        m_tray->setToolTip(tr("qzapret: %1").arg(text));
+        m_tray->setToolTip(tr("zapret2applet: %1").arg(text));
         m_trayStart->setEnabled(!active);
         m_trayStop->setEnabled(active);
     }
@@ -160,6 +168,12 @@ void MainWindow::toggleWindow()
 
 void MainWindow::quit()
 {
+    if (m_update->isBusy()) {
+        showNormal();
+        QMessageBox::information(this, tr("Идёт обновление"),
+                                 tr("Дождитесь завершения обновления zapret2 перед выходом."));
+        return;
+    }
     if (m_blockcheck->isRunning()) {
         showNormal();
         QMessageBox::information(this, tr("Идёт подбор"),
@@ -175,6 +189,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
     // Есть трей — крестик сворачивает в трей, выход через меню трея.
     if (m_tray && m_tray->isVisible() && !m_quitting) {
         hide();
+        event->ignore();
+        return;
+    }
+    if (m_update->isBusy()) {
+        QMessageBox::information(this, tr("Идёт обновление"),
+                                 tr("Дождитесь завершения обновления zapret2 перед выходом."));
         event->ignore();
         return;
     }

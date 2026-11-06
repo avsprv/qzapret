@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC
+ "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+  <vendor>zapret2applet</vendor>
+  <vendor_url>https://github.com/avsprv/zapret2applet</vendor_url>
+
+  <action id="org.zapret2applet.helper">
+    <description>Manage zapret2 and run DPI strategy scan</description>
+    <description xml:lang="ru">Управление zapret2 и подбор стратегий обхода DPI</description>
+    <message>Authentication is required to manage zapret2</message>
+    <message xml:lang="ru">Для управления zapret2 требуется аутентификация</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">@QZAPRET_HELPER@</annotate>
+  </action>
+
+  <!-- Обновление zapret2 скачивает из сети и заменяет код, исполняемый от root, поэтому
+       запрашивает пароль каждый раз (без auth_admin_keep). Действие выбирается по argv[1]. -->
+  <action id="org.zapret2applet.update">
+    <description>Update zapret2 from GitHub</description>
+    <description xml:lang="ru">Обновление zapret2 с GitHub</description>
+    <message>Authentication is required to download and install a new zapret2 version</message>
+    <message xml:lang="ru">Для загрузки и установки новой версии zapret2 требуется аутентификация</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>auth_admin</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">@QZAPRET_HELPER@</annotate>
+    <annotate key="org.freedesktop.policykit.exec.argv1">update</annotate>
+  </action>
+</policyconfig>

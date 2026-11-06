@@ -9,15 +9,15 @@ Unofficial Qt6 GUI for [bol-van/zapret2](https://github.com/bol-van/zapret2).
   уровень сканирования), найденные стратегии собираются списком, их можно скопировать.
 - **Системный апплет:** иконка в трее (Plasma/Wayland через StatusNotifierItem), меню запуска/остановки;
   крестик окна сворачивает в трей, выход — через меню трея.
-- **Автозапуск:** сервис zapret2 при загрузке системы (`systemctl enable/disable`) и сам qzapret при входе
-  в сеанс (`~/.config/autostart/qzapret.desktop`, запуск с `--minimized`).
+- **Автозапуск:** сервис zapret2 при загрузке системы (`systemctl enable/disable`) и сам zapret2applet при входе
+  в сеанс (`~/.config/autostart/zapret2applet.desktop`, запуск с `--minimized`).
 - **Локализация:** русский и английский. Язык выбирается по локали системы; для любого языка, кроме
   русского, без собственного перевода показывается английский.
 
 ## Принципы
 
-- GUI работает **без root**. Привилегированные действия выполняет `qzapret-helper`
-  (`/usr/libexec/qzapret/`) через `pkexec` и polkit-действие `org.qzapret.helper`.
+- GUI работает **без root**. Привилегированные действия выполняет `zapret2applet-helper`
+  (`/usr/libexec/zapret2applet/`) через `pkexec` и polkit-действие `org.zapret2applet.helper`.
 - Хелпер принимает только фиксированный набор команд (`unit start|stop|enable|disable`, `blockcheck`,
   `blockcheck-cancel`), строго валидирует аргументы и запускает blockcheck2 с чистым окружением.
 - Вся работа с апстримом изолирована в `src/backend/` (интерфейс `ZapretBackend`).
@@ -32,15 +32,15 @@ Unofficial Qt6 GUI for [bol-van/zapret2](https://github.com/bol-van/zapret2).
 
 ```bash
 sudo dnf install cmake ninja-build gcc-c++ qt6-qtbase-devel qt6-qttools-devel polkit
-git clone --recurse-submodules https://github.com/avsprv/qzapret.git
-cd qzapret
+git clone --recurse-submodules https://github.com/avsprv/zapret2applet.git
+cd zapret2applet
 cmake -S . -B build -G Ninja
 cmake --build build
 ctest --test-dir build --output-on-failure   # парсер, конвейер runner, валидация хелпера, переводы
-./build/qzapret
+./build/zapret2applet
 ```
 
-Для запуска из каталога сборки (без установки) хелпер находится по `../packaging/helper/qzapret-helper`;
+Для запуска из каталога сборки (без установки) хелпер находится по `../packaging/helper/zapret2applet-helper`;
 путь можно переопределить переменной `QZAPRET_HELPER`. Для установленной версии с нормальным
 polkit-диалогом: `sudo cmake --install build --prefix /usr`.
 
@@ -49,7 +49,7 @@ polkit-диалогом: `sudo cmake --install build --prefix /usr`.
 ## Требования на машине
 
 zapret2 должен быть установлен отдельно (по документации апстрима, по умолчанию в
-`/opt/zapret2`) и иметь юнит `zapret2.service`. qzapret его не устанавливает.
+`/opt/zapret2`) и иметь юнит `zapret2.service`. zapret2applet его не устанавливает.
 
 ## Структура
 
@@ -57,7 +57,7 @@ zapret2 должен быть установлен отдельно (по док
 src/                 Qt6-код GUI (src/i18n.* — подключение переводов)
 i18n/                переводы (.ts)
 src/backend/         адаптер к zapret2 (systemd), запуск blockcheck2
-packaging/helper/    qzapret-helper — привилегированная часть (polkit)
+packaging/helper/    zapret2applet-helper — привилегированная часть (polkit)
 data/                .desktop и шаблон polkit-политики
 tests/               QtTest и shell-тест хелпера
 packaging/fedora/    spec для COPR (заготовка)
@@ -66,16 +66,16 @@ third_party/zapret2/ апстрим, submodule
 
 ## Переводы
 
-Исходные строки в коде — русские (`tr("…")`), перевод на английский лежит в `i18n/qzapret_en.ts` и
+Исходные строки в коде — русские (`tr("…")`), перевод на английский лежит в `i18n/zapret2applet_en.ts` и
 вшивается в бинарник. После правки строк:
 
 ```bash
 cmake --build build --target update_translations   # lupdate: обновит .ts
-# дописать переводы в i18n/qzapret_en.ts (Qt Linguist или любой редактор), затем:
+# дописать переводы в i18n/zapret2applet_en.ts (Qt Linguist или любой редактор), затем:
 ctest --test-dir build -R i18n                      # нет пустых/незавершённых, плейсхолдеры %1 совпадают
 ```
 
-Новый язык: добавить `i18n/qzapret_<код>.ts` в `qt_add_translations()` в `CMakeLists.txt`.
+Новый язык: добавить `i18n/zapret2applet_<код>.ts` в `qt_add_translations()` в `CMakeLists.txt`.
 
 ## Обновление апстрима
 

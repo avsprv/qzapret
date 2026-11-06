@@ -1,11 +1,11 @@
 [Desktop Entry]
 Type=Application
-Name=qzapret
+Name=zapret2applet
 GenericName=zapret2 front-end
 GenericName[ru]=Оболочка для zapret2
 Comment=Unofficial Qt6 GUI for zapret2
 Comment[ru]=Неофициальная Qt6-оболочка для zapret2
-Exec=qzapret
+Exec=zapret2applet
 Icon=preferences-system-network
 Categories=Network;Settings;
 Terminal=false

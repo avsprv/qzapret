@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(qzapret VERSION 0.2.0 LANGUAGES CXX)
+project(zapret2applet VERSION 0.3.0 LANGUAGES CXX)
 
 # Минимум — Qt 6.8 LTS (поддержка до 2029). API новее 6.8 не используем;
 # при выходе дистрибутивных пакетов Qt 6.12 LTS проверяем сборку и на нём.
@@ -13,10 +13,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include(GNUInstallDirs)
 include(CTest)
 
-find_package(Qt6 ${QZAPRET_QT_MIN} REQUIRED COMPONENTS Widgets LinguistTools)
+find_package(Qt6 ${QZAPRET_QT_MIN} REQUIRED COMPONENTS Widgets Network LinguistTools)
 qt_standard_project_setup(REQUIRES ${QZAPRET_QT_MIN})
 
-set(QZAPRET_HELPER "${CMAKE_INSTALL_FULL_LIBEXECDIR}/qzapret/qzapret-helper")
+set(QZAPRET_HELPER "${CMAKE_INSTALL_FULL_LIBEXECDIR}/zapret2applet/zapret2applet-helper")
 
 set(QZAPRET_SOURCES
     src/main.cpp
@@ -26,41 +26,48 @@ set(QZAPRET_SOURCES
     src/blockcheckpage.h
     src/mainwindow.cpp
     src/mainwindow.h
+    src/updatepage.cpp
+    src/updatepage.h
     src/backend/blockcheckrunner.cpp
     src/backend/blockcheckrunner.h
     src/backend/helperpath.h
     src/backend/systemdbackend.cpp
     src/backend/systemdbackend.h
+    src/backend/updatechecker.cpp
+    src/backend/updatechecker.h
+    src/backend/zapretpaths.h
+    src/backend/zapretupdater.cpp
+    src/backend/zapretupdater.h
     src/backend/zapretbackend.h
 )
 
 # Локализация. Исходные строки в коде русские; переводы — i18n/*.ts, вшиваются в ресурсы.
 # Обновить .ts после правки строк: cmake --build build --target update_translations
-qt_add_library(qzapret_i18n STATIC src/i18n.cpp src/i18n.h)
-target_include_directories(qzapret_i18n PUBLIC src)
-target_link_libraries(qzapret_i18n PUBLIC Qt6::Core)
-qt_add_translations(qzapret_i18n
-    TS_FILES i18n/qzapret_en.ts
+qt_add_library(zapret2applet_i18n STATIC src/i18n.cpp src/i18n.h)
+target_include_directories(zapret2applet_i18n PUBLIC src)
+target_link_libraries(zapret2applet_i18n PUBLIC Qt6::Core)
+qt_add_translations(zapret2applet_i18n
+    TS_FILES i18n/zapret2applet_en.ts
     SOURCES ${QZAPRET_SOURCES} src/i18n.cpp
     INCLUDE_DIRECTORIES src
 )
 
-qt_add_executable(qzapret ${QZAPRET_SOURCES})
-target_include_directories(qzapret PRIVATE src)
-target_link_libraries(qzapret PRIVATE Qt6::Widgets qzapret_i18n)
-target_compile_definitions(qzapret PRIVATE
+qt_add_executable(zapret2applet ${QZAPRET_SOURCES})
+target_include_directories(zapret2applet PRIVATE src)
+target_link_libraries(zapret2applet PRIVATE Qt6::Widgets Qt6::Network zapret2applet_i18n)
+target_compile_definitions(zapret2applet PRIVATE
     QZAPRET_VERSION="${PROJECT_VERSION}"
     QZAPRET_HELPER_PATH="${QZAPRET_HELPER}")
-target_compile_options(qzapret PRIVATE -Wall -Wextra)
+target_compile_options(zapret2applet PRIVATE -Wall -Wextra)
 
-configure_file(data/org.qzapret.policy.in ${CMAKE_BINARY_DIR}/org.qzapret.policy @ONLY)
+configure_file(data/org.zapret2applet.policy.in ${CMAKE_BINARY_DIR}/org.zapret2applet.policy @ONLY)
 
-install(TARGETS qzapret RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(PROGRAMS packaging/helper/qzapret-helper
-        DESTINATION ${CMAKE_INSTALL_LIBEXECDIR}/qzapret)
-install(FILES ${CMAKE_BINARY_DIR}/org.qzapret.policy
+install(TARGETS zapret2applet RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(PROGRAMS packaging/helper/zapret2applet-helper
+        DESTINATION ${CMAKE_INSTALL_LIBEXECDIR}/zapret2applet)
+install(FILES ${CMAKE_BINARY_DIR}/org.zapret2applet.policy
         DESTINATION ${CMAKE_INSTALL_DATADIR}/polkit-1/actions)
-install(FILES data/qzapret.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+install(FILES data/zapret2applet.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
 
 if(BUILD_TESTING)
     find_package(Qt6 ${QZAPRET_QT_MIN} REQUIRED COMPONENTS Test)
@@ -72,11 +79,21 @@ if(BUILD_TESTING)
     add_test(NAME blockcheck COMMAND test_blockcheck)
 
     qt_add_executable(test_i18n tests/test_i18n.cpp)
-    target_link_libraries(test_i18n PRIVATE Qt6::Test qzapret_i18n)
+    target_link_libraries(test_i18n PRIVATE Qt6::Test zapret2applet_i18n)
     target_compile_definitions(test_i18n PRIVATE QZAPRET_I18N_DIR="${CMAKE_SOURCE_DIR}/i18n")
     add_test(NAME i18n COMMAND test_i18n)
 
+    qt_add_executable(test_update tests/test_update.cpp
+        src/backend/updatechecker.cpp src/backend/updatechecker.h)
+    target_include_directories(test_update PRIVATE src)
+    target_link_libraries(test_update PRIVATE Qt6::Test Qt6::Network)
+    add_test(NAME update_versions COMMAND test_update)
+
+    add_test(NAME update_helper
+             COMMAND sh ${CMAKE_SOURCE_DIR}/tests/test_update_helper.sh
+                     ${CMAKE_SOURCE_DIR}/packaging/helper/zapret2applet-helper)
+
     add_test(NAME helper_validation
              COMMAND sh ${CMAKE_SOURCE_DIR}/tests/test_helper.sh
-                     ${CMAKE_SOURCE_DIR}/packaging/helper/qzapret-helper)
+                     ${CMAKE_SOURCE_DIR}/packaging/helper/zapret2applet-helper)
 endif()

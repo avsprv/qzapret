@@ -1,6 +1,6 @@
 #!/bin/sh
-# Проверка валидации аргументов qzapret-helper (до любых привилегированных действий).
-H="${1:?usage: test_helper.sh /path/to/qzapret-helper}"
+# Проверка валидации аргументов zapret2applet-helper (до любых привилегированных действий).
+H="${1:?usage: test_helper.sh /path/to/zapret2applet-helper}"
 fail=0
 
 expect_reject() {
@@ -31,6 +31,13 @@ expect_reject blockcheck --repeats 1x
 expect_reject blockcheck --scanlevel insane
 expect_reject blockcheck --unknown 1
 expect_reject blockcheck --domains
+expect_reject update
+expect_reject update bogus
+expect_reject update 1.0.7
+expect_reject update 'v1.0.7;id'
+expect_reject update 'v1.$(id)'
+expect_reject update v1..7
+expect_reject update ../v1.0.7
 
 # blockcheck-cancel без запущенного blockcheck — не ошибка
 "$H" blockcheck-cancel >/dev/null 2>&1 || { echo "FAIL: cancel should exit 0"; fail=1; }

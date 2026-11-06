@@ -9,7 +9,7 @@
 static QString desktopPath()
 {
     return QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation)
-           + QStringLiteral("/autostart/qzapret.desktop");
+           + QStringLiteral("/autostart/zapret2applet.desktop");
 }
 
 bool Autostart::isEnabled()
@@ -34,7 +34,7 @@ bool Autostart::setEnabled(bool enabled)
         return false;
     f.write(QStringLiteral("[Desktop Entry]\n"
                            "Type=Application\n"
-                           "Name=qzapret\n"
+                           "Name=zapret2applet\n"
                            "Comment=Unofficial Qt6 GUI for zapret2\n"
                            "Exec=\"%1\" --minimized\n"
                            "Icon=preferences-system-network\n"
