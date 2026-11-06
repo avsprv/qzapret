@@ -20,8 +20,6 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends},
          pkexec | policykit-1,
          curl,
-         tar,
-         coreutils,
          systemd
 Recommends: qt6-translations-l10n
 Description: unofficial Qt6 GUI for zapret2
