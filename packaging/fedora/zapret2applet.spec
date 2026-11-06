@@ -25,15 +25,16 @@ Requires:       systemd
 Recommends:     qt6-qttranslations
 
 %description
-Qt6 graphical front-end for zapret2: service control, strategy selection
-(blockcheck2), system tray applet and autostart. Privileged operations go
-through a small polkit-protected helper. zapret2 itself is not bundled and must be installed separately.
+Qt6 graphical front-end for zapret2: service control and strategy selection
+(blockcheck2), system tray applet, and automatic startup. Privileged operations
+use a small Polkit-protected helper. zapret2 is not bundled and must be
+installed separately.
 
 %prep
 %autosetup
 
 %build
-%cmake -G Ninja
+%cmake -G Ninja -DCMAKE_SKIP_RPATH=ON
 %cmake_build
 
 %install
