@@ -1,144 +1,163 @@
 # zapret2applet
 
-**A graphical frontend for [zapret2](https://github.com/bol-van/zapret2) on Linux.**
+**An unofficial graphical frontend for [zapret2](https://github.com/bol-van/zapret2) on Linux.**
 
-Manage the zapret2 service, test strategies, and update an existing installation through a graphical interface — without having to perform these tasks in a terminal.
+[![CI](https://github.com/avsprv/zapret2applet/actions/workflows/ci.yml/badge.svg)](https://github.com/avsprv/zapret2applet/actions/workflows/ci.yml)
+[![Packages](https://github.com/avsprv/zapret2applet/actions/workflows/packages.yml/badge.svg)](https://github.com/avsprv/zapret2applet/actions/workflows/packages.yml)
+[![Latest release](https://img.shields.io/github/v/release/avsprv/zapret2applet)](https://github.com/avsprv/zapret2applet/releases)
+[![License: MIT](https://img.shields.io/github/license/avsprv/zapret2applet)](LICENSE)
+
+[Русский](README.md) · **English**
+
+Manage the zapret2 service, test DPI-bypass strategies, and update an existing installation through a graphical interface.
 
 > [!IMPORTANT]
-> **Unofficial project.** `zapret2applet` is not affiliated with the author or maintainers of [zapret2](https://github.com/bol-van/zapret2).
+> **Independent project.** zapret2applet is not affiliated with the author or maintainers of [zapret2](https://github.com/bol-van/zapret2).
 >
-> This is an early version of the application. Strategies found by the app must be transferred to the zapret2 configuration manually.
+> The application does not perform the initial zapret2 installation. Strategies found by the app must be transferred to your zapret2 configuration and verified manually.
+
+## Contents
+
+- [Features](#features)
+- [Compatibility and requirements](#compatibility-and-requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Security](#security)
+- [Building from source](#building-from-source)
+- [Building packages](#building-packages)
+- [Development and testing](#development-and-testing)
+- [Report a bug](#report-a-bug)
+- [License](#license)
 
 ## Features
 
-- **zapret2 management.** View the service status, start it, or stop it with one click.
-- **Strategy testing.** Test specified websites over HTTP, HTTPS, and QUIC using IPv4 and IPv6. The app reports which strategies work with your ISP.
-- **Copy results.** Copy a detected strategy with one click.
-- **System tray.** Closing the window leaves the application running in the system tray. Start and stop controls are available from the tray icon menu.
-- **Autostart.** Configure the zapret2 service to start at system boot and the app to start when you log in. When launched automatically, the app starts minimized to the tray.
-- **Update checks.** The app checks GitHub for new releases once a day. You can update the installed zapret2 version to the latest release; downloaded files are verified using checksums.
-- **Two interface languages.** Russian and English; the language is selected automatically based on the system language.
+- **Service management:** view the status, start, and stop the zapret2 systemd service.
+- **Strategy testing:** test domains over HTTP, TLS 1.2/1.3, and HTTP/3 (QUIC), with IPv4 and IPv6 checks.
+- **Results:** view and copy detected strategies.
+- **System tray:** the application keeps running in the notification area after the main window is closed.
+- **Autostart:** start the service at boot and the application at user login.
+- **Updates:** check upstream releases and update zapret2 from the interface.
+- **Localization:** Russian and English.
 
-## Compatibility
+## Compatibility and requirements
 
-Supported distributions:
+Building requires **Qt 6.8+**, CMake 3.21+, a C++20 compiler, and Ninja. The application also requires systemd, Polkit, pkexec, curl, and tar.
 
-| Distribution | Minimum version |
+| Distribution | Baseline in packaging configuration |
 |---|---:|
-| Fedora | 41 |
-| Debian | 13 |
-| Ubuntu | 25.04 |
+| Fedora | 41+ |
+| Debian | 13 (Trixie)+ |
+| Ubuntu | 25.04+ |
 
-**zapret2 must be installed before using this application.** The app manages and updates an existing installation but does not perform the initial zapret2 installation.
+These versions reflect the baseline availability of Qt 6.8; they do not guarantee support for every distribution release. **Ubuntu 25.04 has reached end of life** and should not be installed just for this application. On Ubuntu, use a currently supported release with Qt 6.8+ and validate the specific release separately.
+
+**zapret2 must be installed separately.** The application manages an existing installation (usually /opt/zapret2) but does not perform the initial setup.
 
 ## Installation
 
-### 1. Install zapret2
+1. Install [zapret2](https://github.com/bol-van/zapret2) by following its official instructions.
+2. Download the package from [Releases](https://github.com/avsprv/zapret2applet/releases).
+3. Install it:
 
-Install zapret2 by following the [official project instructions](https://github.com/bol-van/zapret2). The usual installation directory is `/opt/zapret2`.
-
-### 2. Download and install the package
-
-Open the [Releases](https://github.com/avsprv/zapret2applet/releases) page, download the package for your distribution, and install it.
-
-**Fedora (`.rpm`):**
-
+**Fedora (.rpm):**
 ```bash
 sudo dnf install ./zapret2applet-*.rpm
 ```
 
-**Debian / Ubuntu (`.deb`):**
-
+**Debian / Ubuntu (.deb):**
 ```bash
 sudo apt install ./zapret2applet_*.deb
 ```
 
-### 3. Launch the application
+4. Launch zapret2applet from your application menu.
 
-Find **zapret2applet** in your application menu and launch it.
-
-> If a package for your distribution is not available yet, follow the [build from source instructions](#building-from-source).
+If a prebuilt package is unavailable, follow the [build from source](#building-from-source) instructions.
 
 ## Usage
 
 ### Service management
 
-On the **Status** tab, you can view the zapret2 service status, start or stop the service, and configure autostart for both the service and the application.
+The **Status** tab displays the zapret2 service state. You can start or stop the service and configure its autostart. Application autostart at user login is configured separately.
 
 ### Strategy testing
 
-1. Make sure the websites you want to test are listed in the application.
-2. Click **Start testing**.
-3. If zapret2 is running, the app will ask you to stop it for the duration of the test.
-4. Wait for the tests to finish. This may take several minutes.
-5. Review the results and copy a suitable strategy.
+1. Enter the domains you want to test.
+2. Start testing from the strategy testing tab.
+3. If the zapret2 service is running, the application will ask to stop it for the duration of the test.
+4. Wait for the tests to finish and review the results.
+5. Copy a suitable strategy and transfer it to the zapret2 configuration manually.
 
-Testing covers HTTP, HTTPS, and QUIC over both IPv4 and IPv6. A detected strategy must be transferred to the zapret2 configuration manually.
+Testing covers HTTP, TLS 1.2/1.3, and HTTP/3 (QUIC), over IPv4 and IPv6. Results depend on the network and current filtering conditions; a successful test does not guarantee that a strategy will remain effective.
+
+The engine supports 1–10 domains, scan levels veryquick, quick, standard, and force, and 1–10 repetitions. A thorough scan may take several minutes.
 
 ### Updates
 
-The **Updates** tab provides **Check for updates** and **Update** actions. Automatic daily update checks can be disabled.
+The **Updates** tab lets you check for a new zapret2 release and start the update. Automatic checks are enabled by default and run no more than once per day; this can be disabled.
 
-## Why does the application ask for an administrator password?
+## Security
 
-The main application runs as a regular user. Some operations require elevated privileges and are performed by a small helper module. The system requests the administrator password through its authorization mechanism.
+The main interface runs as a regular user. Operations requiring system privileges are performed by a separate helper through Polkit and pkexec. Elevated privileges may be required to manage the service, test strategies, and update zapret2.
 
-Authorization may be requested when you:
+The helper accepts a limited set of operations and validates its arguments. During an update, authorization is requested separately because files that may later run as root are being replaced.
 
-- start or stop the service;
-- test strategies;
-- update zapret2.
-
-An authorization prompt appears every time you update: the operation replaces files that are later executed with `root` privileges.
+zapret2 release files are checked against the SHA-256 checksums in sha256sum.txt. This helps detect corruption or mismatches against the published checksum list, but **it is not cryptographic release-signature verification** and does not protect against compromise of the upstream repository or its account. The updater validates the archive structure and version, creates a backup before replacing files, and provides rollback if installation fails.
 
 ## Building from source
 
 ### Dependencies
 
 **Fedora:**
-
 ```bash
 sudo dnf install cmake ninja-build gcc-c++ qt6-qtbase-devel qt6-qttools-devel polkit
 ```
 
 **Debian / Ubuntu:**
-
 ```bash
 sudo apt install build-essential cmake ninja-build qt6-base-dev qt6-tools-dev qt6-l10n-tools pkexec
 ```
 
-### Build and install
+### Build and test
 
 ```bash
 git clone https://github.com/avsprv/zapret2applet.git
 cd zapret2applet
-
 cmake -S . -B build -G Ninja
 cmake --build build
+ctest --test-dir build --output-on-failure
+```
 
+Run without installing: ./build/zapret2applet.
+
+Install system-wide:
+```bash
 sudo cmake --install build --prefix /usr
 ```
 
-You can also run the application directly from the build directory without installing it:
+When launched from the build directory, the authorization dialog may not include the action description provided by the installed Polkit policy.
+
+## Building packages
+
+Manual instructions are available in [packaging/README.md](packaging/README.md).
+
+GitHub Actions builds packages for Debian 13 and Fedora on pushes to main and pull requests targeting main. The resulting files are available as workflow artifacts in [package build runs](https://github.com/avsprv/zapret2applet/actions/workflows/packages.yml). Artifacts are intended for build verification; use packages attached to [Releases](https://github.com/avsprv/zapret2applet/releases) for normal installation.
+
+## Development and testing
+
+The project uses C++20, Qt 6, CMake, and CTest. Tests cover strategy-testing logic, localization, update versions, and helper validation.
 
 ```bash
-./build/zapret2applet
+ctest --test-dir build --output-on-failure
 ```
 
-When launched from the build directory, the authorization dialog does not include a detailed description of the operation. When the application is installed on the system, the dialog displays a clearer description.
+Developer documentation: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
-### Building packages
+## Report a bug
 
-Instructions for building `.deb` and `.rpm` packages are available in [`packaging/README.md`](packaging/README.md).
+Before opening a report, check [existing Issues](https://github.com/avsprv/zapret2applet/issues). Include the distribution and version, application and zapret2 versions, reproduction steps, expected and actual behavior, and relevant error messages with personal data removed.
 
-## Report a bug or suggest an improvement
+[Open an issue](https://github.com/avsprv/zapret2applet/issues/new).
 
-If you find a bug or have an idea for an improvement, [open an issue](https://github.com/avsprv/zapret2applet/issues).
+## License
 
-Developer documentation is available in [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
-
-## License and third-party projects
-
-This project is licensed under the **MIT License**. See [`LICENSE`](LICENSE) for the license text.
-
-`zapret2` is a separate project by [bol-van](https://github.com/bol-van/zapret2), also licensed under the MIT License. See [`NOTICE.md`](NOTICE.md) for additional information.
+The zapret2applet source code is distributed under the [MIT License](LICENSE). Third-party zapret2 information is available in [NOTICE.md](NOTICE.md). zapret2 is a separate project maintained at [bol-van/zapret2](https://github.com/bol-van/zapret2) and is independently distributed under the MIT License.
