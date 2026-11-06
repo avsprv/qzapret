@@ -1,0 +1,7 @@
+zapret2applet (0.3.0) unstable; urgency=medium
+
+  * Project renamed to zapret2applet.
+  * Install and update zapret2 from the latest GitHub release.
+  * Qt 6.8 LTS minimum, English localization.
+
+ -- avsprv <avsprv@users.noreply.github.com>  Fri, 06 Nov 2026 12:00:00 +0300

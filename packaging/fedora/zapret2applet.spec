@@ -1,19 +1,27 @@
-Name:           qzapret
-Version:        0.2.0
+Name:           zapret2applet
+Version:        0.3.0
 Release:        1%{?dist}
 Summary:        Unofficial Qt6 GUI for zapret2
 License:        MIT
-URL:            https://github.com/avsprv/qzapret
+URL:            https://github.com/avsprv/zapret2applet
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  cmake >= 3.21
 BuildRequires:  ninja-build
 BuildRequires:  gcc-c++
 BuildRequires:  cmake(Qt6Widgets) >= 6.8
+BuildRequires:  cmake(Qt6Network) >= 6.8
 BuildRequires:  cmake(Qt6LinguistTools) >= 6.8
 BuildRequires:  cmake(Qt6Test) >= 6.8
 BuildRequires:  desktop-file-utils
+# тесты скриптов-хелпера
+BuildRequires:  curl
+BuildRequires:  tar
 Requires:       polkit
+Requires:       curl
+Requires:       tar
+Requires:       coreutils
+Requires:       systemd
 Recommends:     qt6-qttranslations
 
 %description
@@ -32,18 +40,23 @@ through a small polkit-protected helper. zapret2 itself is not bundled and must 
 %cmake_install
 
 %check
+export QT_QPA_PLATFORM=offscreen
 %ctest
-desktop-file-validate %{buildroot}%{_datadir}/applications/qzapret.desktop
+desktop-file-validate %{buildroot}%{_datadir}/applications/zapret2applet.desktop
 
 %files
 %license LICENSE NOTICE.md
 %doc README.md
-%{_bindir}/qzapret
-%{_libexecdir}/qzapret/qzapret-helper
-%{_datadir}/polkit-1/actions/org.qzapret.policy
-%{_datadir}/applications/qzapret.desktop
+%{_bindir}/zapret2applet
+%{_libexecdir}/zapret2applet/zapret2applet-helper
+%{_datadir}/polkit-1/actions/org.zapret2applet.policy
+%{_datadir}/applications/zapret2applet.desktop
 
 %changelog
+* Fri Nov 06 2026 avsprv <avsprv@users.noreply.github.com> - 0.3.0-1
+- Project renamed to zapret2applet (binary, polkit actions, helper, translations)
+- Install and update zapret2 from the latest GitHub release (sha256 verified)
+- Qt 6.8 LTS is now the minimum; English localization
 * Tue Nov 03 2026 avsprv - 0.2.0-1
 - Strategy selection via blockcheck2, tray applet, boot and login autostart
 - Privileged helper with polkit policy

@@ -1,0 +1,32 @@
+Source: zapret2applet
+Section: net
+Priority: optional
+Maintainer: avsprv <avsprv@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13),
+               cmake (>= 3.21),
+               ninja-build,
+               qt6-base-dev (>= 6.8),
+               qt6-tools-dev (>= 6.8),
+               qt6-l10n-tools (>= 6.8),
+               desktop-file-utils,
+               curl,
+               tar
+Standards-Version: 4.7.0
+Homepage: https://github.com/avsprv/zapret2applet
+Rules-Requires-Root: no
+
+Package: zapret2applet
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends},
+         pkexec | policykit-1,
+         curl,
+         tar,
+         coreutils,
+         systemd
+Recommends: qt6-translations-l10n
+Description: unofficial Qt6 GUI for zapret2
+ Graphical front-end for zapret2 (bol-van): service control, DPI bypass
+ strategy selection (blockcheck2), system tray applet, autostart, and
+ installation/update of zapret2 from the latest GitHub release.
+ Privileged operations go through a small polkit-protected helper.
+ zapret2 itself is not bundled.
