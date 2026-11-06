@@ -1,0 +1,80 @@
+name: Packages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  deb:
+    name: Build DEB (Debian 13)
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    steps:
+      - name: Install build tools
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            build-essential ca-certificates cmake curl debhelper devscripts equivs \
+            git ninja-build qt6-base-dev qt6-tools-dev qt6-l10n-tools \
+            desktop-file-utils lintian
+      - uses: actions/checkout@v4
+      - name: Install package build dependencies
+        run: |
+          ln -sfn packaging/debian debian
+          mk-build-deps -ir -t "apt-get -y --no-install-recommends" debian/control
+      - name: Build DEB
+        run: |
+          dpkg-buildpackage -us -uc -b
+          mkdir -p dist
+          cp ../zapret2applet_*.deb dist/
+      - name: Inspect package
+        run: |
+          dpkg-deb --info dist/*.deb
+          dpkg-deb --contents dist/*.deb
+          lintian -I dist/*.deb
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zapret2applet-deb
+          path: dist/*.deb
+          if-no-files-found: error
+          retention-days: 30
+
+  rpm:
+    name: Build RPM (Fedora)
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    steps:
+      - name: Install build tools
+        run: |
+          dnf install -y ca-certificates cmake curl desktop-file-utils gcc-c++ git \
+            ninja-build qt6-qtbase-devel qt6-qttools-devel rpm-build rpmlint tar
+      - uses: actions/checkout@v4
+      - name: Prepare RPM build tree
+        run: |
+          mkdir -p "$HOME/rpmbuild"/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+          git archive --format=tar.gz --prefix="zapret2applet-0.3.0/" HEAD \
+            -o "$HOME/rpmbuild/SOURCES/zapret2applet-0.3.0.tar.gz"
+          cp packaging/fedora/zapret2applet.spec "$HOME/rpmbuild/SPECS/"
+      - name: Build RPM
+        run: |
+          rpmbuild -ba "$HOME/rpmbuild/SPECS/zapret2applet.spec" \
+            --define "_topdir $HOME/rpmbuild"
+      - name: Inspect packages
+        run: |
+          mkdir -p dist
+          cp "$HOME"/rpmbuild/RPMS/*/zapret2applet-*.rpm dist/
+          cp "$HOME"/rpmbuild/SRPMS/zapret2applet-*.src.rpm dist/
+          rpm -qpl dist/zapret2applet-*.rpm
+          rpm -qpR dist/zapret2applet-*.rpm
+          rpmlint dist/*.rpm
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zapret2applet-rpm
+          path: dist/*.rpm
+          if-no-files-found: error
+          retention-days: 30
