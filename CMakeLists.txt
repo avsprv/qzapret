@@ -30,6 +30,8 @@ set(QZAPRET_SOURCES
     src/profileanalyzer.h
     src/profilepage.cpp
     src/profilepage.h
+    src/listsmanagerpage.cpp
+    src/listsmanagerpage.h
     src/mainwindow.cpp
     src/mainwindow.h
     src/updatepage.cpp

@@ -161,7 +161,7 @@ lists-write)
     fi
     [ -d "$BACKUP_ROOT" ] || { mkdir -p "$BACKUP_ROOT" && chmod 700 "$BACKUP_ROOT"; } || die "cannot create backup directory"
     if [ "$TEST_MODE" != 1 ]; then
-        secure_root_dir /var && secure_root_dir "$BACKUP_ROOT" || die "backup directory must be root-owned and private"
+        secure_root_dir /var && secure_root_dir /var/backups && secure_root_dir "$BACKUP_ROOT" || die "backup directory must be root-owned and private"
     fi
     list_backup_root="$BACKUP_ROOT/lists"
     if [ -e "$list_backup_root" ] && { [ ! -d "$list_backup_root" ] || [ -L "$list_backup_root" ]; }; then
