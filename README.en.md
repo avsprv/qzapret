@@ -9,7 +9,7 @@
 
 [Русский](README.md) · **English**
 
-The application provides a graphical interface for managing an existing zapret2 service, running blockcheck2 network tests, and updating zapret2.
+The application provides a graphical interface for managing an existing zapret2 service, running blockcheck2 network diagnostics, and updating zapret2.
 
 > [!IMPORTANT]
 > **Independent project.** zapret2applet is not affiliated with the author or maintainers of [zapret2](https://github.com/bol-van/zapret2).
@@ -34,7 +34,7 @@ The application provides a graphical interface for managing an existing zapret2 
 ## Features
 
 - **Service management:** view the status, start, and stop the zapret2 systemd service.
-- **Network testing:** run the upstream blockcheck2 script against user-specified domains over HTTP, TLS 1.2/1.3, and HTTP/3 (QUIC), with IPv4 and IPv6 checks.
+- **Network diagnostics:** run the upstream `blockcheck2` script to test connectivity to user-specified domains over HTTP, TLS 1.2/1.3, and HTTP/3 (QUIC), with IPv4 and IPv6 support.
 - **Results:** view and copy detected strategies.
 - **System tray:** the application keeps running in the notification area after the main window is closed.
 - **Autostart:** start the service at boot and the application at user login.

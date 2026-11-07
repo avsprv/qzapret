@@ -34,9 +34,9 @@ The request uses a User-Agent in the form `zapret2applet/<version>`. When an upd
 
 GitHub may receive the device's IP address, request time, User-Agent, and other technical data handled by its infrastructure and policies. This information is sent directly to GitHub; the zapret2applet developer does not receive it through an application-operated server.
 
-## 3. Сеточные проверки / Network tests
+## 3. Сетевые тесты / Network diagnostics
 
-При запуске проверки приложение передаёт указанные пользователем домены и параметры upstream-скрипту `blockcheck2.sh`, входящему в установленную версию zapret2. Скрипт выполняет сеточные запросы к выбранным доменам по выбранным протоколам и IP-версиям.
+При запуске проверки приложение передаёт указанные пользователем домены и параметры upstream-скрипту `blockcheck2.sh`, входящему в установленную версию zapret2. Скрипт выполняет сетевые запросы к выбранным доменам по выбранным протоколам и IP-версиям.
 
 В зависимости от настроек и поведения upstream-скрипта, сетевые обращения могут быть видны:
 - DNS-резолверу, используемому системой;
@@ -68,7 +68,7 @@ Current-session results and logs are displayed in the application window. If a u
 
 При обращении к GitHub применяются условия и политика конфиденциальности GitHub: https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement
 
-При сеточных проверках применяются условия и политики соответствующих DNS-провайдеров, сетевых операторов и проверяемых ресурсов. Разработчик zapret2applet не контролирует их обработку данных.
+При сетевых тестах применяются условия и политики соответствующих DNS-провайдеров, сетевых операторов и проверяемых ресурсов. Разработчик zapret2applet не контролирует их обработку данных.
 
 GitHub's terms and privacy statement apply when the application connects to GitHub: https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement
 
