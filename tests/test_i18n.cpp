@@ -77,6 +77,10 @@ private slots:
         QCOMPARE(translate("MainWindow", "Выход"), QStringLiteral("Quit"));
         QCOMPARE(translate("main", "Запустить скрытым в системном трее"),
                  QStringLiteral("Start hidden in the system tray"));
+        QCOMPARE(translate("Main", "Статус"), QStringLiteral("Status"));
+        QCOMPARE(translate("SettingsPage", "Внешний вид"), QStringLiteral("Appearance"));
+        QCOMPARE(translate("ConfigPage", "Прочитать"), QStringLiteral("Read"));
+        QCOMPARE(translate("ProfilesPage", "Новый профиль"), QStringLiteral("New profile"));
     }
 
     // Языка нет в переводах — показываем английский, а не русские исходники
