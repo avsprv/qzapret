@@ -1,6 +1,7 @@
 #include <QtTest>
 #include <QProcess>
 #include <QSignalSpy>
+#include <QPointer>
 
 #include "backend/systemdbackend.h"
 
@@ -17,6 +18,8 @@ public:
     bool failNextActionToExecute = false;
     bool failNextStateQueryToStart = false;
     int activeQueryCount = 0;
+    bool holdPrivilegedProcessOpen = false;
+    QPointer<QProcess> lastPrivilegedProcess;
 
 protected:
     void startProcess(QProcess *process, const QString &program,
@@ -29,12 +32,18 @@ protected:
             ++activePrivilegedProcesses;
             maxConcurrentPrivilegedProcesses = qMax(maxConcurrentPrivilegedProcesses,
                                                        activePrivilegedProcesses);
+            lastPrivilegedProcess = process;
             connect(process, &QProcess::finished, this, [this] { --activePrivilegedProcesses; });
             connect(process, &QProcess::errorOccurred, this,
                     [this](QProcess::ProcessError error) {
                 if (error == QProcess::FailedToStart)
                     --activePrivilegedProcesses;
             });
+            if (holdPrivilegedProcessOpen) {
+                process->start(QStringLiteral("/bin/sh"),
+                               {QStringLiteral("-c"), QStringLiteral("sleep 10")});
+                return;
+            }
             if (failNextActionToStart) {
                 failNextActionToStart = false;
                 process->start(QStringLiteral("/path/that/does/not/exist"));
@@ -85,6 +94,8 @@ private slots:
     void correlatedVerificationDoesNotPublishGlobalState();
     void ordinaryVerificationPublishesGlobalState();
     void newerRefreshSupersedesOlderStateQuery();
+    void correlatedVerificationInvalidatesOlderRefresh();
+    void destroyingBackendDestroysActiveProcesses();
 };
 
 void SystemdBackendTest::serializesUnitActionsInFifoOrder()
@@ -173,6 +184,35 @@ void SystemdBackendTest::newerRefreshSupersedesOlderStateQuery()
     QCOMPARE(globalState.at(0).at(0).value<ZapretBackend::State>(), ZapretBackend::State::Active);
     QTest::qWait(200);
     QCOMPARE(globalState.count(), 1);
+}
+
+void SystemdBackendTest::correlatedVerificationInvalidatesOlderRefresh()
+{
+    TestSystemdBackend backend;
+    QSignalSpy globalState(&backend, &ZapretBackend::stateChanged);
+    QSignalSpy verified(&backend, &ZapretBackend::stateVerifiedForRequest);
+
+    backend.refresh();
+    backend.verifyState(quint64(73));
+
+    QTRY_COMPARE_WITH_TIMEOUT(verified.count(), 1, 3000);
+    QCOMPARE(globalState.count(), 0);
+    QTest::qWait(200);
+    QCOMPARE(globalState.count(), 0);
+}
+
+void SystemdBackendTest::destroyingBackendDestroysActiveProcesses()
+{
+    auto *backend = new TestSystemdBackend;
+    backend->holdPrivilegedProcessOpen = true;
+    backend->stop();
+    QTRY_VERIFY_WITH_TIMEOUT(backend->lastPrivilegedProcess
+                                 && backend->lastPrivilegedProcess->state() != QProcess::NotRunning,
+                             3000);
+
+    QPointer<QProcess> process = backend->lastPrivilegedProcess;
+    delete backend;
+    QVERIFY(process.isNull());
 }
 
 void SystemdBackendTest::releasesQueueWhenStateQueryCannotStart()
