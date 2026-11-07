@@ -113,6 +113,14 @@ if(BUILD_TESTING)
     target_compile_definitions(test_i18n PRIVATE QZAPRET_I18N_DIR="${CMAKE_SOURCE_DIR}/i18n")
     add_test(NAME i18n COMMAND test_i18n)
 
+    qt_add_executable(test_aboutpage tests/test_aboutpage.cpp
+        src/aboutpage.cpp src/aboutpage.h)
+    target_include_directories(test_aboutpage PRIVATE src)
+    target_link_libraries(test_aboutpage PRIVATE Qt6::Test Qt6::Widgets)
+    target_compile_definitions(test_aboutpage PRIVATE QZAPRET_VERSION="${PROJECT_VERSION}")
+    add_test(NAME aboutpage COMMAND test_aboutpage)
+    set_tests_properties(aboutpage PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+
     qt_add_executable(test_update tests/test_update.cpp
         src/backend/updatechecker.cpp src/backend/updatechecker.h)
     target_include_directories(test_update PRIVATE src)
