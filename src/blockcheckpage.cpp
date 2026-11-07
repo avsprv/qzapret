@@ -16,6 +16,7 @@
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QSaveFile>
+#include <QTextDocument>
 #include <QSpinBox>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -53,7 +54,6 @@ BlockcheckPage::BlockcheckPage(ZapretBackend *backend, QWidget *parent)
     m_scan->setToolTip(tr("veryquick/quick быстрее, но могут пропускать рабочие стратегии; "
                           "force проверяет всё."));
     m_log->setReadOnly(true);
-    m_log->setMaximumBlockCount(5000);
     m_log->setLineWrapMode(QPlainTextEdit::NoWrap);
     m_log->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
     m_cancelBtn->setEnabled(false);
