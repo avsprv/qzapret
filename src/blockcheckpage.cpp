@@ -200,6 +200,7 @@ void BlockcheckPage::onStartClicked()
         return;
     }
 
+#ifndef QZAPRET_TEST_SKIP_COMPATIBILITY
     const auto compatibility = ZapretCompatibility::inspect(ZapretPaths::baseDir());
     if (!compatibility.compatible) {
         const QString details = compatibility.missingComponents.join(QStringLiteral("\n"));
@@ -210,6 +211,8 @@ void BlockcheckPage::onStartClicked()
         QMessageBox::warning(this, tr("Подбор стратегий"), message);
         return;
     }
+
+#endif
 
     m_found = 0;
     m_results->clear();
