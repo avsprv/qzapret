@@ -62,7 +62,7 @@ public:
     void completeStop(State result, bool success)
     {
         state = result;
-        emit unitActionFinished(QStringLiteral("stop"), state, success);
+        emit unitActionFinishedForRequest(lastRequestId, QStringLiteral("stop"), state, success);
     }
     void completeStop(quint64 requestId, State result, bool success)
     {
@@ -72,7 +72,7 @@ public:
     void completeStart(State result, bool success)
     {
         state = result;
-        emit unitActionFinished(QStringLiteral("start"), state, success);
+        emit unitActionFinishedForRequest(lastRequestId, QStringLiteral("start"), state, success);
     }
     void completeStart(quint64 requestId, State result, bool success)
     {
