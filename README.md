@@ -1,6 +1,6 @@
 # zapret2applet
 
-**Независимый графический интерфейс для управления установленной службой [zapret2](https://github.com/bol-van/zapret2) в Linux.**
+**Графический интерфейс для управления установленной службой [zapret2](https://github.com/bol-van/zapret2) в Linux.**
 
 [![CI](https://github.com/avsprv/zapret2applet/actions/workflows/ci.yml/badge.svg)](https://github.com/avsprv/zapret2applet/actions/workflows/ci.yml)
 [![Packages](https://github.com/avsprv/zapret2applet/actions/workflows/packages.yml/badge.svg)](https://github.com/avsprv/zapret2applet/actions/workflows/packages.yml)
