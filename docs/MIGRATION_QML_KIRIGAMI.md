@@ -31,7 +31,7 @@ The following areas have a QML/Kirigami implementation in the preview target:
 | Blockcheck | Implemented | Domain/protocol options, confirmation before stopping the service, result copying and log export |
 | Settings | Partial | Language selection works at runtime; system theme is used; forced light/dark theme is not implemented |
 | About | Implemented | Version, dependencies, licensing, project separation and relevant links |
-| Update and clean install | Not migrated | Existing implementation remains in the Widgets application |
+| Update and clean install | Implemented | Release check, clean install, update, confirmation, bounded log and privileged helper integration |
 | Tray and desktop lifecycle | Not migrated | Production Widgets behavior remains in use |
 
 “Implemented” means that the page and its current workflow exist in the preview target; it does
@@ -45,8 +45,8 @@ non-production and is not installed.
 3. Migrate configuration and profile management. **Complete**
 4. Migrate lists and journal monitoring. **Complete**
 5. Migrate blockcheck2 orchestration and strategy results. **Implemented; reliability review continues**
-6. Migrate update checking, clean installation, update and recovery workflows. **Next**
-7. Complete settings behavior, theme integration, tray integration and desktop lifecycle.
+6. Migrate update checking, clean installation, update and recovery workflows. **Implemented; final CI verification in progress**
+7. Complete settings behavior, theme integration, tray integration and desktop lifecycle. **Next**
 8. Remove the legacy Widgets UI only after feature parity, tests and package validation.
 
 ## Architectural boundaries
@@ -61,9 +61,9 @@ non-production and is not installed.
 - Potentially long operations must be asynchronous, bounded and cancellable where supported.
 - Failure to confirm a service state must never be treated as a successful transition.
 
-## Update/install migration requirements
+## Update/install behavior and safety
 
-The update page must preserve the behavior and safety properties of the current Widgets workflow:
+The QML update page now reuses the existing update checker, updater and privileged helper. The implementation preserves these behavior and safety properties:
 
 - Check the latest upstream release without blocking the GUI and validate the release redirect.
 - Preserve the existing update/lastCheck, update/notifiedTag and update/autoCheck settings.
@@ -76,6 +76,7 @@ The update page must preserve the behavior and safety properties of the current 
 - Report cancellation, failure, rollback and service-restoration outcomes distinctly.
 - Prevent update/install while blockcheck or another conflicting operation is active.
 - Bound log output and ensure helper process completion is handled exactly once.
+- Lock conflicting Blockcheck and dashboard service controls during update/install, then refresh the displayed service state when maintenance finishes.
 - Cover version parsing, network failure, helper failure, checksum rejection, rollback and clean
   installation with automated tests.
 
