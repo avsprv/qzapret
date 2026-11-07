@@ -29,7 +29,7 @@ The following areas have a QML/Kirigami implementation in the preview target:
 | Lists | Implemented | All nine list files; only the three source user hostlists are writable |
 | Journal monitoring | Implemented | Read-only journal access, bounded output and optional refresh |
 | Blockcheck | Implemented | Domain/protocol options, confirmation before stopping the service, result copying and log export |
-| Settings | Partial | Language selection works at runtime; system theme is used; forced light/dark theme is not implemented |
+| Settings | Implemented with platform caveat | System/light/dark preference is persisted and applied at runtime through Qt color-scheme hints; forcing a scheme depends on platform support |
 | About | Implemented | Version, dependencies, licensing, project separation and relevant links |
 | Update and clean install | Implemented | Release check, clean install, update, confirmation, bounded log and privileged helper integration |
 | Tray and desktop lifecycle | Not migrated | Production Widgets behavior remains in use |
@@ -46,7 +46,7 @@ non-production and is not installed.
 4. Migrate lists and journal monitoring. **Complete**
 5. Migrate blockcheck2 orchestration and strategy results. **Implemented; reliability review continues**
 6. Migrate update checking, clean installation, update and recovery workflows. **Implemented; final CI verification in progress**
-7. Complete settings behavior, theme integration, tray integration and desktop lifecycle. **Next**
+7. Complete settings behavior and theme integration. **Implemented; CI verification pending**. Tray integration and desktop lifecycle remain outstanding.
 8. Remove the legacy Widgets UI only after feature parity, tests and package validation.
 
 ## Architectural boundaries
@@ -81,6 +81,8 @@ The QML update page now reuses the existing update checker, updater and privileg
   installation with automated tests.
 
 ## Quality baseline
+
+Theme selection uses the Qt 6.8+ `QStyleHints::setColorScheme()` API. The `system` value restores the desktop color scheme; explicit light/dark requests are platform hints and may be ignored by a platform plugin that does not support application-level overrides. Kirigami and Qt Quick Controls continue to use the active platform palette rather than a project-defined hard-coded palette.
 
 The migration follows the repository-wide [quality and engineering standards](QUALITY_STANDARDS.md),
 which use the official KDE Kirigami documentation and KDE Human Interface Guidelines as their
