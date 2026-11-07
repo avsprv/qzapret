@@ -72,9 +72,9 @@ Kirigami.ScrollablePage {
             }
 
             Controls.Button {
-                text: updateController.installedVersion === qsTr("не установлена")
-                      ? qsTr("Установить %1").arg(updateController.latestVersion)
-                      : qsTr("Обновить до %1").arg(updateController.latestVersion)
+                text: updateController.installed
+                      ? qsTr("Обновить до %1").arg(updateController.latestVersion)
+                      : qsTr("Установить %1").arg(updateController.latestVersion)
                 icon.name: "system-software-update"
                 enabled: updateController.canInstall || updateController.canUpdate
                 onClicked: {
