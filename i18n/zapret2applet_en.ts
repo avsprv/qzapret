@@ -1355,5 +1355,46 @@ If the service is running, it will be stopped for the duration of the update and
     <message><source>Список сохранён; резервная копия создана.</source><translation>List saved; backup created.</translation></message>
     <message><source>Не удалось сохранить список (код %1).</source><translation>Could not save list (exit code %1).</translation></message>
     <message><source>Не удалось сохранить список: %1</source><translation>Could not save list: %1</translation></message>
-  </context>
+      <message><source>Сохранить журнал диагностики</source><translation>Save diagnostic log</translation></message>
+    <message><source>Текстовые файлы (*.txt)</source><translation>Text files (*.txt)</translation></message>
+    <message><source>Все файлы (*)</source><translation>All files (*)</translation></message>
+    <message><source>Выберите локальный файл для сохранения журнала.</source><translation>Choose a local file to save the log.</translation></message>
+    <message><source>Не удалось открыть файл журнала: %1</source><translation>Could not open log file: %1</translation></message>
+    <message><source>Журнал сохранён: %1</source><translation>Log saved: %1</translation></message>
+    <message><source>строка журнала сокращена</source><translation>log line truncated</translation></message>
+    <message><source>Некорректный домен: %1</source><translation>Invalid domain: %1</translation></message>
+    <message><source>Недопустимый протокол IP.</source><translation>Invalid IP version.</translation></message>
+    <message><source>Недопустимый уровень сканирования.</source><translation>Invalid scan level.</translation></message>
+    <message><source>Подбор недоступен во время другой операции.</source><translation>The scan is unavailable while another operation is running.</translation></message>
+    <message><source>Проверка состояния службы zapret2…</source><translation>Checking zapret2 service state…</translation></message>
+    <message><source>Не удалось достоверно определить состояние службы. Диагностика не запущена.</source><translation>Could not verify the service state. Diagnostics were not started.</translation></message>
+    <message><source>Служба zapret2 запущена</source><translation>The zapret2 service is running</translation></message>
+    <message><source>Для диагностики требуется временно остановить zapret2. После завершения приложение попытается восстановить работу службы. Продолжить?</source><translation>Diagnostics require temporarily stopping zapret2. The application will attempt to restore the service afterwards. Continue?</translation></message>
+    <message><source>Подбор отменён. Служба не изменена.</source><translation>Scan canceled. The service was not changed.</translation></message>
+    <message><source>Остановка службы zapret2…</source><translation>Stopping zapret2 service…</translation></message>
+    <message><source>Выполняется диагностика blockcheck2…</source><translation>Running blockcheck2 diagnostics…</translation></message>
+    <message><source>Отмена запрошена; ожидается подтверждение остановки службы.</source><translation>Cancellation requested; waiting for service stop confirmation.</translation></message>
+    <message><source>Не удалось подтвердить остановку службы. Диагностика не запущена.</source><translation>Could not confirm that the service stopped. Diagnostics were not started.</translation></message>
+    <message><source>Не получено подтверждение остановки службы за отведённое время.</source><translation>The service stop was not confirmed within the allowed time.</translation></message>
+    <message><source>Восстановление службы zapret2…</source><translation>Restoring zapret2 service…</translation></message>
+    <message><source>Не удалось подтвердить восстановление службы. Проверьте systemd.</source><translation>Could not confirm service recovery. Check systemd.</translation></message>
+    <message><source>Служба zapret2 снова активна.</source><translation>The zapret2 service is active again.</translation></message>
+    <message><source>Не удалось восстановить службу. Проверьте состояние systemd.</source><translation>Could not restore the service. Check the systemd state.</translation></message>
+    <message><source>Диагностика завершена с кодом %1.</source><translation>Diagnostics finished with exit code %1.</translation></message>
+    <message><source>Найдено стратегий: %1; ошибок: %2</source><translation>Strategies found: %1; errors: %2</translation></message>
+    <message><source>Восстановление исходного состояния службы…</source><translation>Restoring the original service state…</translation></message>
+    <message><source>Готово.</source><translation>Done.</translation></message>
+    <message><source>Стратегии пока не найдены.</source><translation>No strategies found yet.</translation></message>
+    <message><source>Параметры диагностики</source><translation>Diagnostic options</translation></message>
+    <message><source>Домены (от 1 до 10, через пробел)</source><translation>Domains (1 to 10, space-separated)</translation></message>
+    <message><source>Домены для проверки</source><translation>Domains to check</translation></message>
+    <message><source>IP-протокол</source><translation>IP version</translation></message>
+    <message><source>Уровень сканирования</source><translation>Scan level</translation></message>
+    <message><source>Количество повторов</source><translation>Number of repeats</translation></message>
+    <message><source>Найденные стратегии</source><translation>Strategies found</translation></message>
+    <message><source>Журнал диагностики</source><translation>Diagnostic log</translation></message>
+    <message><source>Вывод процесса blockcheck2 в режиме только чтения</source><translation>Read-only output from the blockcheck2 process</translation></message>
+    <message><source>Найденные стратегии являются рекомендациями blockcheck2 и требуют ручной проверки перед применением.</source><translation>Strategies found are recommendations from blockcheck2 and should be reviewed manually before applying.</translation></message>
+    <message><source>Копировать стратегию: %1</source><translation>Copy strategy: %1</translation></message>
+</context>
 </TS>
