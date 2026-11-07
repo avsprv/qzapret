@@ -14,6 +14,7 @@ public:
 
     bool isRunning() const { return m_proc != nullptr; }
     void start(const QString &tag);
+    void startInstall(const QString &tag);
 
 signals:
     void logLine(const QString &line);
@@ -21,6 +22,7 @@ signals:
     void failedToStart(const QString &message);
 
 private:
+    void startOperation(const QString &operation, const QString &tag);
     void drain();
 
     QProcess *m_proc = nullptr;
