@@ -506,7 +506,7 @@ install)
     for required in config.default blockcheck2.sh install_bin.sh docs/changes.txt common/base.sh init.d/sysv/zapret2 init.d/systemd/zapret2.service; do
         [ -f "$stage/$required" ] && [ ! -L "$stage/$required" ] || die "archive is missing required file: $required"
     done
-    newver=$(grep -E '^[0-9]+(\\.[0-9]+)+[[:space:]]*$' "$stage/docs/changes.txt" | tail -n 1 | tr -d '[:space:]')
+    newver=$(grep -E '^[0-9]+(\.[0-9]+)+[[:space:]]*$' "$stage/docs/changes.txt" | tail -n 1 | tr -d '[:space:]')
     [ -x "$stage/init.d/sysv/zapret2" ] || die "upstream sysv init script is not executable"
     [ "$newver" = "${tag#v}" ] || die "version mismatch: archive says '$newver', expected '${tag#v}'"
 
