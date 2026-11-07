@@ -53,6 +53,8 @@ void ConfigController::finishProcess(QProcess *process, const QString &operation
     });
     connect(process, &QProcess::finished, this,
             [this, process, operation, input](int code, QProcess::ExitStatus exitStatus) {
+        if (m_process != process)
+            return;
         const QByteArray out = process->readAllStandardOutput();
         const QString error = QString::fromUtf8(process->readAllStandardError()).trimmed();
         m_process = nullptr;
@@ -65,8 +67,13 @@ void ConfigController::finishProcess(QProcess *process, const QString &operation
             return;
         }
         if (operation == QLatin1String("read")) {
+            const QString decoded = QString::fromUtf8(out);
+            if (decoded.toUtf8() != out) {
+                setStatus(tr("Файл конфигурации содержит некорректную последовательность UTF-8; чтение отменено во избежание потери данных."));
+                return;
+            }
             m_originalBytes = out;
-            setConfigText(QString::fromUtf8(out));
+            setConfigText(decoded);
             if (!m_loaded) {
                 m_loaded = true;
                 emit loadedChanged();
@@ -82,7 +89,7 @@ void ConfigController::finishProcess(QProcess *process, const QString &operation
     });
     connect(process, &QProcess::errorOccurred, this,
             [this, process](QProcess::ProcessError error) {
-        if (error != QProcess::FailedToStart)
+        if (error != QProcess::FailedToStart || m_process != process)
             return;
         const QString reason = process->errorString();
         m_process = nullptr;
