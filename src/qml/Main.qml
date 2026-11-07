@@ -48,7 +48,7 @@ Kirigami.ApplicationWindow {
             Kirigami.Action {
                 text: qsTr("Подбор стратегий")
                 icon.name: "search"
-                onTriggered: root.pageStack.push(placeholderPage, { pageTitle: text })
+                onTriggered: root.pageStack.push(blockcheckPageComponent)
             },
             Kirigami.Action {
                 text: qsTr("Обновления")
@@ -202,6 +202,11 @@ Kirigami.ApplicationWindow {
     Component {
         id: listsPageComponent
         ListsPage {}
+    }
+
+    Component {
+        id: blockcheckPageComponent
+        BlockcheckPage {}
     }
 
     Component {
