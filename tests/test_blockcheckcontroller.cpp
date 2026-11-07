@@ -14,6 +14,7 @@ private slots:
     void invalidInputHasErrorStatus();
     void busyGuardHasWarningStatus();
     void statusTypeChangesNotifyObservers();
+    void statusSeverityPropertyMatchesEnum();
 };
 
 void BlockcheckControllerTest::clampsRepeatCount()
@@ -49,6 +50,7 @@ void BlockcheckControllerTest::invalidInputHasErrorStatus()
     controller.setDomains(QStringLiteral("example..org"));
     controller.start();
     QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Error);
+    QCOMPARE(controller.statusSeverity(), QStringLiteral("Error"));
 }
 
 void BlockcheckControllerTest::busyGuardHasWarningStatus()
@@ -57,6 +59,7 @@ void BlockcheckControllerTest::busyGuardHasWarningStatus()
     controller.setUpdateBusy(true);
     controller.start();
     QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Warning);
+    QCOMPARE(controller.statusSeverity(), QStringLiteral("Warning"));
 }
 
 void BlockcheckControllerTest::statusTypeChangesNotifyObservers()
@@ -67,6 +70,16 @@ void BlockcheckControllerTest::statusTypeChangesNotifyObservers()
     controller.start();
     QCOMPARE(statusSpy.count(), 1);
     QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Error);
+}
+
+void BlockcheckControllerTest::statusSeverityPropertyMatchesEnum()
+{
+    BlockcheckController controller;
+    QCOMPARE(controller.statusSeverity(), QStringLiteral("Information"));
+
+    controller.setDomains(QStringLiteral("example..org"));
+    controller.start();
+    QCOMPARE(controller.statusSeverity(), QStringLiteral("Error"));
 }
 
 void BlockcheckControllerTest::rejectsEmptyCheckSelection()
