@@ -85,7 +85,7 @@ if(BUILD_TESTING)
         src/backend/zapretcompatibility.cpp src/backend/zapretcompatibility.h)
     target_include_directories(test_zapretcompatibility PRIVATE src)
     target_link_libraries(test_zapretcompatibility PRIVATE Qt6::Test Qt6::Core)
-    target_compile_definitions(test_zapretcompatibility PRIVATE QZAPRET_HELPER_PATH="/nonexistent")
+    target_compile_definitions(test_zapretcompatibility PRIVATE QZAPRET_HELPER_PATH="/nonexistent" QZAPRET_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
     add_test(NAME zapretcompatibility COMMAND test_zapretcompatibility)
 
     qt_add_executable(test_blockcheck_lifecycle tests/test_blockcheck_lifecycle.cpp
