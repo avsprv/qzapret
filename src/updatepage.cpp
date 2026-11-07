@@ -193,7 +193,7 @@ void UpdatePage::refreshUi()
     const bool canInstall = m_installed.isEmpty() && !m_latestTag.isEmpty();
     m_updateBtn->setText(canInstall ? tr("Установить %1").arg(m_latestTag)
                                     : (newer ? tr("Обновить до %1").arg(m_latestTag) : tr("Обновить")));
-    m_updateBtn->setEnabled((canInstall || newer) && !busy && !m_serviceBusy);
+    m_updateBtn->setEnabled((canInstall || newer) && !busy && !m_checker->isRunning() && !m_serviceBusy);
     m_checkBtn->setEnabled(!busy && !m_checker->isRunning());
     m_notesBtn->setEnabled(!m_latestTag.isEmpty());
 }
