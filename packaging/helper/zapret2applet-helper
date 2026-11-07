@@ -492,7 +492,7 @@ install)
     if tar -tvzf "$tmp/z.tgz" | cut -c1 | grep -qv '[-d]'; then die "links or special files in archive"; fi
 
     [ -s "$tmp/sums.txt" ] || die "empty sha256sum.txt"
-    if grep -qvE "^[0-9a-f]{64}  $name/binaries/[A-Za-z0-9._/+-]+\\$" "$tmp/sums.txt"; then
+    if grep -qvE "^[0-9a-f]{64}  $name/binaries/[A-Za-z0-9._/+-]+\$" "$tmp/sums.txt"; then
         die "unexpected sha256sum.txt format"
     fi
 
@@ -507,6 +507,7 @@ install)
         [ -f "$stage/$required" ] && [ ! -L "$stage/$required" ] || die "archive is missing required file: $required"
     done
     newver=$(grep -E '^[0-9]+(\\.[0-9]+)+[[:space:]]*$' "$stage/docs/changes.txt" | tail -n 1 | tr -d '[:space:]')
+    [ -x "$stage/init.d/sysv/zapret2" ] || die "upstream sysv init script is not executable"
     [ "$newver" = "${tag#v}" ] || die "version mismatch: archive says '$newver', expected '${tag#v}'"
 
     config_assignments=$(grep -Ec '^[[:space:]]*NFQWS2_ENABLE[[:space:]]*=' "$stage/config.default" || true)
