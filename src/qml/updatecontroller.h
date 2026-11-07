@@ -12,6 +12,7 @@ class UpdateController final : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString installedVersion READ installedVersion NOTIFY stateChanged)
+    Q_PROPERTY(bool installed READ installed NOTIFY stateChanged)
     Q_PROPERTY(QString latestVersion READ latestVersion NOTIFY stateChanged)
     Q_PROPERTY(QString status READ status NOTIFY stateChanged)
     Q_PROPERTY(QString logText READ logText NOTIFY logTextChanged)
@@ -26,6 +27,7 @@ public:
     explicit UpdateController(SettingsManager *settings, QObject *parent = nullptr);
 
     QString installedVersion() const;
+    bool installed() const;
     QString latestVersion() const;
     QString status() const;
     QString logText() const;
@@ -40,6 +42,7 @@ public:
     Q_INVOKABLE void checkNow();
     Q_INVOKABLE void install();
     Q_INVOKABLE void update();
+    Q_INVOKABLE void clearLog();
 
 signals:
     void stateChanged();
@@ -48,6 +51,7 @@ signals:
 
 private:
     void maybeAutoCheck();
+    void startCheck(bool automatic);
     void refreshInstalled();
     void appendLog(const QString &line);
     void setStatus(const QString &status);
@@ -63,6 +67,8 @@ private:
     QString m_status;
     QString m_logText;
     bool m_checking = false;
+    bool m_busy = false;
+    bool m_automaticCheck = false;
     bool m_blockcheckBusy = false;
     bool m_installing = false;
 };
