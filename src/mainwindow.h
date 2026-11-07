@@ -28,6 +28,7 @@ private:
     void buildTray();
     void onStateChanged(ZapretBackend::State state);
     void openSettings();
+    void updateTrayIcon(ZapretBackend::State state);
     void toggleWindow();
     void quit();
 
@@ -43,4 +44,5 @@ private:
     QAction *m_trayStop = nullptr;
     QTimer *m_poll = nullptr;
     bool m_quitting = false;
+    ZapretBackend::State m_trayState = ZapretBackend::State::Unknown;
 };
