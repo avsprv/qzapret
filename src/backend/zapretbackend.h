@@ -16,6 +16,7 @@ public:
     ~ZapretBackend() override = default;
 
     virtual void refresh() = 0; // асинхронно, результат придёт в сигналах
+    virtual void verifyState() = 0; // отдельная проверка для критических переходов состояния
     virtual void start() = 0;
     virtual void stop() = 0;
     virtual void setBootEnabled(bool enabled) = 0; // автозапуск сервиса при загрузке системы
@@ -23,6 +24,8 @@ public:
 
 signals:
     void stateChanged(ZapretBackend::State state);
+    void stateVerified(ZapretBackend::State state);
+    void unitActionFinished(const QString &action, ZapretBackend::State state, bool success);
     void bootEnabledChanged(bool enabled);
     void errorOccurred(const QString &message);
 };
