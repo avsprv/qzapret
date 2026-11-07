@@ -65,6 +65,7 @@ void SystemdBackend::runUnitAction(const QString &action)
         if (e == QProcess::FailedToStart) {
             emit errorOccurred(tr("Не удалось запустить pkexec/хелпер: %1").arg(proc->errorString()));
             proc->deleteLater(); // finished() после FailedToStart не приходит
+            refresh(); // сообщить странице фактическое состояние после неудачной команды
         }
     });
     Helper::start(proc, {QStringLiteral("unit"), action});
