@@ -28,8 +28,6 @@ qt_standard_project_setup(REQUIRES ${QZAPRET_QT_MIN})
 set(QZAPRET_HELPER "${CMAKE_INSTALL_FULL_LIBEXECDIR}/zapret2applet/zapret2applet-helper")
 
 set(QZAPRET_SOURCES
-    src/appsettings.cpp
-    src/appsettings.h
     src/main.cpp
     src/settingsdialog.cpp
     src/settingsdialog.h
@@ -111,7 +109,7 @@ qt_add_qml_module(zapret2applet-qml-preview
 )
 target_include_directories(zapret2applet-qml-preview PRIVATE src src/qml)
 target_link_libraries(zapret2applet-qml-preview PRIVATE
-    Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick Qt6::QuickControls2 Qt6::Widgets
+    Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick Qt6::QuickControls2
 )
 target_compile_definitions(zapret2applet-qml-preview PRIVATE
     QZAPRET_VERSION="${PROJECT_VERSION}"
@@ -157,7 +155,7 @@ if(BUILD_TESTING)
     set_tests_properties(blockcheck_lifecycle PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
 
     qt_add_executable(test_appsettings tests/test_appsettings.cpp
-        src/appsettings.cpp src/appsettings.h)
+
     target_include_directories(test_appsettings PRIVATE src)
     target_link_libraries(test_appsettings PRIVATE Qt6::Test Qt6::Core Qt6::Widgets)
     add_test(NAME appsettings COMMAND test_appsettings)
@@ -166,7 +164,7 @@ if(BUILD_TESTING)
         src/qml/settingsmanager.cpp src/qml/settingsmanager.h
         src/appsettings.cpp src/appsettings.h)
     target_include_directories(test_settingsmanager PRIVATE src src/qml)
-    target_link_libraries(test_settingsmanager PRIVATE Qt6::Test Qt6::Core Qt6::Widgets)
+    target_link_libraries(test_settingsmanager PRIVATE Qt6::Test Qt6::Core)
     add_test(NAME settingsmanager COMMAND test_settingsmanager)
 
     qt_add_executable(test_i18n tests/test_i18n.cpp)
