@@ -96,7 +96,8 @@ private:
     StatusType m_statusType = StatusType::Information;
     QVariantList m_results;
     bool m_busy = false, m_updateBusy = false, m_serviceBusy = false;
-    bool m_resumeService = false, m_cancelRequested = false, m_stopTimedOut = false;
+    bool m_resumeService = false, m_cancelRequested = false;
+    bool m_stopTimedOut = false, m_startTimedOut = false;
     int m_found = 0;
     quint64 m_operationId = 0;
     BlockcheckRunner::Options m_lastOptions;
