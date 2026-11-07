@@ -38,7 +38,11 @@ EOS
     chmod +x "$W/src/$name"/*.sh "$W/src/$name/init.d/sysv/zapret2" "$W/src/$name/binaries/linux-x86_64/"*
     [ "$4" = symlink ] && ln -s /etc/passwd "$W/src/$name/docs/evil-link"
     ( cd "$W/src" && sha256sum "$name/binaries/linux-x86_64/nfqws2" "$name/binaries/linux-x86_64/ip2net" "$name/binaries/linux-x86_64/mdig" > "$rel/sha256sum.txt" )
-    [ "$2" = bad_sums ] && sed -i 's/^./0/' "$rel/sha256sum.txt"
+    if [ "$2" = bad_sums ]; then
+        awk 'NR == 1 { first = substr($0, 1, 1); $0 = (first == "0" ? "1" : "0") substr($0, 2) } { print }' \
+            "$rel/sha256sum.txt" > "$rel/sha256sum.tmp"
+        mv "$rel/sha256sum.tmp" "$rel/sha256sum.txt"
+    fi
     if [ "$3" = unsafe ]; then
         ( cd "$W/src" && tar -czf "$rel/$name.tar.gz" --transform "s|^$name/docs/changes.txt|$name/../evil|" "$name" )
     else
