@@ -73,7 +73,13 @@ target_include_directories(zapret2applet_i18n PUBLIC src)
 target_link_libraries(zapret2applet_i18n PUBLIC Qt6::Core)
 qt_add_translations(zapret2applet_i18n
     TS_FILES i18n/zapret2applet_en.ts i18n/zapret2applet_about_en.ts
-    SOURCES ${QZAPRET_SOURCES} src/i18n.cpp
+    SOURCES
+        ${QZAPRET_SOURCES}
+        src/i18n.cpp
+        src/qml/Main.qml
+        src/qml/pages/SettingsPage.qml
+        src/qml/pages/ConfigPage.qml
+        src/qml/pages/ProfilesPage.qml
     INCLUDE_DIRECTORIES src
 )
 
@@ -118,6 +124,7 @@ qt_add_qml_module(zapret2applet-qml-preview
 target_include_directories(zapret2applet-qml-preview PRIVATE src src/qml)
 target_link_libraries(zapret2applet-qml-preview PRIVATE
     Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick Qt6::QuickControls2
+    zapret2applet_i18n
 )
 target_compile_definitions(zapret2applet-qml-preview PRIVATE
     QZAPRET_VERSION="${PROJECT_VERSION}"
