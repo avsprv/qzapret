@@ -6,6 +6,7 @@
 #include <QPlainTextEdit>
 #include <QProcess>
 #include <QPushButton>
+#include <QTextCursor>
 #include <QVBoxLayout>
 
 #include "backend/helperpath.h"
