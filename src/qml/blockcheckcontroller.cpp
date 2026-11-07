@@ -1,6 +1,8 @@
 #include "blockcheckcontroller.h"
 
 #include <QRegularExpression>
+#include <QGuiApplication>
+#include <QClipboard>
 #include <QTimer>
 #include "backend/systemdbackend.h"
 
@@ -82,6 +84,11 @@ void BlockcheckController::confirmStop(bool accepted) {
     m_resumeService=true; m_phase=Phase::WaitingForStop; setStatus(tr("Остановка службы zapret2…")); m_backend->stop();
 }
 void BlockcheckController::beginScan() { m_phase=Phase::Scanning; setStatus(tr("Выполняется диагностика blockcheck2…")); appendLog(tr("Запуск blockcheck2…")); m_runner->start(m_lastOptions); }
+void BlockcheckController::copyStrategy(int index) {
+    if (index < 0 || index >= m_results.size()) return;
+    const QString command = m_results.at(index).toMap().value(QStringLiteral("command")).toString();
+    if (!command.isEmpty() && QGuiApplication::clipboard()) QGuiApplication::clipboard()->setText(command);
+}
 void BlockcheckController::cancel() {
     if (m_phase==Phase::Checking || m_phase==Phase::AwaitingConfirmation) { finish(tr("Диагностика отменена до запуска.")); return; }
     if (m_phase==Phase::WaitingForStop) { m_cancelRequested=true; setStatus(tr("Отмена запрошена; ожидается подтверждение остановки службы.")); return; }
