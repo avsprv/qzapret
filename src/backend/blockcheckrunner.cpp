@@ -31,6 +31,7 @@ void BlockcheckRunner::start(const Options &o)
 
     m_buf.clear();
     m_seenResults.clear();
+    m_errorCount = 0;
     m_cancelRequested = false;
     m_proc = new QProcess(this);
     m_proc->setProcessChannelMode(QProcess::MergedChannels);
@@ -42,6 +43,8 @@ void BlockcheckRunner::start(const Options &o)
             handleLine(QString::fromUtf8(m_buf));
         m_buf.clear();
         const bool canceled = m_cancelRequested || Helper::isAuthDismissed(code);
+        if (!canceled && (st == QProcess::CrashExit || code != 0) && m_errorCount == 0)
+            ++m_errorCount;
         m_proc->deleteLater();
         m_proc = nullptr;
         emit finished(st == QProcess::CrashExit ? -1 : code, canceled);
@@ -49,6 +52,7 @@ void BlockcheckRunner::start(const Options &o)
     connect(m_proc, &QProcess::errorOccurred, this, [this](QProcess::ProcessError e) {
         if (e != QProcess::FailedToStart)
             return;
+        ++m_errorCount;
         emit logLine(tr("Не удалось запустить хелпер: %1").arg(m_proc->errorString()));
         m_proc->deleteLater();
         m_proc = nullptr;
@@ -98,6 +102,8 @@ void BlockcheckRunner::handleLine(const QString &rawLine)
     line.remove(ansi);
     line.remove(QLatin1Char('\r'));
     emit logLine(line);
+    if (line.startsWith(QStringLiteral("zapret2applet-helper:")))
+        ++m_errorCount;
     if (const auto r = parseLine(line)) {
         const QString key = QStringList{r->test, r->ipv, r->domain, r->daemon, r->args}
                                 .join(QChar(0));
