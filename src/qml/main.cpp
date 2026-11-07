@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty(QStringLiteral("appController"), &controller);
     engine.rootContext()->setContextProperty(QStringLiteral("settingsManager"), &settingsManager);
     engine.rootContext()->setContextProperty(QStringLiteral("configController"), &configController);
+    engine.rootContext()->setContextProperty(QStringLiteral("profileController"), &profileController);
     engine.loadFromModule(QStringLiteral("org.avsprv.zapret2applet"), QStringLiteral("Main"));
 
     if (engine.rootObjects().isEmpty())
