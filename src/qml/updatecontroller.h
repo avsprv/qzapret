@@ -48,6 +48,7 @@ signals:
     void stateChanged();
     void logTextChanged();
     void updateAvailable(const QString &tag);
+    void operationFinished();
 
 private:
     void maybeAutoCheck();
