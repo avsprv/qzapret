@@ -16,6 +16,7 @@ public:
     bool failNextActionToStart = false;
     bool failNextActionToExecute = false;
     bool failNextStateQueryToStart = false;
+    int activeQueryCount = 0;
 
 protected:
     void startProcess(QProcess *process, const QString &program,
@@ -56,6 +57,14 @@ protected:
             return;
         }
 
+        if (arguments.value(0) == QLatin1String("is-active")) {
+            ++activeQueryCount;
+            if (activeQueryCount == 1) {
+                process->start(QStringLiteral("/bin/sh"),
+                               {QStringLiteral("-c"), QStringLiteral("sleep 0.15; printf inactive")});
+                return;
+            }
+        }
         const QString output = arguments.value(0) == QLatin1String("is-enabled")
                                    ? QStringLiteral("enabled")
                                    : QStringLiteral("active");
@@ -75,6 +84,7 @@ private slots:
     void releasesQueueWhenStateQueryCannotStart();
     void correlatedVerificationDoesNotPublishGlobalState();
     void ordinaryVerificationPublishesGlobalState();
+    void newerRefreshSupersedesOlderStateQuery();
 };
 
 void SystemdBackendTest::serializesUnitActionsInFifoOrder()
@@ -149,6 +159,20 @@ void SystemdBackendTest::ordinaryVerificationPublishesGlobalState()
     QTRY_COMPARE_WITH_TIMEOUT(verified.count(), 1, 3000);
     QCOMPARE(globalState.count(), 1);
     QCOMPARE(globalState.at(0).at(0).value<ZapretBackend::State>(), ZapretBackend::State::Active);
+}
+
+void SystemdBackendTest::newerRefreshSupersedesOlderStateQuery()
+{
+    TestSystemdBackend backend;
+    QSignalSpy globalState(&backend, &ZapretBackend::stateChanged);
+
+    backend.refresh();
+    backend.refresh();
+
+    QTRY_COMPARE_WITH_TIMEOUT(globalState.count(), 1, 3000);
+    QCOMPARE(globalState.at(0).at(0).value<ZapretBackend::State>(), ZapretBackend::State::Active);
+    QTest::qWait(200);
+    QCOMPARE(globalState.count(), 1);
 }
 
 void SystemdBackendTest::releasesQueueWhenStateQueryCannotStart()
