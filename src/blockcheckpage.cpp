@@ -3,6 +3,8 @@
 #include <QCheckBox>
 #include <QFontDatabase>
 #include <QClipboard>
+#include <QDateTime>
+#include <QFileDialog>
 #include <QComboBox>
 #include <QFormLayout>
 #include <QGuiApplication>
@@ -13,6 +15,7 @@
 #include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QPushButton>
+#include <QSaveFile>
 #include <QSpinBox>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -32,6 +35,7 @@ BlockcheckPage::BlockcheckPage(ZapretBackend *backend, QWidget *parent)
     , m_startBtn(new QPushButton(tr("Начать подбор"), this))
     , m_cancelBtn(new QPushButton(tr("Отмена"), this))
     , m_copyBtn(new QPushButton(tr("Копировать стратегию"), this))
+    , m_saveLogBtn(new QPushButton(tr("Сохранить журнал…"), this))
     , m_log(new QPlainTextEdit(this))
     , m_results(new QListWidget(this))
     , m_stopTimeout(new QTimer(this))
@@ -54,6 +58,7 @@ BlockcheckPage::BlockcheckPage(ZapretBackend *backend, QWidget *parent)
     m_log->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
     m_cancelBtn->setEnabled(false);
     m_copyBtn->setEnabled(false);
+    m_saveLogBtn->setEnabled(false);
 
     auto *checks = new QHBoxLayout;
     for (auto *c : {m_http, m_tls12, m_tls13, m_http3})
@@ -84,7 +89,11 @@ BlockcheckPage::BlockcheckPage(ZapretBackend *backend, QWidget *parent)
     layout->addWidget(new QLabel(tr("Найденные стратегии:"), this));
     layout->addWidget(m_results, 1);
     layout->addWidget(m_copyBtn, 0, Qt::AlignLeft);
-    layout->addWidget(new QLabel(tr("Журнал:"), this));
+    auto *logHeader = new QHBoxLayout;
+    logHeader->addWidget(new QLabel(tr("Журнал:"), this));
+    logHeader->addStretch();
+    logHeader->addWidget(m_saveLogBtn);
+    layout->addLayout(logHeader);
     layout->addWidget(m_log, 2);
     layout->addWidget(note);
 
@@ -108,6 +117,10 @@ BlockcheckPage::BlockcheckPage(ZapretBackend *backend, QWidget *parent)
         } else {
             m_runner->cancel();
         }
+    });
+    connect(m_saveLogBtn, &QPushButton::clicked, this, &BlockcheckPage::saveLog);
+    connect(m_log, &QPlainTextEdit::textChanged, this, [this] {
+        m_saveLogBtn->setEnabled(!m_log->document()->isEmpty());
     });
     connect(m_copyBtn, &QPushButton::clicked, this, [this] {
         if (auto *it = m_results->currentItem())
@@ -199,6 +212,33 @@ void BlockcheckPage::beginScan()
     setBusy(true);
     m_log->appendPlainText(tr("Запускаю blockcheck2…"));
     m_runner->start(collectOptions());
+}
+
+void BlockcheckPage::saveLog()
+{
+    if (m_log->document()->isEmpty())
+        return;
+
+    const QString defaultName = QStringLiteral("blockcheck2-log-%1.txt")
+                                    .arg(QDateTime::currentDateTime().toString(QStringLiteral("yyyyMMdd-HHmmss")));
+    const QString path = QFileDialog::getSaveFileName(
+        this, tr("Сохранить журнал"), defaultName,
+        tr("Текстовые файлы (*.txt);;Все файлы (*)"));
+    if (path.isEmpty())
+        return;
+
+    QSaveFile file(path);
+    if (!file.open(QIODevice::WriteOnly)) {
+        QMessageBox::critical(this, tr("Ошибка сохранения"),
+                              tr("Не удалось открыть файл для записи: %1").arg(file.errorString()));
+        return;
+    }
+
+    const QByteArray data = m_log->toPlainText().toUtf8();
+    if (file.write(data) != data.size() || !file.commit()) {
+        QMessageBox::critical(this, tr("Ошибка сохранения"),
+                              tr("Не удалось сохранить журнал: %1").arg(file.errorString()));
+    }
 }
 
 void BlockcheckPage::onFinished(int exitCode, bool canceled)
