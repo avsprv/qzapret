@@ -124,15 +124,15 @@ prepare_install() {
     mkdir -p "$W/opt" "$W/systemd" "$W/run" "$W/bin"
     cat > "$W/bin/systemctl" <<'EOS'
 #!/bin/sh
-printf '%s\\n' "$*" >> "$SYSTEMCTL_LOG"
+printf '%s\n' "$*" >> "$SYSTEMCTL_LOG"
 EOS
     chmod +x "$W/bin/systemctl"
 }
 
 run_install() {
-    QZAPRET_TEST_BASE=$W/opt/zapret2 QZAPRET_TEST_RUNDIR=$W/run QZAPRET_TEST_NO_SERVICE=1 \
+    PATH="$W/bin:$PATH" SYSTEMCTL_LOG="$W/systemctl.log" \
+    QZAPRET_TEST_BASE=$W/opt/zapret2 QZAPRET_TEST_RUNDIR=$W/run \
     QZAPRET_TEST_UNIT_DIR=$W/systemd QZAPRET_TEST_URLBASE="file://$W/rel" "$H" install "$1" 2>&1
-}
 
 expect_no_install() {
     [ ! -e "$W/opt/zapret2" ] && [ ! -e "$W/systemd/zapret2.service" ] \
@@ -148,7 +148,7 @@ grep -q 'NFQWS2_ENABLE=0' "$W/opt/zapret2/config" && ok "fresh config disables N
     && ok "compatible binaries linked" || bad "binary links missing"
 [ -f "$W/systemd/zapret2.service" ] && ok "systemd unit installed" || bad "systemd unit missing"
 [ ! -e "$W/run/install.lock" ] && ok "install lock released" || bad "install lock left behind"
-[ "$(cat "$W/systemctl.log")" = "daemon-reload" ] \\
+[ "$(cat "$W/systemctl.log")" = "daemon-reload" ] \
     && ok "systemd reloaded without starting or enabling service" || bad "unexpected systemctl calls: $(cat "$W/systemctl.log")"
 
 # --- 9. существующая установка никогда не перезаписывается
