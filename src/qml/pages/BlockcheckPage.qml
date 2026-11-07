@@ -48,10 +48,10 @@ Kirigami.ScrollablePage {
             visible: blockcheckController.status.length > 0
             text: blockcheckController.status
             type: {
-                switch (blockcheckController.statusType) {
-                case BlockcheckController.Error: return Kirigami.MessageType.Error
-                case BlockcheckController.Warning: return Kirigami.MessageType.Warning
-                case BlockcheckController.Success: return Kirigami.MessageType.Positive
+                switch (blockcheckController.statusSeverity) {
+                case "Error": return Kirigami.MessageType.Error
+                case "Warning": return Kirigami.MessageType.Warning
+                case "Success": return Kirigami.MessageType.Positive
                 default: return Kirigami.MessageType.Information
                 }
             }
