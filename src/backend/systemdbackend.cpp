@@ -90,7 +90,7 @@ void SystemdBackend::runUnitAction(const QString &action)
         reportResult(success);
     });
     connect(proc, &QProcess::errorOccurred, this,
-            [this, proc, action, reportResult](QProcess::ProcessError e) {
+            [this, proc, reportResult](QProcess::ProcessError e) {
         if (e == QProcess::FailedToStart) {
             emit errorOccurred(tr("Не удалось запустить pkexec/хелпер: %1").arg(proc->errorString()));
             proc->deleteLater(); // finished() после FailedToStart не приходит
