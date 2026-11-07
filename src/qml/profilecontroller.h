@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QByteArray>
 #include <QProcess>
+#include <QVariant>
 #include <QVector>
 #include "profileanalyzer.h"
 
