@@ -30,15 +30,20 @@ private:
     void beginScan();
     void onBackendState(ZapretBackend::State state);
     void onFinished(int exitCode, bool canceled);
+    void onLifecycleTimeout();
+    void restoreService(const QString &reason);
+    void finishLifecycle(const QString &message = {});
     void saveLog();
     void setBusy(bool busy);
     BlockcheckRunner::Options collectOptions() const;
 
     ZapretBackend *m_backend;
     BlockcheckRunner *m_runner;
+    enum class LifecyclePhase { Idle, Checking, WaitingForStop, Scanning, WaitingForStart };
     ZapretBackend::State m_state = ZapretBackend::State::Unknown;
-    bool m_waitingStop = false;
+    LifecyclePhase m_phase = LifecyclePhase::Idle;
     bool m_resumeService = false;
+    bool m_cancelRequested = false;
     int m_found = 0;
     BlockcheckRunner::Options m_lastOptions;
 
