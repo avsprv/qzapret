@@ -271,6 +271,6 @@ update)
     echo "OK: zapret2 updated to $tag (previous version kept in $bak)"
     ;;
 *)
-    die "usage: zapret2applet-helper unit {start|stop|enable|disable} | blockcheck [opts] | blockcheck-cancel | update vX.Y.Z"
+    die "usage: zapret2applet-helper lists-read NAME | config-read | config-write | config-rollback | unit {start|stop|enable|disable} | blockcheck [opts] | blockcheck-cancel | update vX.Y.Z"
     ;;
 esac

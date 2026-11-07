@@ -47,7 +47,7 @@ if "$H" lists-read zapret-hosts-user.txt >/dev/null 2>&1; then
 fi
 echo "ok: rejects lists larger than 1 MiB"
 
-rm "$tmp/base/ipset"
+rm -rf "$tmp/base/ipset"
 ln -s "$tmp" "$tmp/base/ipset"
 if "$H" lists-read zapret-hosts-user.txt >/dev/null 2>&1; then
     echo "FAIL: symlink ipset directory was accepted"; exit 1
