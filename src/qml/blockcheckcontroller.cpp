@@ -16,7 +16,7 @@ BlockcheckController::BlockcheckController(QObject *parent)
     m_lifecycleTimeout->setInterval(30000);
     connect(m_lifecycleTimeout, &QTimer::timeout, this, [this] {
         if (m_phase == Phase::Checking) finish(tr("Не удалось получить подтверждённое состояние службы. Диагностика не запущена."));
-        else if (m_phase == Phase::WaitingForStop) restoreService(tr("Не получено подтверждение остановки службы за отведённое время."));
+        else if (m_phase == Phase::WaitingForStop) {\n            m_stopTimedOut = true;\n            appendLog(tr("Операция остановки выполняется дольше ожидаемого. Новая команда запуска не отправляется до получения результата остановки."));\n            setStatus(tr("Ожидание завершения операции остановки службы…"));\n        }
         else if (m_phase == Phase::WaitingForStart) { m_resumeService=false; finish(tr("Не удалось подтвердить восстановление службы. Проверьте systemd.")); }
     });
     connect(m_backend, &ZapretBackend::stateVerified, this, &BlockcheckController::handleVerifiedState);
@@ -91,7 +91,7 @@ void BlockcheckController::start() {
     if (!o.http && !o.tls12 && !o.tls13 && !o.http3) { setStatus(tr("Выберите хотя бы один тип проверки.")); return; }
     if (o.scanLevel!=QLatin1String("veryquick") && o.scanLevel!=QLatin1String("quick") && o.scanLevel!=QLatin1String("standard") && o.scanLevel!=QLatin1String("force")) { setStatus(tr("Недопустимый уровень сканирования.")); return; }
     m_lastOptions=o; m_found=0; m_results.clear(); emit resultsChanged(); m_logText.clear(); emit logTextChanged();
-    m_resumeService=false; m_cancelRequested=false; m_phase=Phase::Checking; setBusy(true);
+    m_resumeService=false; m_cancelRequested=false; m_stopTimedOut=false; m_phase=Phase::Checking; setBusy(true);
     setStatus(tr("Проверка состояния службы zapret2…")); m_lifecycleTimeout->start(); m_backend->verifyState();
 }
 void BlockcheckController::handleVerifiedState(ZapretBackend::State state) {
@@ -169,7 +169,7 @@ void BlockcheckController::handleFinished(int exitCode, bool canceled) {
 }
 void BlockcheckController::finish(const QString &message) {
     m_lifecycleTimeout->stop();
-    m_phase=Phase::Idle; m_resumeService=false;
+    m_phase=Phase::Idle; m_resumeService=false; m_stopTimedOut=false;
     if (!message.isEmpty()) appendLog(message);
     setStatus(message.isEmpty() ? tr("Готово.") : message);
     setBusy(false);
