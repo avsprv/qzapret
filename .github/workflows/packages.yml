@@ -23,6 +23,8 @@ jobs:
             git ninja-build qt6-base-dev qt6-tools-dev qt6-l10n-tools \
             desktop-file-utils lintian
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Install package build dependencies
         run: |
           ln -sfn packaging/debian debian
@@ -54,12 +56,19 @@ jobs:
           dnf install -y ca-certificates cmake curl desktop-file-utils gcc-c++ git \
             ninja-build qt6-qtbase-devel qt6-qttools-devel rpm-build rpmlint tar
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Prepare RPM build tree
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           mkdir -p "$HOME/rpmbuild"/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-          git archive --format=tar.gz --prefix="zapret2applet-0.3.0/" HEAD \
-            -o "$HOME/rpmbuild/SOURCES/zapret2applet-0.3.0.tar.gz"
+          source_dir="$RUNNER_TEMP/zapret2applet-source"
+          mkdir -p "$source_dir"
+          git archive HEAD | tar -x -C "$source_dir"
+          mkdir -p "$source_dir/third_party"
+          cp -a third_party/zapret2 "$source_dir/third_party/zapret2"
+          tar -czf "$HOME/rpmbuild/SOURCES/zapret2applet-0.3.0.tar.gz" \
+            --transform='s,^,zapret2applet-0.3.0/,' -C "$source_dir" .
           cp packaging/fedora/zapret2applet.spec "$HOME/rpmbuild/SPECS/"
       - name: Build RPM
         run: |
