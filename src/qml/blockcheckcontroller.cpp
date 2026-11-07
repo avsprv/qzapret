@@ -15,13 +15,13 @@ BlockcheckController::BlockcheckController(QObject *parent)
     m_lifecycleTimeout->setSingleShot(true);
     m_lifecycleTimeout->setInterval(30000);
     connect(m_lifecycleTimeout, &QTimer::timeout, this, [this] {
-        if (m_phase == Phase::Checking) finish(tr("Не удалось получить подтверждённое состояние службы. Диагностика не запущена."));
+        if (m_phase == Phase::Checking) finish(tr("Не удалось получить подтверждённое состояние службы. Диагностика не запущена."), StatusType::Error);
         else if (m_phase == Phase::WaitingForStop) {
             m_stopTimedOut = true;
             appendLog(tr("Операция остановки выполняется дольше ожидаемого. Новая команда запуска не отправляется до получения результата остановки."));
-            setStatus(tr("Ожидание завершения операции остановки службы…"));
+            setStatus(tr("Ожидание завершения операции остановки службы…"), StatusType::Warning);
         }
-        else if (m_phase == Phase::WaitingForStart) { m_resumeService=false; finish(tr("Не удалось подтвердить восстановление службы. Проверьте systemd.")); }
+        else if (m_phase == Phase::WaitingForStart) { m_resumeService=false; finish(tr("Не удалось подтвердить восстановление службы. Проверьте systemd."), StatusType::Error); }
     });
     connect(m_backend, &ZapretBackend::stateVerified, this, &BlockcheckController::handleVerifiedState);
     connect(m_backend, &ZapretBackend::unitActionFinished, this, &BlockcheckController::handleUnitAction);
@@ -54,6 +54,7 @@ void BlockcheckController::setScanLevel(const QString &v) { if (m_scanLevel != v
 QString BlockcheckController::logText() const { return m_logText; }
 QVariantList BlockcheckController::results() const { return m_results; }
 QString BlockcheckController::status() const { return m_status; }
+BlockcheckController::StatusType BlockcheckController::statusType() const { return m_statusType; }
 bool BlockcheckController::busy() const { return m_busy; }
 bool BlockcheckController::updateBusy() const { return m_updateBusy; }
 void BlockcheckController::setUpdateBusy(bool v) { if (m_updateBusy != v) { m_updateBusy=v; emit updateBusyChanged(); } }
@@ -67,7 +68,13 @@ void BlockcheckController::appendLog(const QString &line) {
         m_logText.remove(0, m_logText.size() - maxLogChars);
     emit logTextChanged();
 }
-void BlockcheckController::setStatus(const QString &v) { if (m_status != v) { m_status=v; emit statusChanged(); } }
+void BlockcheckController::setStatus(const QString &v, StatusType type) {
+    if (m_status != v || m_statusType != type) {
+        m_status = v;
+        m_statusType = type;
+        emit statusChanged();
+    }
+}
 void BlockcheckController::setBusy(bool v) { if (m_busy != v) { m_busy=v; emit busyChanged(); } }
 BlockcheckRunner::Options BlockcheckController::collectOptions() const {
     BlockcheckRunner::Options o;
@@ -76,24 +83,24 @@ BlockcheckRunner::Options BlockcheckController::collectOptions() const {
     o.repeats=m_repeats; o.scanLevel=m_scanLevel; return o;
 }
 void BlockcheckController::start() {
-    if (m_busy || m_updateBusy) { setStatus(tr("Подбор недоступен во время другой операции.")); return; }
+    if (m_busy || m_updateBusy) { setStatus(tr("Подбор недоступен во время другой операции."), StatusType::Warning); return; }
     const auto o=collectOptions();
     static const QRegularExpression labelRe(QStringLiteral("^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$"));
-    if (o.domains.isEmpty() || o.domains.size()>10) { setStatus(tr("Укажите от 1 до 10 доменов.")); return; }
+    if (o.domains.isEmpty() || o.domains.size()>10) { setStatus(tr("Укажите от 1 до 10 доменов."), StatusType::Error); return; }
     for (const auto &input : o.domains) {
         QString domain = input;
         if (domain.endsWith(QLatin1Char('.'))) domain.chop(1);
         if (domain.isEmpty() || domain.size()>253) {
-            setStatus(tr("Некорректный домен: %1").arg(input)); return;
+            setStatus(tr("Некорректный домен: %1").arg(input), StatusType::Error); return;
         }
         bool valid = true;
         for (const auto &label : domain.split(QLatin1Char('.')))
             valid = valid && label.size()<=63 && labelRe.match(label).hasMatch();
         if (!valid) { setStatus(tr("Некорректный домен: %1").arg(input)); return; }
     }
-    if (o.ipvs!=QLatin1String("4") && o.ipvs!=QLatin1String("6") && o.ipvs!=QLatin1String("46")) { setStatus(tr("Недопустимый протокол IP.")); return; }
-    if (!o.http && !o.tls12 && !o.tls13 && !o.http3) { setStatus(tr("Выберите хотя бы один тип проверки.")); return; }
-    if (o.scanLevel!=QLatin1String("veryquick") && o.scanLevel!=QLatin1String("quick") && o.scanLevel!=QLatin1String("standard") && o.scanLevel!=QLatin1String("force")) { setStatus(tr("Недопустимый уровень сканирования.")); return; }
+    if (o.ipvs!=QLatin1String("4") && o.ipvs!=QLatin1String("6") && o.ipvs!=QLatin1String("46")) { setStatus(tr("Недопустимый протокол IP."), StatusType::Error); return; }
+    if (!o.http && !o.tls12 && !o.tls13 && !o.http3) { setStatus(tr("Выберите хотя бы один тип проверки."), StatusType::Error); return; }
+    if (o.scanLevel!=QLatin1String("veryquick") && o.scanLevel!=QLatin1String("quick") && o.scanLevel!=QLatin1String("standard") && o.scanLevel!=QLatin1String("force")) { setStatus(tr("Недопустимый уровень сканирования."), StatusType::Error); return; }
     m_lastOptions=o; m_found=0; m_results.clear(); emit resultsChanged(); m_logText.clear(); emit logTextChanged();
     m_resumeService=false; m_cancelRequested=false; m_stopTimedOut=false; m_phase=Phase::Checking; setBusy(true);
     setStatus(tr("Проверка состояния службы zapret2…")); m_lifecycleTimeout->start(); m_backend->verifyState();
@@ -108,31 +115,31 @@ void BlockcheckController::handleVerifiedState(ZapretBackend::State state) {
             tr("Для диагностики требуется временно остановить zapret2. После завершения приложение попытается восстановить работу службы. Продолжить?"));
         return;
     }
-    finish(tr("Не удалось достоверно определить состояние службы. Диагностика не запущена."));
+    finish(tr("Не удалось достоверно определить состояние службы. Диагностика не запущена."), StatusType::Error);
 }
 void BlockcheckController::confirmStop(bool accepted) {
     if (m_phase!=Phase::AwaitingConfirmation) return;
-    if (!accepted) { finish(tr("Подбор отменён. Служба не изменена.")); return; }
+    if (!accepted) { finish(tr("Подбор отменён. Служба не изменена."), StatusType::Warning); return; }
     m_resumeService=true; m_phase=Phase::WaitingForStop; setStatus(tr("Остановка службы zapret2…")); m_lifecycleTimeout->start(); m_backend->stop();
 }
 void BlockcheckController::beginScan() { m_phase=Phase::Scanning; setStatus(tr("Выполняется диагностика blockcheck2…")); appendLog(tr("Запуск blockcheck2…")); m_runner->start(m_lastOptions); }
 bool BlockcheckController::saveLog(const QUrl &url) {
     if (!url.isLocalFile() || url.toLocalFile().isEmpty()) {
-        setStatus(tr("Выберите локальный файл для сохранения журнала."));
+        setStatus(tr("Выберите локальный файл для сохранения журнала."), StatusType::Error);
         return false;
     }
     const QString path = url.toLocalFile();
     QSaveFile file(path);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        setStatus(tr("Не удалось открыть файл журнала: %1").arg(file.errorString()));
+        setStatus(tr("Не удалось открыть файл журнала: %1").arg(file.errorString()), StatusType::Error);
         return false;
     }
     const QByteArray data = m_logText.toUtf8();
     if (file.write(data) != data.size() || !file.commit()) {
-        setStatus(tr("Не удалось сохранить журнал: %1").arg(file.errorString()));
+        setStatus(tr("Не удалось сохранить журнал: %1").arg(file.errorString()), StatusType::Error);
         return false;
     }
-    setStatus(tr("Журнал сохранён: %1").arg(QFileInfo(path).fileName()));
+    setStatus(tr("Журнал сохранён: %1").arg(QFileInfo(path).fileName()), StatusType::Success);
     return true;
 }
 void BlockcheckController::copyStrategy(int index) {
@@ -141,8 +148,8 @@ void BlockcheckController::copyStrategy(int index) {
     if (!command.isEmpty() && QGuiApplication::clipboard()) QGuiApplication::clipboard()->setText(command);
 }
 void BlockcheckController::cancel() {
-    if (m_phase==Phase::Checking || m_phase==Phase::AwaitingConfirmation) { finish(tr("Диагностика отменена до запуска.")); return; }
-    if (m_phase==Phase::WaitingForStop) { m_cancelRequested=true; setStatus(tr("Отмена запрошена; ожидается подтверждение остановки службы.")); return; }
+    if (m_phase==Phase::Checking || m_phase==Phase::AwaitingConfirmation) { finish(tr("Диагностика отменена до запуска."), StatusType::Warning); return; }
+    if (m_phase==Phase::WaitingForStop) { m_cancelRequested=true; setStatus(tr("Отмена запрошена; ожидается подтверждение остановки службы."), StatusType::Warning); return; }
     if (m_phase==Phase::Scanning) { m_cancelRequested=true; m_runner->cancel(); }
 }
 void BlockcheckController::handleUnitAction(const QString &action, ZapretBackend::State state, bool success) {
@@ -152,7 +159,7 @@ void BlockcheckController::handleUnitAction(const QString &action, ZapretBackend
             m_stopTimedOut = false;
             if (state == ZapretBackend::State::Active) {
                 m_resumeService = false;
-                finish(tr("Операция остановки завершилась с активной службой. Диагностика не запускалась."));
+                finish(tr("Операция остановки завершилась с активной службой. Диагностика не запускалась."), StatusType::Error);
             } else {
                 restoreService(tr("Получен результат операции остановки после тайм-аута."));
             }
@@ -161,12 +168,13 @@ void BlockcheckController::handleUnitAction(const QString &action, ZapretBackend
         if (success && state==ZapretBackend::State::Inactive) {
             if (m_cancelRequested) restoreService(tr("Диагностика отменена до запуска."));
             else beginScan();
-        } else if (state==ZapretBackend::State::Active) { m_resumeService=false; finish(tr("Остановка не подтверждена. Диагностика не запущена.")); }
+        } else if (state==ZapretBackend::State::Active) { m_resumeService=false; finish(tr("Остановка не подтверждена. Диагностика не запущена."), StatusType::Error); }
         else restoreService(tr("Не удалось подтвердить остановку службы."));
     } else if (m_phase==Phase::WaitingForStart && action==QLatin1String("start")) {
         m_lifecycleTimeout->stop();
         m_resumeService=false;
-        finish(state==ZapretBackend::State::Active ? tr("Служба zapret2 снова активна.") : tr("Не удалось восстановить службу. Проверьте состояние systemd."));
+        finish(state==ZapretBackend::State::Active ? tr("Служба zapret2 снова активна.") : tr("Не удалось восстановить службу. Проверьте состояние systemd."),
+               state==ZapretBackend::State::Active ? StatusType::Success : StatusType::Error);
     }
 }
 void BlockcheckController::restoreService(const QString &reason) {
@@ -178,14 +186,21 @@ void BlockcheckController::handleFinished(int exitCode, bool canceled) {
     m_cancelRequested=canceled;
     appendLog(canceled ? tr("Подбор отменён.") : tr("Диагностика завершена с кодом %1.").arg(exitCode));
     appendLog(tr("Найдено стратегий: %1; ошибок: %2").arg(m_found).arg(m_runner->errorCount()));
-    if (m_resumeService) restoreService(tr("Восстановление исходного состояния службы…"));
-    else finish();
+    if (m_resumeService) {
+        restoreService(tr("Восстановление исходного состояния службы…"));
+    } else if (!canceled && exitCode != 0) {
+        finish(tr("Диагностика завершилась с ошибкой (код %1).").arg(exitCode), StatusType::Error);
+    } else if (canceled) {
+        finish(tr("Подбор отменён."), StatusType::Warning);
+    } else {
+        finish(tr("Диагностика завершена."), StatusType::Success);
+    }
 }
-void BlockcheckController::finish(const QString &message) {
+void BlockcheckController::finish(const QString &message, StatusType type) {
     m_lifecycleTimeout->stop();
     m_phase=Phase::Idle; m_resumeService=false; m_stopTimedOut=false;
     if (!message.isEmpty()) appendLog(message);
-    setStatus(message.isEmpty() ? tr("Готово.") : message);
+    setStatus(message.isEmpty() ? tr("Готово.") : message, type);
     setBusy(false);
     emit scanFinished(m_found,m_cancelRequested);
     m_cancelRequested=false;
