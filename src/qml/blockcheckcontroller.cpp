@@ -28,7 +28,11 @@ BlockcheckController::BlockcheckController(ZapretBackend *backend, BlockcheckRun
             appendLog(tr("Операция остановки выполняется дольше ожидаемого. Новая команда запуска не отправляется до получения результата остановки."));
             setStatus(tr("Ожидание завершения операции остановки службы…"), StatusType::Warning);
         }
-        else if (m_phase == Phase::WaitingForStart) { m_resumeService=false; finish(tr("Не удалось подтвердить восстановление службы. Проверьте systemd."), StatusType::Error); }
+        else if (m_phase == Phase::WaitingForStart) {
+            m_startTimedOut = true;
+            appendLog(tr("Восстановление службы выполняется дольше ожидаемого. Новые команды управления заблокированы до получения результата."));
+            setStatus(tr("Ожидание подтверждения восстановления службы…"), StatusType::Warning);
+        }
     });
     connect(m_backend, &ZapretBackend::stateVerifiedForRequest, this, &BlockcheckController::handleVerifiedState);
     connect(m_backend, &ZapretBackend::unitActionFinishedForRequest, this, &BlockcheckController::handleUnitAction);
@@ -119,7 +123,7 @@ void BlockcheckController::start() {
     if (!o.http && !o.tls12 && !o.tls13 && !o.http3) { setStatus(tr("Выберите хотя бы один тип проверки."), StatusType::Error); return; }
     if (o.scanLevel!=QLatin1String("veryquick") && o.scanLevel!=QLatin1String("quick") && o.scanLevel!=QLatin1String("standard") && o.scanLevel!=QLatin1String("force")) { setStatus(tr("Недопустимый уровень сканирования."), StatusType::Error); return; }
     m_lastOptions=o; m_found=0; m_results.clear(); emit resultsChanged(); m_logText.clear(); emit logTextChanged();
-    m_resumeService=false; m_cancelRequested=false; m_stopTimedOut=false; m_phase=Phase::Checking; ++m_operationId; setBusy(true);
+    m_resumeService=false; m_cancelRequested=false; m_stopTimedOut=false; m_startTimedOut=false; m_phase=Phase::Checking; ++m_operationId; setBusy(true);
     setStatus(tr("Проверка состояния службы zapret2…")); m_lifecycleTimeout->start(); m_backend->verifyState(m_operationId);
 }
 void BlockcheckController::handleVerifiedState(quint64 requestId, ZapretBackend::State state) {
@@ -203,7 +207,14 @@ void BlockcheckController::handleUnitAction(quint64 requestId, const QString &ac
     } else if (m_phase==Phase::WaitingForStart && action==QLatin1String("start")) {
         m_lifecycleTimeout->stop();
         m_resumeService=false;
-        if (state == ZapretBackend::State::Active) {
+        if (m_startTimedOut) {
+            m_startTimedOut = false;
+            if (state == ZapretBackend::State::Active) {
+                finish(tr("Служба zapret2 восстановлена с задержкой. Проверьте состояние приложения."), StatusType::Warning);
+            } else {
+                finish(tr("Не удалось подтвердить восстановление службы после тайм-аута. Проверьте systemd."), StatusType::Error);
+            }
+        } else if (state == ZapretBackend::State::Active) {
             const QString message = m_pendingFinalMessage.isEmpty()
                 ? tr("Служба zapret2 снова активна.") : m_pendingFinalMessage;
             finish(message, m_pendingFinalType);
@@ -221,7 +232,7 @@ void BlockcheckController::restoreService(const QString &reason, const QString &
         finish(m_pendingFinalMessage, m_pendingFinalType);
         return;
     }
-    m_phase=Phase::WaitingForStart; setStatus(tr("Восстановление службы zapret2…")); m_lifecycleTimeout->start(); m_backend->start(m_operationId);
+    m_startTimedOut=false; m_phase=Phase::WaitingForStart; setStatus(tr("Восстановление службы zapret2…")); m_lifecycleTimeout->start(); m_backend->start(m_operationId);
 }
 void BlockcheckController::handleFinished(int exitCode, bool canceled) {
     m_cancelRequested=canceled;
@@ -245,7 +256,7 @@ void BlockcheckController::handleFinished(int exitCode, bool canceled) {
 }
 void BlockcheckController::finish(const QString &message, StatusType type) {
     m_lifecycleTimeout->stop();
-    m_phase=Phase::Idle; m_resumeService=false; m_stopTimedOut=false;
+    m_phase=Phase::Idle; m_resumeService=false; m_stopTimedOut=false; m_startTimedOut=false;
     if (!message.isEmpty()) appendLog(message);
     setStatus(message.isEmpty() ? tr("Готово.") : message, type);
     setBusy(false);
