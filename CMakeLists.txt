@@ -20,6 +20,8 @@ set(QZAPRET_HELPER "${CMAKE_INSTALL_FULL_LIBEXECDIR}/zapret2applet/zapret2applet
 
 set(QZAPRET_SOURCES
     src/main.cpp
+    src/aboutpage.cpp
+    src/aboutpage.h
     src/autostart.cpp
     src/autostart.h
     src/blockcheckpage.cpp
@@ -57,7 +59,7 @@ qt_add_library(zapret2applet_i18n STATIC src/i18n.cpp src/i18n.h)
 target_include_directories(zapret2applet_i18n PUBLIC src)
 target_link_libraries(zapret2applet_i18n PUBLIC Qt6::Core)
 qt_add_translations(zapret2applet_i18n
-    TS_FILES i18n/zapret2applet_en.ts
+    TS_FILES i18n/zapret2applet_en.ts i18n/zapret2applet_about_en.ts
     SOURCES ${QZAPRET_SOURCES} src/i18n.cpp
     INCLUDE_DIRECTORIES src
 )
