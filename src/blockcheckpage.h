@@ -29,6 +29,8 @@ private:
     void onStartClicked();
     void beginScan();
     void onBackendState(ZapretBackend::State state);
+    void onVerifiedState(ZapretBackend::State state);
+    void onUnitActionFinished(const QString &action, ZapretBackend::State state, bool success);
     void onFinished(int exitCode, bool canceled);
     void onLifecycleTimeout();
     void restoreService(const QString &reason);
