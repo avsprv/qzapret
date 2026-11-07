@@ -43,7 +43,7 @@ Kirigami.ApplicationWindow {
             Kirigami.Action {
                 text: qsTr("Мониторинг")
                 icon.name: "utilities-system-monitor"
-                onTriggered: root.pageStack.push(placeholderPage, { pageTitle: text })
+                onTriggered: root.pageStack.push(logsPageComponent)
             },
             Kirigami.Action {
                 text: qsTr("Подбор стратегий")
@@ -192,6 +192,11 @@ Kirigami.ApplicationWindow {
     Component {
         id: aboutPageComponent
         AboutPage {}
+    }
+
+    Component {
+        id: logsPageComponent
+        LogsPage {}
     }
 
     Component {
