@@ -29,7 +29,6 @@ signals:
 private:
     void onStartClicked();
     void beginScan();
-    void onBackendState(ZapretBackend::State state);
     void onVerifiedState(ZapretBackend::State state);
     void onUnitActionFinished(const QString &action, ZapretBackend::State state, bool success);
     void onFinished(int exitCode, bool canceled);
@@ -42,7 +41,6 @@ private:
 
     ZapretBackend *m_backend;
     BlockcheckRunner *m_runner;
-    ZapretBackend::State m_state = ZapretBackend::State::Unknown;
     LifecyclePhase m_phase = LifecyclePhase::Idle;
     bool m_resumeService = false;
     bool m_cancelRequested = false;
