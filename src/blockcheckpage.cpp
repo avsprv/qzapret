@@ -1,5 +1,8 @@
 #include "blockcheckpage.h"
 
+#include "backend/zapretcompatibility.h"
+#include "backend/zapretpaths.h"
+
 #include <QCheckBox>
 #include <QFontDatabase>
 #include <QClipboard>
@@ -194,6 +197,17 @@ void BlockcheckPage::onStartClicked()
     }
     if (!o.http && !o.tls12 && !o.tls13 && !o.http3) {
         QMessageBox::warning(this, tr("Подбор стратегий"), tr("Выберите хотя бы один тип проверки."));
+        return;
+    }
+
+    const auto compatibility = ZapretCompatibility::inspect(ZapretPaths::baseDir());
+    if (!compatibility.compatible) {
+        const QString details = compatibility.missingComponents.join(QStringLiteral("\\n"));
+        const QString message = tr("Установка zapret2 не прошла проверку совместимости. Отсутствуют или не поддерживаются компоненты:\\n%1")
+                                    .arg(details);
+        m_log->clear();
+        m_log->appendPlainText(message);
+        QMessageBox::warning(this, tr("Подбор стратегий"), message);
         return;
     }
 
