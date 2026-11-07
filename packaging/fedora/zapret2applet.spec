@@ -7,6 +7,9 @@ URL:            https://github.com/avsprv/zapret2applet
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  cmake >= 3.21
+BuildRequires:  extra-cmake-modules >= 6.0
+BuildRequires:  kf6-kirigami-devel
+BuildRequires:  qt6-qtdeclarative-devel
 BuildRequires:  ninja-build
 BuildRequires:  gcc-c++
 BuildRequires:  cmake(Qt6Widgets) >= 6.8
@@ -14,7 +17,7 @@ BuildRequires:  cmake(Qt6Network) >= 6.8
 BuildRequires:  cmake(Qt6LinguistTools) >= 6.8
 BuildRequires:  cmake(Qt6Test) >= 6.8
 BuildRequires:  desktop-file-utils
-# тесты скриптов-хелпера
+# test dependencies for the privileged helper
 BuildRequires:  curl
 BuildRequires:  tar
 Requires:       polkit
