@@ -22,6 +22,7 @@ ecm_find_qmlmodule(org.kde.kirigami REQUIRED)
 find_package(Qt6 ${QZAPRET_QT_MIN} REQUIRED COMPONENTS
     Widgets Network LinguistTools
     Core Gui Qml Quick QuickControls2 QuickDialogs2
+)
 
 qt_standard_project_setup(REQUIRES ${QZAPRET_QT_MIN})
 
