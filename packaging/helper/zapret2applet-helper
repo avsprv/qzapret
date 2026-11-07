@@ -86,10 +86,10 @@ secure_config_paths() {
 }
 
 prepare_backup_root() {
+    if [ "$TEST_MODE" != 1 ]; then
+        secure_root_dir /var && secure_root_dir /var/backups || return 1
+    fi
     if [ ! -e "$BACKUP_ROOT" ]; then
-        if [ "$TEST_MODE" != 1 ]; then
-            secure_root_dir /var && secure_root_dir /var/backups || return 1
-        fi
         mkdir "$BACKUP_ROOT" 2>/dev/null || return 1
         chmod 700 "$BACKUP_ROOT" || return 1
     fi
