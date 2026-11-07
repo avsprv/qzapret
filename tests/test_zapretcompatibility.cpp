@@ -37,6 +37,11 @@ private:
         writeFile(root + QStringLiteral("/config.default"), "# default config\n");
         writeFile(root + QStringLiteral("/common/base.sh"), "# common\n");
         writeFile(root + QStringLiteral("/common/dialog.sh"), "# dialog\n");
+        writeFile(root + QStringLiteral("/common/elevate.sh"), "# elevate\\n");
+        writeFile(root + QStringLiteral("/common/fwtype.sh"), "# fwtype\\n");
+        writeFile(root + QStringLiteral("/common/virt.sh"), "# virt\\n");
+        writeFile(root + QStringLiteral("/blockcheck2.d/standard/def.inc"), "# defaults\\n");
+        writeFile(root + QStringLiteral("/mdig/mdig"), "#!/bin/sh\\n");
         writeFile(root + QStringLiteral("/blockcheck2.d/standard/10-http-basic.sh"), "# tests\n");
         writeFile(root + QStringLiteral("/nfq2/nfqws2"), "#!/bin/sh\n");
         writeFile(root + QStringLiteral("/docs/changes.txt"), "v1.0.6\n\n1.0.7\n\nrelease\n");
