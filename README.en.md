@@ -33,7 +33,7 @@ The application provides a graphical interface for managing an existing zapret2 
 
 ## Features
 
-- **Service management:** view the status, start, and stop the zapret2 systemd service.
+- **Service management:** view the status, start, stop, and configure autostart for zapret2 through systemd, OpenRC, or OpenWrt procd.
 - **Network diagnostics:** run the upstream `blockcheck2` script to test connectivity to user-specified domains over HTTP, TLS 1.2/1.3, and HTTP/3 (QUIC), with IPv4 and IPv6 support.
 - **Results:** view and copy detected strategies.
 - **System tray:** the application keeps running in the notification area after the main window is closed.
@@ -43,7 +43,7 @@ The application provides a graphical interface for managing an existing zapret2 
 
 ## Compatibility and requirements
 
-Building requires **Qt 6.8+**, CMake 3.21+, a C++20 compiler, and Ninja. The application also requires systemd, Polkit, pkexec, curl, and tar.
+Building requires **Qt 6.8+**, CMake 3.21+, a C++20 compiler, and Ninja. Runtime requires one supported init system (systemd, OpenRC, or OpenWrt procd); privileged operations require Polkit and pkexec. curl and tar are also required.
 
 | Distribution | Baseline in packaging configuration |
 |---|---:|
@@ -52,6 +52,8 @@ Building requires **Qt 6.8+**, CMake 3.21+, a C++20 compiler, and Ninja. The app
 | Ubuntu | 25.04+ |
 
 These versions reflect the baseline availability of Qt 6.8; they do not guarantee support for every distribution release. **Ubuntu 25.04 has reached end of life** and should not be installed just for this application. On Ubuntu, use a currently supported release with Qt 6.8+ and validate the specific release separately.
+
+Prebuilt packages are currently published for Debian and Fedora systems using systemd. OpenRC and OpenWrt require a source build. OpenRC requires `rc-service` and `rc-update`; OpenWrt requires `procd`, `ubus`, and `/etc/rc.common`. Both require an installed `/etc/init.d/zapret2` whose contents match the upstream adapter under `/opt/zapret2/init.d/`. The helper verifies this match before privileged operations. Polkit and pkexec are required to keep the GUI unprivileged.
 
 **zapret2 must be installed separately.** The application manages an existing installation (usually /opt/zapret2) but does not perform the initial setup.
 
@@ -79,7 +81,9 @@ If a prebuilt package is unavailable, follow the [build from source](#building-f
 
 ### Service management
 
-The **Status** tab displays the zapret2 service state. You can start or stop the service and configure its autostart. Application autostart at user login is configured separately.
+The **Status** tab displays the zapret2 state and the detected init system. You can start or stop the service and configure its autostart. Application autostart at user login is configured separately. OpenRC and OpenWrt require their upstream init adapter to be installed; service controls are disabled if the adapter is missing or differs from upstream.
+
+The **Monitoring** tab displays the `zapret2.service` journald log only with the systemd backend. The journald view is disabled for OpenRC and OpenWrt.
 
 ### Strategy testing
 

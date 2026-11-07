@@ -12,6 +12,7 @@ URLBASE=https://github.com/bol-van/zapret2/releases/download
 PROTO='=https'
 NOSVC=0
 JOURNALCTL=journalctl
+SERVICE_DIR=/etc/init.d
 
 # Переопределения ТОЛЬКО для тестов. Игнорируются, если хелпер установлен в системный
 # каталог; кроме того, pkexec сам очищает окружение вызывающего.
@@ -24,6 +25,7 @@ case "$0" in
         if [ -n "${QZAPRET_TEST_URLBASE:-}" ]; then URLBASE=$QZAPRET_TEST_URLBASE; PROTO='=https,file'; fi
         if [ -n "${QZAPRET_TEST_NO_SERVICE:-}" ]; then NOSVC=1; fi
         if [ -n "${QZAPRET_TEST_JOURNALCTL:-}" ]; then JOURNALCTL=$QZAPRET_TEST_JOURNALCTL; fi
+        if [ -n "${QZAPRET_TEST_SERVICE_DIR:-}" ]; then SERVICE_DIR=$QZAPRET_TEST_SERVICE_DIR; fi
         ;;
 esac
 PIDFILE=$RUNDIR/blockcheck.pid
@@ -230,6 +232,66 @@ config-rollback)
     trap - EXIT HUP INT TERM
     echo "OK: config restored from $restore; previous config backed up to $backup"
     ;;
+service)
+    [ "$#" -eq 3 ] || die "usage: service {openrc|openwrt} {state|status|enabled|start|stop|enable|disable}"
+    case "$2" in openrc|openwrt) backend=$2 ;; *) die "service backend is not allowlisted" ;; esac
+    service_script="$SERVICE_DIR/zapret2"
+    upstream_script="$BASE/init.d/$backend/zapret2"
+    [ -d "$BASE" ] && [ ! -L "$BASE" ] || die "zapret2 not found in $BASE"
+    [ -f "$upstream_script" ] && [ ! -L "$upstream_script" ] || die "upstream $backend service adapter is missing or unsafe"
+    [ -f "$service_script" ] && [ -x "$service_script" ] || die "installed zapret2 init script is missing or not executable"
+    cmp -s "$service_script" "$upstream_script" || die "installed init script differs from the bundled upstream $backend adapter"
+    case "$backend:$3" in
+        openrc:state)
+            command -v rc-service >/dev/null 2>&1 || die "rc-service is not available"
+            command -v rc-update >/dev/null 2>&1 || die "rc-update is not available"
+            status=inactive
+            if rc-service zapret2 status >/dev/null 2>&1; then status=active; fi
+            runlevels=$(rc-update show default 2>&1) || die "cannot query OpenRC runlevels: $runlevels"
+            enabled=disabled
+            if printf '%s\n' "$runlevels" | grep -Eq '(^|[[:space:]])zapret2([[:space:]]|$)'; then enabled=enabled; fi
+            printf '%s\n%s\n' "$status" "$enabled"
+            ;;
+        openrc:status)
+            command -v rc-service >/dev/null 2>&1 || die "rc-service is not available"
+            if rc-service zapret2 status >/dev/null 2>&1; then echo active; else echo inactive; fi
+            ;;
+        openrc:enabled)
+            command -v rc-update >/dev/null 2>&1 || die "rc-update is not available"
+            runlevels=$(rc-update show default 2>&1) || die "cannot query OpenRC runlevels: $runlevels"
+            if printf '%s\n' "$runlevels" | grep -Eq '(^|[[:space:]])zapret2([[:space:]]|$)'; then echo enabled; else echo disabled; fi
+            ;;
+        openrc:start|openrc:stop)
+            command -v rc-service >/dev/null 2>&1 || die "rc-service is not available"
+            rc-service zapret2 "$3"
+            ;;
+        openrc:enable)
+            command -v rc-update >/dev/null 2>&1 || die "rc-update is not available"
+            rc-update add zapret2 default
+            ;;
+        openrc:disable)
+            command -v rc-update >/dev/null 2>&1 || die "rc-update is not available"
+            rc-update del zapret2 default
+            ;;
+        openwrt:state)
+            status=inactive
+            enabled=disabled
+            if "$service_script" running >/dev/null 2>&1; then status=active; fi
+            if "$service_script" enabled >/dev/null 2>&1; then enabled=enabled; fi
+            printf '%s\n%s\n' "$status" "$enabled"
+            ;;
+        openwrt:status)
+            if "$service_script" running >/dev/null 2>&1; then echo active; else echo inactive; fi
+            ;;
+        openwrt:enabled)
+            if "$service_script" enabled >/dev/null 2>&1; then echo enabled; else echo disabled; fi
+            ;;
+        openwrt:start|openwrt:stop|openwrt:enable|openwrt:disable)
+            "$service_script" "$3"
+            ;;
+        *) die "service action is not allowlisted" ;;
+    esac
+    ;;
 unit)
     case "${2:-}" in
         start|stop|enable|disable) exec systemctl "$2" "$UNIT" ;;
@@ -383,6 +445,6 @@ update)
     echo "OK: zapret2 updated to $tag (previous version kept in $bak)"
     ;;
 *)
-    die "usage: zapret2applet-helper logs-read {50|100|200|500} | lists-read NAME | lists-write NAME | config-read | config-write [EXPECTED_SHA256] | config-rollback | unit {start|stop|enable|disable} | blockcheck [opts] | blockcheck-cancel | update vX.Y.Z"
+    die "usage: zapret2applet-helper logs-read {50|100|200|500} | service {openrc|openwrt} ACTION | unit {start|stop|enable|disable} | lists-read NAME | lists-write NAME | config-read | config-write [EXPECTED_SHA256] | config-rollback | unit {start|stop|enable|disable} | blockcheck [opts] | blockcheck-cancel | update vX.Y.Z"
     ;;
 esac
