@@ -1163,4 +1163,29 @@ If the service is running, it will be stopped for the duration of the update and
     <message><source>Не удалось прочитать журнал: %1</source><translation>Could not read journal: %1</translation></message>
     <message><source>Не удалось запустить хелпер: %1</source><translation>Could not start helper: %1</translation></message>
   </context>
+
+  <context>
+    <name>SettingsDialog</name>
+    <message><source>Настройки</source><translation>Settings</translation></message>
+    <message><source>Как в системе</source><translation>Follow system</translation></message>
+    <message><source>Русский</source><translation>Russian</translation></message>
+    <message><source>English</source><translation>English</translation></message>
+    <message><source>Светлая</source><translation>Light</translation></message>
+    <message><source>Тёмная</source><translation>Dark</translation></message>
+    <message><source>Автоматически проверять обновления (не чаще раза в сутки)</source><translation>Check for updates automatically (at most once a day)</translation></message>
+    <message><source>Запускать приложение при входе в систему</source><translation>Launch application at login</translation></message>
+    <message><source>Сворачивать в системный трей при закрытии окна</source><translation>Minimize to the system tray when closing the window</translation></message>
+    <message><source>Язык интерфейса:</source><translation>Interface language:</translation></message>
+    <message><source>Тема оформления:</source><translation>Appearance:</translation></message>
+    <message><source>Ошибка</source><translation>Error</translation></message>
+    <message><source>Не удалось изменить автозапуск zapret2applet.</source><translation>Could not change zapret2applet autostart.</translation></message>
+  </context>
+  <context>
+    <name>MainWindow</name>
+    <message><source>Приложение</source><translation>Application</translation></message>
+    <message><source>Настройки…</source><translation>Settings…</translation></message>
+    <message><source>Выход</source><translation>Quit</translation></message>
+    <message><source>Язык интерфейса</source><translation>Interface language</translation></message>
+    <message><source>Изменение языка будет применено после следующего запуска приложения.</source><translation>The language change will take effect the next time the application starts.</translation></message>
+  </context>
 </TS>
