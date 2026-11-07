@@ -17,22 +17,10 @@ Kirigami.ScrollablePage {
         }
 
         Controls.Label {
-            text: qsTr("Тема оформления")
-        }
-
-        Controls.ComboBox {
             Layout.fillWidth: true
-            model: [
-                { text: qsTr("Системная"), value: "system" },
-                { text: qsTr("Светлая"), value: "light" },
-                { text: qsTr("Тёмная"), value: "dark" }
-            ]
-            textRole: "text"
-            currentIndex: {
-                const index = model.findIndex(item => item.value === settingsManager.theme)
-                return Math.max(0, index)
-            }
-            onActivated: settingsManager.theme = model[currentIndex].value
+            wrapMode: Text.WordWrap
+            text: qsTr("Тема пока следует системным настройкам. Выбор светлой и тёмной темы будет добавлен позже.")
+            Accessible.name: qsTr("Тема оформления")
         }
 
         Controls.Label {
@@ -47,6 +35,7 @@ Kirigami.ScrollablePage {
                 { text: qsTr("English"), value: "en" }
             ]
             textRole: "text"
+            Accessible.name: qsTr("Язык интерфейса")
             currentIndex: {
                 const index = model.findIndex(item => item.value === settingsManager.language)
                 return Math.max(0, index)
