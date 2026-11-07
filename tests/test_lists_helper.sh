@@ -19,7 +19,7 @@ chmod 777 "$tmp/base/ipset"
 if "$H" lists-read zapret-hosts-user.txt >/dev/null 2>&1; then
     echo "FAIL: writable list directory was accepted"; exit 1
 fi
-if printf 'changed.example\\n' | "$H" lists-write zapret-hosts-user.txt >/dev/null 2>&1; then
+if printf 'changed.example\n' | "$H" lists-write zapret-hosts-user.txt >/dev/null 2>&1; then
     echo "FAIL: writable list directory was accepted for writing"; exit 1
 fi
 chmod 755 "$tmp/base/ipset"
@@ -27,7 +27,7 @@ chmod 666 "$tmp/base/ipset/zapret-hosts-user.txt"
 if "$H" lists-read zapret-hosts-user.txt >/dev/null 2>&1; then
     echo "FAIL: group/world-writable list file was accepted"; exit 1
 fi
-if printf 'changed.example\\n' | "$H" lists-write zapret-hosts-user.txt >/dev/null 2>&1; then
+if printf 'changed.example\n' | "$H" lists-write zapret-hosts-user.txt >/dev/null 2>&1; then
     echo "FAIL: group/world-writable list file was accepted for writing"; exit 1
 fi
 chmod 644 "$tmp/base/ipset/zapret-hosts-user.txt"
