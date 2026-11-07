@@ -228,4 +228,5 @@ void UpdateController::handleUpdateFinished(int exitCode)
     m_installing = false;
     m_busy = false;
     emit stateChanged();
+    emit operationFinished();
 }
