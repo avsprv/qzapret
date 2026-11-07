@@ -17,6 +17,8 @@ expect_reject bogus
 expect_reject unit
 expect_reject unit restart
 expect_reject unit "start;id"
+expect_reject unit start unexpected
+expect_reject blockcheck-cancel unexpected
 expect_reject blockcheck --domains 'a.org;id'
 expect_reject blockcheck --domains '$(id)'
 expect_reject blockcheck --domains '-rf'
@@ -38,6 +40,7 @@ expect_reject blockcheck --unknown 1
 expect_reject blockcheck --domains
 expect_reject update
 expect_reject update bogus
+expect_reject update v1.0.7 unexpected
 expect_reject update 1.0.7
 expect_reject update 'v1.0.7;id'
 expect_reject update 'v1.$(id)'
