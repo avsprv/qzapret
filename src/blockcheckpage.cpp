@@ -202,8 +202,8 @@ void BlockcheckPage::onStartClicked()
 
     const auto compatibility = ZapretCompatibility::inspect(ZapretPaths::baseDir());
     if (!compatibility.compatible) {
-        const QString details = compatibility.missingComponents.join(QStringLiteral("\\n"));
-        const QString message = tr("Установка zapret2 не прошла проверку совместимости. Отсутствуют или не поддерживаются компоненты:\\n%1")
+        const QString details = compatibility.missingComponents.join(QStringLiteral("\n"));
+        const QString message = tr("Установка zapret2 не прошла проверку совместимости. Отсутствуют или не поддерживаются компоненты:\n%1")
                                     .arg(details);
         m_log->clear();
         m_log->appendPlainText(message);
