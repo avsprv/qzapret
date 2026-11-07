@@ -13,6 +13,7 @@
 #include "profilecontroller.h"
 #include "logscontroller.h"
 #include "listscontroller.h"
+#include "updatecontroller.h"
 #include "settingsmanager.h"
 
 namespace {
@@ -40,6 +41,14 @@ int main(int argc, char *argv[])
     LogsController logsController;
     ListsController listsController;
     BlockcheckController blockcheckController;
+    UpdateController updateController(&settingsManager);
+
+    updateController.setBlockcheckBusy(blockcheckController.busy());
+    blockcheckController.setUpdateBusy(updateController.busy());
+    QObject::connect(&blockcheckController, &BlockcheckController::busyChanged,
+                     &updateController, [&] { updateController.setBlockcheckBusy(blockcheckController.busy()); });
+    QObject::connect(&updateController, &UpdateController::stateChanged,
+                     &blockcheckController, [&] { blockcheckController.setUpdateBusy(updateController.busy()); });
 
     const QLocale initialLocale = localeForLanguage(settingsManager.language());
     QLocale::setDefault(initialLocale);
@@ -52,6 +61,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty(QStringLiteral("logsController"), &logsController);
     engine.rootContext()->setContextProperty(QStringLiteral("listsController"), &listsController);
     engine.rootContext()->setContextProperty(QStringLiteral("blockcheckController"), &blockcheckController);
+    engine.rootContext()->setContextProperty(QStringLiteral("updateController"), &updateController);
     engine.loadFromModule(QStringLiteral("org.avsprv.zapret2applet"), QStringLiteral("Main"));
 
     if (engine.rootObjects().isEmpty())
