@@ -67,8 +67,10 @@ jobs:
           git archive HEAD | tar -x -C "$source_dir"
           mkdir -p "$source_dir/third_party"
           cp -a third_party/zapret2 "$source_dir/third_party/zapret2"
-          tar -czf "$HOME/rpmbuild/SOURCES/zapret2applet-0.3.0.tar.gz" \
-            --transform='s,^,zapret2applet-0.3.0/,' -C "$source_dir" .
+          version="$(sed -n 's/^project(zapret2applet VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)"
+          test -n "$version"
+          tar -czf "$HOME/rpmbuild/SOURCES/zapret2applet-${version}.tar.gz" \
+            --transform="s,^,zapret2applet-${version}/," -C "$source_dir" .
           cp packaging/fedora/zapret2applet.spec "$HOME/rpmbuild/SPECS/"
       - name: Build RPM
         run: |
