@@ -21,8 +21,8 @@ ecm_find_qmlmodule(org.kde.kirigami REQUIRED)
 
 find_package(Qt6 ${QZAPRET_QT_MIN} REQUIRED COMPONENTS
     Widgets Network LinguistTools
-    Core Gui Qml Quick QuickControls2
-)
+    Core Gui Qml Quick QuickControls2 QuickDialogs2
+
 qt_standard_project_setup(REQUIRES ${QZAPRET_QT_MIN})
 
 set(QZAPRET_HELPER "${CMAKE_INSTALL_FULL_LIBEXECDIR}/zapret2applet/zapret2applet-helper")
@@ -142,7 +142,7 @@ qt_add_qml_module(zapret2applet-qml-preview
 )
 target_include_directories(zapret2applet-qml-preview PRIVATE src src/qml)
 target_link_libraries(zapret2applet-qml-preview PRIVATE
-    Qt6::Core Qt6::Gui Qt6::Network Qt6::Qml Qt6::Quick Qt6::QuickControls2
+    Qt6::Core Qt6::Gui Qt6::Network Qt6::Qml Qt6::Quick Qt6::QuickControls2 Qt6::QuickDialogs2
     zapret2applet_i18n
 )
 target_compile_definitions(zapret2applet-qml-preview PRIVATE
