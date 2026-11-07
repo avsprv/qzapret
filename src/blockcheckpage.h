@@ -30,6 +30,7 @@ private:
     void beginScan();
     void onBackendState(ZapretBackend::State state);
     void onFinished(int exitCode, bool canceled);
+    void saveLog();
     void setBusy(bool busy);
     BlockcheckRunner::Options collectOptions() const;
 
@@ -51,6 +52,7 @@ private:
     QPushButton *m_startBtn;
     QPushButton *m_cancelBtn;
     QPushButton *m_copyBtn;
+    QPushButton *m_saveLogBtn;
     QPlainTextEdit *m_log;
     QListWidget *m_results;
     QTimer *m_stopTimeout;
