@@ -134,7 +134,7 @@ prepare_install; make_release v9.9.9
 out=$(run_install v9.9.9); rc=$?
 [ $rc -eq 0 ] && ok "clean install succeeds" || bad "clean install rc=$rc: $out"
 grep -q 'NFQWS2_ENABLE=0' "$W/opt/zapret2/config" && ok "fresh config disables NFQWS2" || bad "fresh config is unsafe"
-[ -x "$W/opt/zapret2/nfq2/nfqws2" ] && [ -x "$W/opt/zapret2/ip2net/ip2net"] \
+[ -x "$W/opt/zapret2/nfq2/nfqws2" ] && [ -x "$W/opt/zapret2/ip2net/ip2net" ] \
     && ok "compatible binaries linked" || bad "binary links missing"
 [ -f "$W/systemd/zapret2.service" ] && ok "systemd unit installed" || bad "systemd unit missing"
 [ ! -e "$W/run/install.lock" ] && ok "install lock released" || bad "install lock left behind"
