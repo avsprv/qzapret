@@ -174,7 +174,13 @@ Kirigami.ApplicationWindow {
         }
     }
 
-    Component {\n        id: configPageComponent\n        ConfigPage {}\n    }\n\n    Component {\n        id: settingsPageComponent
+    Component {
+        id: configPageComponent
+        ConfigPage {}
+    }
+
+    Component {
+        id: settingsPageComponent
         SettingsPage {}
     }
 
