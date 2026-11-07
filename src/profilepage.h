@@ -20,7 +20,7 @@ private:
     void copyProfile();
     void deleteProfile();
     void applyProfiles();
-    bool editProfileDialog(ProfileAnalyzer::Profile *profile, const QString &title);
+    bool editProfileDialog(ProfileAnalyzer::Profile *profile, const QString &title, int targetIndex, bool insert);
     int selectedProfile() const;
     QLabel *m_status = nullptr;
     QPushButton *m_refreshButton = nullptr;

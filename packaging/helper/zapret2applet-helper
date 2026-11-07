@@ -133,10 +133,19 @@ config-read)
     cat "$config"
     ;;
 config-write)
-    [ "$#" -eq 1 ] || die "usage: config-write"
+    [ "$#" -ge 1 ] && [ "$#" -le 2 ] || die "usage: config-write [EXPECTED_SHA256]"
     [ -d "$BASE" ] && [ ! -L "$BASE" ] || die "zapret2 not found in $BASE"
     config="$BASE/config"
     [ -f "$config" ] && [ ! -L "$config" ] || die "config is missing or is not a regular file"
+    expected_hash=""
+    if [ "$#" -eq 2 ]; then
+        expected_hash=$2
+        case "$expected_hash" in ''|*[!0-9a-f]*) die "invalid expected config SHA-256" ;; esac
+        [ "${#expected_hash}" -eq 64 ] || die "invalid expected config SHA-256"
+        command -v sha256sum >/dev/null 2>&1 || die "sha256sum is required for guarded config writes"
+        current_hash=$(sha256sum "$config" | awk '{print $1}')
+        [ "$current_hash" = "$expected_hash" ] || die "config changed since it was read; reload before saving"
+    fi
     tmp=$(mktemp "$BASE/.config.zapret2applet.XXXXXX") || die "cannot create temporary config"
     trap 'rm -f "$tmp"' EXIT HUP INT TERM
     head -c 1048577 > "$tmp"
@@ -152,6 +161,18 @@ config-write)
     backup=$(mktemp -d "$BACKUP_ROOT/config-$(date +%Y%m%d-%H%M%S)-XXXXXX") || die "cannot create backup directory"
     cp -p "$config" "$backup/config" || { rm -rf "$backup"; die "cannot create config backup; config was not changed"; }
     chmod 600 "$backup/config" || { rm -rf "$backup"; die "cannot secure config backup; config was not changed"; }
+    if [ -n "$expected_hash" ]; then
+        backup_hash=$(sha256sum "$backup/config" | awk '{print $1}')
+        [ "$backup_hash" = "$expected_hash" ] || {
+            rm -rf "$backup"
+            die "config changed while preparing the write; reload before saving"
+        }
+        current_hash=$(sha256sum "$config" | awk '{print $1}')
+        [ "$current_hash" = "$expected_hash" ] || {
+            rm -rf "$backup"
+            die "config changed while preparing the write; reload before saving"
+        }
+    fi
     sync -f "$tmp" || { rm -rf "$backup"; die "cannot sync staged config; config was not changed"; }
     mv -f -- "$tmp" "$config" || { rm -rf "$backup"; die "atomic config replacement failed"; }
     sync -f "$BASE" || true
@@ -335,6 +356,6 @@ update)
     echo "OK: zapret2 updated to $tag (previous version kept in $bak)"
     ;;
 *)
-    die "usage: zapret2applet-helper lists-read NAME | lists-write NAME | config-read | config-write | config-rollback | unit {start|stop|enable|disable} | blockcheck [opts] | blockcheck-cancel | update vX.Y.Z"
+    die "usage: zapret2applet-helper lists-read NAME | lists-write NAME | config-read | config-write [EXPECTED_SHA256] | config-rollback | unit {start|stop|enable|disable} | blockcheck [opts] | blockcheck-cancel | update vX.Y.Z"
     ;;
 esac
