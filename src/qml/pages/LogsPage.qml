@@ -81,7 +81,6 @@ Kirigami.ScrollablePage {
             Layout.fillWidth: true
             text: logsController.status
             wrapMode: Text.WordWrap
-            Accessible.live: Accessible.Polite
         }
 
         Controls.Frame {
