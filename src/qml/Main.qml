@@ -63,7 +63,7 @@ Kirigami.ApplicationWindow {
             Kirigami.Action {
                 text: qsTr("О программе")
                 icon.name: "help-about"
-                onTriggered: root.pageStack.push(placeholderPage, { pageTitle: text })
+                onTriggered: root.pageStack.push(aboutPageComponent)
             }
         ]
     }
@@ -187,6 +187,11 @@ Kirigami.ApplicationWindow {
     Component {
         id: settingsPageComponent
         SettingsPage {}
+    }
+
+    Component {
+        id: aboutPageComponent
+        AboutPage {}
     }
 
     Component {
