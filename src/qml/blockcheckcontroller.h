@@ -85,7 +85,7 @@ private:
     QString m_logText, m_status;
     QVariantList m_results;
     bool m_busy = false, m_updateBusy = false;
-    bool m_resumeService = false, m_cancelRequested = false;
+    bool m_resumeService = false, m_cancelRequested = false, m_stopTimedOut = false;
     int m_found = 0;
     BlockcheckRunner::Options m_lastOptions;
 };
