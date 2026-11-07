@@ -1,6 +1,6 @@
 # zapret2applet
 
-**An unofficial graphical frontend for [zapret2](https://github.com/bol-van/zapret2) on Linux.**
+**An independent graphical frontend for managing an installed [zapret2](https://github.com/bol-van/zapret2) service on Linux.**
 
 [![CI](https://github.com/avsprv/zapret2applet/actions/workflows/ci.yml/badge.svg)](https://github.com/avsprv/zapret2applet/actions/workflows/ci.yml)
 [![Packages](https://github.com/avsprv/zapret2applet/actions/workflows/packages.yml/badge.svg)](https://github.com/avsprv/zapret2applet/actions/workflows/packages.yml)
@@ -9,7 +9,7 @@
 
 [Русский](README.md) · **English**
 
-Manage the zapret2 service, test DPI-bypass strategies, and update an existing installation through a graphical interface.
+The application provides a graphical interface for managing an existing zapret2 service, running blockcheck2 network tests, and updating zapret2.
 
 > [!IMPORTANT]
 > **Independent project.** zapret2applet is not affiliated with the author or maintainers of [zapret2](https://github.com/bol-van/zapret2).
@@ -27,12 +27,14 @@ Manage the zapret2 service, test DPI-bypass strategies, and update an existing i
 - [Building packages](#building-packages)
 - [Development and testing](#development-and-testing)
 - [Report a bug](#report-a-bug)
+- [Legal information](#legal-information)
+- [Privacy](#privacy)
 - [License](#license)
 
 ## Features
 
 - **Service management:** view the status, start, and stop the zapret2 systemd service.
-- **Strategy testing:** test domains over HTTP, TLS 1.2/1.3, and HTTP/3 (QUIC), with IPv4 and IPv6 checks.
+- **Network testing:** run the upstream blockcheck2 script against user-specified domains over HTTP, TLS 1.2/1.3, and HTTP/3 (QUIC), with IPv4 and IPv6 checks.
 - **Results:** view and copy detected strategies.
 - **System tray:** the application keeps running in the notification area after the main window is closed.
 - **Autostart:** start the service at boot and the application at user login.
@@ -158,6 +160,14 @@ Before opening a report, check [existing Issues](https://github.com/avsprv/zapre
 
 [Open an issue](https://github.com/avsprv/zapret2applet/issues/new).
 
+## Legal information
+
+Read the [Disclaimer](DISCLAIMER.md) before using the software. This documentation describes technical functionality and is not legal advice. A disclaimer does not remove obligations imposed by applicable law.
+
+## Privacy
+
+See the [Privacy Policy](PRIVACY.md) for information about network requests, local settings, and data that may be visible to GitHub and tested network destinations.
+
 ## License
 
-The zapret2applet source code is distributed under the [MIT License](LICENSE). Third-party zapret2 information is available in [NOTICE.md](NOTICE.md). zapret2 is a separate project maintained at [bol-van/zapret2](https://github.com/bol-van/zapret2) and is independently distributed under the MIT License.
+The zapret2applet source code is distributed under the [MIT License](LICENSE). This license applies to this application's code and does not replace licenses for third-party components. Information about the linked zapret2 project is available in [NOTICE.md](NOTICE.md).
