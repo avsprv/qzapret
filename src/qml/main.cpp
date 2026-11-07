@@ -58,6 +58,9 @@ int main(int argc, char *argv[])
     updateController.setBlockcheckBusy(blockcheckController.busy());
     blockcheckController.setUpdateBusy(updateController.busy());
     controller.setOperationsBusy(blockcheckController.busy() || updateController.busy());
+    blockcheckController.setServiceBusy(controller.operationsBusy());
+    QObject::connect(&controller, &ApplicationController::operationsBusyChanged, &app,
+                     [&] { blockcheckController.setServiceBusy(controller.operationsBusy()); });
     QObject::connect(&blockcheckController, &BlockcheckController::busyChanged, &app,
                      [&] {
         updateController.setBlockcheckBusy(blockcheckController.busy());
