@@ -89,7 +89,7 @@ QString ListsController::validateHostlist(const QString &value) const
     const QStringList lines = value.split(QLatin1Char('\n'));
     if (lines.size() > 50000)
         return tr("Слишком много строк (максимум 50000).");
-    static const QRegularExpression labelPattern(QStringLiteral("^[A-Za-z0-9_-]{1,63}$"));
+    static const QRegularExpression labelPattern(QStringLiteral("^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$"));
     static const QRegularExpression numericPattern(QStringLiteral("^[0-9.]+$"));
     for (qsizetype i = 0; i < lines.size(); ++i) {
         const QString raw = lines.at(i);
