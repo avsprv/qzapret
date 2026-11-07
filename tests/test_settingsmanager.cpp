@@ -45,6 +45,24 @@ private slots:
         QVERIFY(!QSettings().value(QStringLiteral("tray/closeToTray")).toBool());
     }
 
+    void themeChangesEmitSignal()
+    {
+        QSettings().clear();
+        SettingsManager settings;
+        QSignalSpy changed(&settings, &SettingsManager::themeChanged);
+
+        settings.setTheme(QStringLiteral("dark"));
+        QCOMPARE(settings.theme(), QStringLiteral("dark"));
+        QCOMPARE(changed.size(), 1);
+
+        settings.setTheme(QStringLiteral("dark"));
+        QCOMPARE(changed.size(), 1);
+
+        settings.setTheme(QStringLiteral("system"));
+        QCOMPARE(settings.theme(), QStringLiteral("system"));
+        QCOMPARE(changed.size(), 2);
+    }
+
     void invalidValuesFallBackToSystem()
     {
         SettingsManager settings;
