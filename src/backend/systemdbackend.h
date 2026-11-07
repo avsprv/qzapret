@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QStringList>
+#include <QQueue>
 #include <functional>
 
 #include "zapretbackend.h"
@@ -23,8 +24,15 @@ public:
     void setBootEnabled(bool enabled) override;
 
 private:
+    struct PendingUnitAction {
+        QString action;
+        quint64 requestId = 0;
+    };
+    void startNextUnitAction();
     void runUnitAction(const QString &action, quint64 requestId = 0);
     void query(const QString &verb, const std::function<void(const QString &)> &onResult);
 
     QString m_unit;
+    QQueue<PendingUnitAction> m_pendingActions;
+    bool m_actionInProgress = false;
 };
