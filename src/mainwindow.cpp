@@ -14,6 +14,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 
+#include "aboutpage.h"
 #include "autostart.h"
 #include "backend/systemdbackend.h"
 #include "blockcheckpage.h"
@@ -41,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
     tabs->addTab(m_blockcheck, tr("Подбор стратегий"));
     m_update = new UpdatePage(m_backend, this);
     tabs->addTab(m_update, tr("Обновления"));
+    tabs->addTab(new AboutPage(this), tr("О программе"));
     connect(m_blockcheck, &BlockcheckPage::busyChanged, this, [this](bool busy) {
         m_update->setServiceBusy(busy);
         m_backend->refresh();
