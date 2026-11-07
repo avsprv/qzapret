@@ -40,6 +40,7 @@ private:
     bool m_waitingStop = false;
     bool m_resumeService = false;
     int m_found = 0;
+    BlockcheckRunner::Options m_lastOptions;
 
     QLineEdit *m_domains;
     QComboBox *m_ipvs;
