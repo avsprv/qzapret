@@ -24,7 +24,7 @@ class BlockcheckController final : public QObject
     Q_PROPERTY(QString logText READ logText NOTIFY logTextChanged)
     Q_PROPERTY(QVariantList results READ results NOTIFY resultsChanged)
     Q_PROPERTY(QString status READ status NOTIFY statusChanged)
-    Q_PROPERTY(StatusType statusType READ statusType NOTIFY statusChanged)
+    Q_PROPERTY(QString statusSeverity READ statusSeverity NOTIFY statusChanged)
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
     Q_PROPERTY(bool updateBusy READ updateBusy WRITE setUpdateBusy NOTIFY updateBusyChanged)
 
@@ -45,6 +45,7 @@ public:
     QVariantList results() const;
     QString status() const;
     StatusType statusType() const;
+    QString statusSeverity() const;
     bool busy() const;
     bool updateBusy() const;
     void setUpdateBusy(bool value);
@@ -70,7 +71,7 @@ private:
     void appendLog(const QString &line);
     void setStatus(const QString &value, StatusType type = StatusType::Information);
     void setBusy(bool value);
-    void finish(const QString &message = {});
+    void finish(const QString &message = {}, StatusType type = StatusType::Success);
     void beginScan();
     void restoreService(const QString &reason);
     void handleVerifiedState(ZapretBackend::State state);
