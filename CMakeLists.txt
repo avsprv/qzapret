@@ -232,6 +232,14 @@ if(BUILD_TESTING)
     target_compile_definitions(test_listscontroller PRIVATE QZAPRET_HELPER_PATH="/nonexistent")
     add_test(NAME lists_controller COMMAND test_listscontroller)
 
+    qt_add_executable(test_systemdbackend tests/test_systemdbackend.cpp
+        src/backend/systemdbackend.cpp src/backend/systemdbackend.h
+        src/backend/zapretbackend.h src/backend/helperpath.h)
+    target_include_directories(test_systemdbackend PRIVATE src)
+    target_link_libraries(test_systemdbackend PRIVATE Qt6::Test Qt6::Core)
+    target_compile_definitions(test_systemdbackend PRIVATE QZAPRET_HELPER_PATH="/nonexistent")
+    add_test(NAME systemd_backend COMMAND test_systemdbackend)
+
     qt_add_executable(test_blockcheckcontroller tests/test_blockcheckcontroller.cpp
         src/qml/blockcheckcontroller.cpp src/qml/blockcheckcontroller.h
         src/backend/blockcheckrunner.cpp src/backend/blockcheckrunner.h
