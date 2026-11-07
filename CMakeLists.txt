@@ -256,6 +256,13 @@ if(BUILD_TESTING)
     target_link_libraries(test_update PRIVATE Qt6::Test Qt6::Network)
     add_test(NAME update_versions COMMAND test_update)
 
+    qt_add_executable(test_zapretupdater tests/test_zapretupdater.cpp
+        src/backend/zapretupdater.cpp src/backend/zapretupdater.h)
+    target_include_directories(test_zapretupdater PRIVATE src)
+    target_link_libraries(test_zapretupdater PRIVATE Qt6::Test Qt6::Core)
+    target_compile_definitions(test_zapretupdater PRIVATE QZAPRET_HELPER_PATH="/nonexistent")
+    add_test(NAME zapretupdater COMMAND test_zapretupdater)
+
     add_test(NAME update_helper
              COMMAND sh ${CMAKE_SOURCE_DIR}/tests/test_update_helper.sh
                      ${CMAKE_SOURCE_DIR}/packaging/helper/zapret2applet-helper)
