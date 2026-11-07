@@ -1,5 +1,5 @@
 #!/bin/sh
-# Офлайн-тест команды `update` хелпера: фейковый релиз по file://, без сети и без root.
+# Офлайн-тесты команд `install` и `update` хелпера: фейковый релиз по file://, без сети и без root.
 # Переопределения QZAPRET_TEST_* работают, только если хелпер лежит вне системных каталогов.
 H="${1:?usage: test_update_helper.sh /path/to/zapret2applet-helper}"
 fail=0
