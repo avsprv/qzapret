@@ -155,14 +155,13 @@ if(BUILD_TESTING)
     set_tests_properties(blockcheck_lifecycle PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
 
     qt_add_executable(test_appsettings tests/test_appsettings.cpp
-
+        src/appsettings.cpp src/appsettings.h)
     target_include_directories(test_appsettings PRIVATE src)
     target_link_libraries(test_appsettings PRIVATE Qt6::Test Qt6::Core Qt6::Widgets)
     add_test(NAME appsettings COMMAND test_appsettings)
 
     qt_add_executable(test_settingsmanager tests/test_settingsmanager.cpp
-        src/qml/settingsmanager.cpp src/qml/settingsmanager.h
-        src/appsettings.cpp src/appsettings.h)
+        src/qml/settingsmanager.cpp src/qml/settingsmanager.h)
     target_include_directories(test_settingsmanager PRIVATE src src/qml)
     target_link_libraries(test_settingsmanager PRIVATE Qt6::Test Qt6::Core)
     add_test(NAME settingsmanager COMMAND test_settingsmanager)
