@@ -1,0 +1,5 @@
+* checking system
+* Linux detected
+!!!!! curl_test_https_tls12: working strategy found for ipv4 rutracker.org : nfqws2 --payload=tls_client_hello --lua-desync=fake:blob=0x00:ttl=3 !!!!!
+!!!!! curl_test_http: working strategy found for ipv6 example.org : nfqws2 --payload=http_req --lua-desync=fake:blob=0x00 !!!!! 
+curl_test_https_tls13: no working strategy found for ipv4 example.org
