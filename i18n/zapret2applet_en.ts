@@ -215,6 +215,66 @@
         <source>Завершено успешно</source>
         <translation>Completed successfully</translation>
     </message>
+    <message>
+        <source>Проверяю состояние сервиса zapret2…</source>
+        <translation>Checking zapret2 service state…</translation>
+    </message>
+    <message>
+        <source>Отмена запрошена. Дожидаюсь результата остановки сервиса…</source>
+        <translation>Cancellation requested. Waiting for the service stop result…</translation>
+    </message>
+    <message>
+        <source>Ошибка управления сервисом: %1</source>
+        <translation>Service management error: %1</translation>
+    </message>
+    <message>
+        <source>Подбор отменён. Сервис не изменён.</source>
+        <translation>Scan canceled. The service was not changed.</translation>
+    </message>
+    <message>
+        <source>Не удалось достоверно определить состояние сервиса. Диагностика не запущена.</source>
+        <translation>Could not verify the service state. Diagnostics were not started.</translation>
+    </message>
+    <message>
+        <source>Останавливаю zapret2 и проверяю результат…</source>
+        <translation>Stopping zapret2 and verifying the result…</translation>
+    </message>
+    <message>
+        <source>Диагностика отменена до запуска.</source>
+        <translation>Diagnostics canceled before starting.</translation>
+    </message>
+    <message>
+        <source>Не удалось подтвердить остановку сервиса. Диагностика не запущена.</source>
+        <translation>Could not confirm that the service stopped. Diagnostics were not started.</translation>
+    </message>
+    <message>
+        <source>Сервис остановлен. Запускаю blockcheck2…</source>
+        <translation>Service stopped. Starting blockcheck2…</translation>
+    </message>
+    <message>
+        <source>Запускаю zapret2 и проверяю восстановление…</source>
+        <translation>Starting zapret2 and verifying recovery…</translation>
+    </message>
+    <message>
+        <source>Не удалось получить подтверждённое состояние сервиса. Диагностика не запущена.</source>
+        <translation>Could not obtain a verified service state. Diagnostics were not started.</translation>
+    </message>
+    <message>
+        <source>Не получено подтверждение остановки сервиса за отведённое время.</source>
+        <translation>The service stop was not confirmed within the allowed time.</translation>
+    </message>
+    <message>
+        <source>Не удалось подтвердить запуск zapret2. Проверьте systemctl status zapret2.service.</source>
+        <translation>Could not confirm that zapret2 started. Check systemctl status zapret2.service.</translation>
+    </message>
+    <message>
+        <source>Диагностика завершена.</source>
+        <translation>Diagnostics completed.</translation>
+    </message>
+    <message>
+        <source>Проверка состояния отменена. Диагностика не запускалась.</source>
+        <translation>Service state check canceled. Diagnostics were not started.</translation>
+    </message>
 </context>
 <context>
     <name>BlockcheckRunner</name>
