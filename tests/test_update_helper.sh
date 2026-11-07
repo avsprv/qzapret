@@ -19,6 +19,7 @@ make_release() {
     cat > "$W/src/$name/install_bin.sh" <<'EOS'
 #!/bin/sh
 D=$(cd "$(dirname "$0")" && pwd)
+mkdir -p "$D/nfq2" "$D/ip2net" "$D/mdig"
 ln -fs ../binaries/linux-x86_64/nfqws2 "$D/nfq2/nfqws2"
 ln -fs ../binaries/linux-x86_64/ip2net "$D/ip2net/ip2net"
 ln -fs ../binaries/linux-x86_64/mdig "$D/mdig/mdig"
