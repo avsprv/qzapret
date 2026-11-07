@@ -16,7 +16,7 @@ Kirigami.ScrollablePage {
         }
         RowLayout {
             Layout.fillWidth: true
-            Controls.Button { text: qsTr("Обновить"); icon.name: "view-refresh"; enabled: !profileController.busy && !profileController.dirty; onClicked: profileController.read() }
+            Controls.Button { text: profileController.dirty ? qsTr("Отменить изменения") : qsTr("Обновить"); icon.name: profileController.dirty ? "edit-undo" : "view-refresh"; enabled: !profileController.busy; onClicked: { if (profileController.dirty) discardDialog.open(); else profileController.read() } }
             Controls.Button { text: qsTr("Создать"); icon.name: "list-add"; enabled: profileController.loaded && !profileController.busy && profileController.profiles.length < 128; onClicked: editor.openFor(-1, []) }
             Controls.Button { text: qsTr("Сохранить"); icon.name: "document-save"; enabled: profileController.dirty && !profileController.busy; onClicked: saveDialog.open() }
         }
@@ -61,6 +61,14 @@ Kirigami.ScrollablePage {
             Controls.Label { Layout.fillWidth: true; wrapMode: Text.WordWrap; text: qsTr("Один аргумент на строку. Не добавляйте --new, кавычки, shell-подстановки или пробелы внутри аргумента.") }
             Controls.TextArea { id: argumentEditor; Layout.fillWidth: true; Layout.preferredHeight: 320; wrapMode: TextEdit.NoWrap; font.family: "monospace"; selectByMouse: true }
         }
+    }
+    Controls.Dialog {
+        id: discardDialog
+        title: qsTr("Отменить изменения?")
+        modal: true
+        standardButtons: Controls.Dialog.Yes | Controls.Dialog.No
+        onAccepted: profileController.read(true)
+        Controls.Label { width: parent.width; wrapMode: Text.WordWrap; text: qsTr("Все несохранённые изменения профилей будут потеряны. Конфигурация будет повторно загружена с диска.") }
     }
     Controls.Dialog {
         id: saveDialog
