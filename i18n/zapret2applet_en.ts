@@ -291,10 +291,6 @@
         <source>Дождитесь завершения обновления перед запуском диагностики.</source>
         <translation>Wait for the update to finish before starting diagnostics.</translation>
     </message>
-    <message>
-        <source>Дождитесь завершения подбора стратегий перед обновлением.</source>
-        <translation>Wait for the strategy scan to finish before updating.</translation>
-    </message>
 </context>
 <context>
     <name>BlockcheckRunner</name>
@@ -598,6 +594,10 @@ If the service is running, it will be stopped for the duration of the update and
         <location filename="../src/updatepage.cpp" line="215"/>
         <source>Обновление не выполнено (код %1). Подробности — в журнале ниже.</source>
         <translation>Update failed (code %1). See the log below for details.</translation>
+    </message>
+    <message>
+        <source>Дождитесь завершения подбора стратегий перед обновлением.</source>
+        <translation>Wait for the strategy scan to finish before updating.</translation>
     </message>
 </context>
 <context>
