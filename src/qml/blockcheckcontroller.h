@@ -7,6 +7,7 @@
 #include "backend/zapretbackend.h"
 
 class SystemdBackend;
+class QTimer;
 
 class BlockcheckController final : public QObject
 {
@@ -70,6 +71,7 @@ private:
     void handleFinished(int exitCode, bool canceled);
     BlockcheckRunner::Options collectOptions() const;
 
+    QTimer *m_lifecycleTimeout = nullptr;
     SystemdBackend *m_backend = nullptr;
     BlockcheckRunner *m_runner = nullptr;
     Phase m_phase = Phase::Idle;
