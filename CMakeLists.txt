@@ -76,6 +76,7 @@ qt_add_translations(zapret2applet_i18n
     SOURCES
         ${QZAPRET_SOURCES}
         src/i18n.cpp
+        src/qml/logscontroller.cpp
         src/qml/Main.qml
         src/qml/pages/SettingsPage.qml
         src/qml/pages/ConfigPage.qml
