@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls as Controls
 import QtQuick.Layouts
+import QtQuick.Dialogs
 import org.kde.kirigami as Kirigami
 
 Kirigami.ScrollablePage {
@@ -14,6 +15,15 @@ Kirigami.ScrollablePage {
             stopServiceDialog.message = message
             stopServiceDialog.open()
         }
+    }
+
+    FileDialog {
+        id: saveLogDialog
+        title: qsTr("Сохранить журнал диагностики")
+        fileMode: FileDialog.SaveFile
+        nameFilters: [qsTr("Текстовые файлы (*.txt)"), qsTr("Все файлы (*)")]
+        defaultSuffix: "txt"
+        onAccepted: blockcheckController.saveLog(selectedFile)
     }
 
     Kirigami.Dialog {
@@ -121,7 +131,17 @@ Kirigami.ScrollablePage {
                 Accessible.name: qsTr("Копировать стратегию: %1").arg(modelData.label)
             }
         }
-        Kirigami.Heading { level: 2; text: qsTr("Журнал диагностики") }
+        RowLayout {
+            Layout.fillWidth: true
+            Kirigami.Heading { level: 2; text: qsTr("Журнал диагностики") }
+            Item { Layout.fillWidth: true }
+            Controls.Button {
+                text: qsTr("Сохранить журнал")
+                icon.name: "document-save"
+                enabled: blockcheckController.logText.length > 0
+                onClicked: saveLogDialog.open()
+            }
+        }
         Controls.TextArea {
             Layout.fillWidth: true
             Layout.preferredHeight: 260
