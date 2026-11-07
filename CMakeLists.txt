@@ -19,6 +19,8 @@ qt_standard_project_setup(REQUIRES ${QZAPRET_QT_MIN})
 set(QZAPRET_HELPER "${CMAKE_INSTALL_FULL_LIBEXECDIR}/zapret2applet/zapret2applet-helper")
 
 set(QZAPRET_SOURCES
+    src/appsettings.cpp
+    src/appsettings.h
     src/main.cpp
     src/aboutpage.cpp
     src/aboutpage.h
@@ -107,6 +109,12 @@ if(BUILD_TESTING)
     target_compile_definitions(test_blockcheck_lifecycle PRIVATE QZAPRET_HELPER_PATH="/nonexistent" QZAPRET_TEST_SKIP_COMPATIBILITY=1)
     add_test(NAME blockcheck_lifecycle COMMAND test_blockcheck_lifecycle)
     set_tests_properties(blockcheck_lifecycle PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+
+    qt_add_executable(test_appsettings tests/test_appsettings.cpp
+        src/appsettings.cpp src/appsettings.h)
+    target_include_directories(test_appsettings PRIVATE src)
+    target_link_libraries(test_appsettings PRIVATE Qt6::Test Qt6::Core)
+    add_test(NAME appsettings COMMAND test_appsettings)
 
     qt_add_executable(test_i18n tests/test_i18n.cpp)
     target_link_libraries(test_i18n PRIVATE Qt6::Test zapret2applet_i18n)
