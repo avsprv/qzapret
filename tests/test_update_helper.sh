@@ -151,6 +151,13 @@ out=$(run_install v9.9.9); rc=$?
     && ok "existing installation protected" || bad "existing installation rc=$rc: $out"
 [ ! -e "$W/systemd/zapret2.service" ] || bad "unit created over existing installation"
 
+# --- 9a. существующий systemd unit никогда не перезаписывается
+prepare_install; echo keep > "$W/systemd/zapret2.service"; make_release v9.9.9
+out=$(run_install v9.9.9); rc=$?
+[ $rc -eq 2 ] && [ "$(cat "$W/systemd/zapret2.service")" = keep ] \
+    && ok "existing systemd unit protected" || bad "existing unit rc=$rc: $out"
+[ ! -e "$W/opt/zapret2" ] || bad "installation created over existing unit"
+
 # --- 10. checksum mismatch rejects clean install before touching system
 prepare_install; make_release v9.9.9 bad_sums
 out=$(run_install v9.9.9); rc=$?
