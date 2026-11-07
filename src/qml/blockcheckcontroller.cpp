@@ -4,7 +4,8 @@
 #include <QGuiApplication>
 #include <QClipboard>
 #include <QTimer>
-#include <QTimer>
+#include <QSaveFile>
+#include <QFileInfo>
 #include "backend/systemdbackend.h"
 
 BlockcheckController::BlockcheckController(QObject *parent)
@@ -102,6 +103,25 @@ void BlockcheckController::confirmStop(bool accepted) {
     m_resumeService=true; m_phase=Phase::WaitingForStop; setStatus(tr("Остановка службы zapret2…")); m_lifecycleTimeout->start(); m_backend->stop();
 }
 void BlockcheckController::beginScan() { m_phase=Phase::Scanning; setStatus(tr("Выполняется диагностика blockcheck2…")); appendLog(tr("Запуск blockcheck2…")); m_runner->start(m_lastOptions); }
+bool BlockcheckController::saveLog(const QUrl &url) {
+    if (!url.isLocalFile() || url.toLocalFile().isEmpty()) {
+        setStatus(tr("Выберите локальный файл для сохранения журнала."));
+        return false;
+    }
+    const QString path = url.toLocalFile();
+    QSaveFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        setStatus(tr("Не удалось открыть файл журнала: %1").arg(file.errorString()));
+        return false;
+    }
+    const QByteArray data = m_logText.toUtf8();
+    if (file.write(data) != data.size() || !file.commit()) {
+        setStatus(tr("Не удалось сохранить журнал: %1").arg(file.errorString()));
+        return false;
+    }
+    setStatus(tr("Журнал сохранён: %1").arg(QFileInfo(path).fileName()));
+    return true;
+}
 void BlockcheckController::copyStrategy(int index) {
     if (index < 0 || index >= m_results.size()) return;
     const QString command = m_results.at(index).toMap().value(QStringLiteral("command")).toString();
