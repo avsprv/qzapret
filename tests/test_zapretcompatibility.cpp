@@ -23,6 +23,7 @@ private:
             QStringLiteral("common"),
             QStringLiteral("blockcheck2.d/standard"),
             QStringLiteral("nfq2"),
+            QStringLiteral("mdig"),
             QStringLiteral("docs")
         };
         for (const QString &directory : directories)
