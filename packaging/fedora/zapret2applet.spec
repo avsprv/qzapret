@@ -27,7 +27,7 @@ Recommends:     qt6-qttranslations
 
 %description
 Qt6 graphical front-end for zapret2: service and configuration management,
-profile and user hostlist editing, journal monitoring, strategy selection via
+profile and user host list editing, journal monitoring, strategy selection via
 blockcheck2, system tray applet, and automatic startup. Privileged operations
 use a small Polkit-protected helper. zapret2 is not bundled and must be
 installed separately.
