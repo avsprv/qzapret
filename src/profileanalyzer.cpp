@@ -65,7 +65,7 @@ bool validArgument(const QString &argument)
     if (argument.isEmpty())
         return false;
     for (const QChar ch : argument) {
-        if (ch.isSpace() || ch.isControl() || ch == QLatin1Char('"') ||
+        if (ch.isSpace() || ch.category() == QChar::Other_Control || ch == QLatin1Char('"') ||
             ch == QLatin1Char('$') || ch == QChar(96) || ch == QLatin1Char('\\'))
             return false;
     }

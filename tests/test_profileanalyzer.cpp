@@ -59,7 +59,7 @@ private slots:
             "MODE_FILTER=hostlist\n");
         auto parsed = ProfileAnalyzer::parse(config);
         QVERIFY(parsed.ok());
-        Profile second;
+        ProfileAnalyzer::Profile second;
         second.allArguments = {QStringLiteral("--filter-tcp=443"),
                                QStringLiteral("--payload=tls_client_hello")};
         const auto edited = ProfileAnalyzer::replaceProfiles(
@@ -76,7 +76,7 @@ private slots:
         auto parsed = ProfileAnalyzer::parse(
             QStringLiteral("NFQWS2_OPT=\"--filter-tcp=80\"\n"));
         QVERIFY(parsed.ok());
-        Profile unsafe;
+        ProfileAnalyzer::Profile unsafe;
         unsafe.allArguments = {QStringLiteral("--filter-tcp=$PORT")};
         QVERIFY(!ProfileAnalyzer::replaceProfiles(
             QStringLiteral("NFQWS2_OPT=\"--filter-tcp=80\"\n"), {unsafe}).ok());
