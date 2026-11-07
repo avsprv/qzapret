@@ -41,10 +41,12 @@ signals:
 
 private:
     void setState(ZapretBackend::State state);
+    void setServiceActionBusy(bool busy);
 
     SystemdBackend *m_backend = nullptr;
     ZapretBackend::State m_state = ZapretBackend::State::Unknown;
     bool m_bootEnabled = false;
     bool m_operationsBusy = false;
+    bool m_serviceActionBusy = false;
     QString m_errorMessage;
 };
