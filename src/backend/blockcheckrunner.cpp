@@ -30,6 +30,7 @@ void BlockcheckRunner::start(const Options &o)
         return;
 
     m_buf.clear();
+    m_seenResults.clear();
     m_cancelRequested = false;
     m_proc = new QProcess(this);
     m_proc->setProcessChannelMode(QProcess::MergedChannels);
@@ -97,6 +98,12 @@ void BlockcheckRunner::handleLine(const QString &rawLine)
     line.remove(ansi);
     line.remove(QLatin1Char('\r'));
     emit logLine(line);
-    if (const auto r = parseLine(line))
-        emit strategyFound(*r);
+    if (const auto r = parseLine(line)) {
+        const QString key = QStringList{r->test, r->ipv, r->domain, r->daemon, r->args}
+                                .join(QChar(0));
+        if (!m_seenResults.contains(key)) {
+            m_seenResults.insert(key);
+            emit strategyFound(*r);
+        }
+    }
 }
