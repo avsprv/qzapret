@@ -466,9 +466,9 @@ install)
         rmdir "$RUNDIR/install.lock"
         die "cannot create temporary installation directory"
     }
-    unit_tmp="$UNIT_DIR/.zapret2.service.$"
+    unit_tmp=""
     cleanup_install() {
-        rm -f "$unit_tmp"
+        [ -z "$unit_tmp" ] || rm -f "$unit_tmp"
         rm -rf "$tmp"
         rmdir "$RUNDIR/install.lock" 2>/dev/null || true
     }
@@ -486,6 +486,10 @@ install)
     echo "Validating archive structure ..."
     tar -tzf "$tmp/z.tgz" > "$tmp/list" 2>/dev/null || die "corrupt archive"
     [ -s "$tmp/list" ] || die "empty archive"
+    entries=$(wc -l < "$tmp/list" | tr -d '[:space:]')
+    [ "$entries" -le 50000 ] || die "archive contains too many entries"
+    tar -tvzf "$tmp/z.tgz" | awk '$1 ~ /^-/ { total += $3; files++ } END { if (files > 50000 || total > 536870912) exit 1 }' \
+        || die "archive exceeds the extraction limits"
     if grep -qE '(^/|(^|/)\.\.(/|$))' "$tmp/list"; then die "unsafe paths in archive"; fi
     if grep -qv "^$name/" "$tmp/list"; then die "unexpected content outside $name/"; fi
     if tar -tvzf "$tmp/z.tgz" | cut -c1 | grep -qv '[-d]'; then die "links or special files in archive"; fi
@@ -703,6 +707,7 @@ esac
     printf '0.0.0.0\n' | "$stage/ip2net/ip2net" >/dev/null 2>&1 || die "ip2net does not run on this system"
 
     unit="$stage/init.d/systemd/zapret2.service"
+    unit_tmp=$(mktemp "$UNIT_DIR/.zapret2.service.XXXXXX") || die "cannot stage systemd unit"
     grep -q '^ExecStart=/opt/zapret2/init.d/sysv/zapret2 start    # update vX.Y.Z — скачать релиз zapret2 с github.com/bol-van/zapret2 и обновить $BASE.
     # Файлы пользователя (config, ipset/zapret-hosts-user*.txt, init.d/*/custom.d) в архиве
     # отсутствуют, поэтому наложение файлов поверх их не затрагивает.
