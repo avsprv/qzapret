@@ -130,6 +130,7 @@ private slots:
     void clampsRepeatCount();
     void rejectsInvalidDomainBeforeStarting();
     void blocksScanDuringUpdate();
+    void blocksScanDuringManualServiceOperation();
     void rejectsEmptyCheckSelection();
     void invalidInputHasErrorStatus();
     void busyGuardHasWarningStatus();
@@ -172,6 +173,15 @@ void BlockcheckControllerTest::blocksScanDuringUpdate()
 {
     BlockcheckController controller;
     controller.setUpdateBusy(true);
+    controller.start();
+    QVERIFY(!controller.busy());
+    QVERIFY(controller.status().contains(QStringLiteral("другой операции")));
+}
+
+void BlockcheckControllerTest::blocksScanDuringManualServiceOperation()
+{
+    BlockcheckController controller;
+    controller.setServiceBusy(true);
     controller.start();
     QVERIFY(!controller.busy());
     QVERIFY(controller.status().contains(QStringLiteral("другой операции")));
