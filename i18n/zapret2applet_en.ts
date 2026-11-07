@@ -301,20 +301,20 @@
     <message><source>Независимый графический интерфейс на Qt 6 для управления zapret2 в Linux.</source><translation>An independent Qt 6 graphical interface for managing zapret2 on Linux.</translation></message>
     <message><source>Версия и компоненты</source><translation>Version and components</translation></message>
     <message><source>Версия приложения: %1</source><translation>Application version: %1</translation></message>
-    <message><source>Qt %1 — графическая платформа приложения.</source><translation>Qt %1 — the application's graphical platform.</translation></message>
     <message><source>zapret2 — отдельный upstream-компонент; он не входит в состав приложения.</source><translation>zapret2 is a separate upstream component; it is not included with the application.</translation></message>
     <message><source>systemd и Polkit используются для системной интеграции и авторизации операций.</source><translation>systemd and Polkit are used for system integration and operation authorization.</translation></message>
     <message><source>Лицензии</source><translation>Licenses</translation></message>
     <message><source>Код zapret2applet распространяется по лицензии MIT. Лицензии сторонних компонентов сохраняют собственную область действия. Подробности приведены в NOTICE и в документации upstream.</source><translation>zapret2applet code is distributed under the MIT License. Third-party components retain their own applicable licenses. See NOTICE and the upstream documentation for details.</translation></message>
     <message><source>Проект и документация</source><translation>Project and documentation</translation></message>
     <message><source>Ссылки на проект и документацию</source><translation>Project and documentation links</translation></message>
-    <message><source>&lt;a href="https://github.com/avsprv/zapret2applet"&gt;Репозиторий zapret2applet&lt;/a&gt;</source><translation>&lt;a href="https://github.com/avsprv/zapret2applet"&gt;zapret2applet repository&lt;/a&gt;</translation></message>
-    <message><source>&lt;a href="https://github.com/avsprv/zapret2applet/blob/main/README.md"&gt;Документация приложения&lt;/a&gt;</source><translation>&lt;a href="https://github.com/avsprv/zapret2applet/blob/main/README.md"&gt;Application documentation&lt;/a&gt;</translation></message>
-    <message><source>&lt;a href="https://github.com/avsprv/zapret2applet/releases"&gt;Релизы приложения&lt;/a&gt;</source><translation>&lt;a href="https://github.com/avsprv/zapret2applet/releases"&gt;Application releases&lt;/a&gt;</translation></message>
-    <message><source>&lt;a href="https://github.com/avsprv/zapret2applet/issues"&gt;Сообщить об ошибке&lt;/a&gt;</source><translation>&lt;a href="https://github.com/avsprv/zapret2applet/issues"&gt;Report an issue&lt;/a&gt;</translation></message>
-    <message><source>&lt;a href="https://github.com/avsprv/zapret2applet/blob/main/NOTICE.md"&gt;Уведомления о сторонних компонентах&lt;/a&gt;</source><translation>&lt;a href="https://github.com/avsprv/zapret2applet/blob/main/NOTICE.md"&gt;Third-party notices&lt;/a&gt;</translation></message>
-    <message><source>&lt;a href="https://github.com/bol-van/zapret2"&gt;Upstream-проект zapret2&lt;/a&gt;</source><translation>&lt;a href="https://github.com/bol-van/zapret2"&gt;zapret2 upstream project&lt;/a&gt;</translation></message>
     <message><source>zapret2applet — независимый проект и не связан с автором или сопровождающими upstream-проекта zapret2.</source><translation>zapret2applet is an independent project and is not affiliated with the zapret2 upstream author or maintainers.</translation></message>
+    <message><source>Qt 6 — графическая платформа приложения.</source><translation>Qt 6 — the application's graphical platform.</translation></message>
+    <message><source>Репозиторий zapret2applet</source><translation>zapret2applet repository</translation></message>
+    <message><source>Документация приложения</source><translation>Application documentation</translation></message>
+    <message><source>Релизы приложения</source><translation>Application releases</translation></message>
+    <message><source>Сообщить об ошибке</source><translation>Report an issue</translation></message>
+    <message><source>Уведомления о сторонних компонентах</source><translation>Third-party notices</translation></message>
+    <message><source>Upstream-проект zapret2</source><translation>zapret2 upstream project</translation></message>
 </context>
 <context>
     <name>BlockcheckRunner</name>
