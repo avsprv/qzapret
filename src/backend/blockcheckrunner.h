@@ -60,4 +60,5 @@ private:
     QSet<QString> m_seenResults;
     int m_errorCount = 0;
     bool m_cancelRequested = false;
+    bool m_discardingOversizedLine = false;
 };
