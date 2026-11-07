@@ -66,7 +66,7 @@ void ZapretUpdater::drain()
         return;
 
     constexpr qsizetype maxLineBytes = 64 * 1024;
-    static const QByteArray truncationMarker = QByteArrayLiteral("… [update log line truncated]");
+    const QByteArray truncationMarker = tr("… [строка журнала сокращена]").toUtf8();
     m_buf += m_proc->readAllStandardOutput();
 
     while (true) {
