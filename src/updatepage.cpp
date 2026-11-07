@@ -161,6 +161,7 @@ void UpdatePage::checkNow(bool automatic)
     refreshInstalled();
     m_statusLabel->setText(tr("Проверяю обновления…"));
     m_checkBtn->setEnabled(false);
+    m_updateBtn->setEnabled(false);
     m_checker->check();
 }
 
@@ -200,7 +201,7 @@ void UpdatePage::refreshUi()
 
 void UpdatePage::confirmAndUpdate()
 {
-    if (m_latestTag.isEmpty() || m_installed.isEmpty() || isBusy())
+    if (m_latestTag.isEmpty() || m_installed.isEmpty() || isBusy() || m_checker->isRunning())
         return;
     if (m_serviceBusy) {
         QMessageBox::information(this, tr("Идёт подбор"),
@@ -226,7 +227,7 @@ void UpdatePage::confirmAndUpdate()
 
 void UpdatePage::confirmAndInstall()
 {
-    if (m_latestTag.isEmpty() || !m_installed.isEmpty() || isBusy())
+    if (m_latestTag.isEmpty() || !m_installed.isEmpty() || isBusy() || m_checker->isRunning())
         return;
     if (m_serviceBusy) {
         QMessageBox::information(this, tr("Идёт подбор"),
