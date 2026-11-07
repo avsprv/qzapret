@@ -125,6 +125,10 @@ if(BUILD_TESTING)
              COMMAND sh ${CMAKE_SOURCE_DIR}/tests/test_config_helper.sh
                      ${CMAKE_SOURCE_DIR}/packaging/helper/zapret2applet-helper)
 
+    add_test(NAME lists_helper
+             COMMAND sh ${CMAKE_SOURCE_DIR}/tests/test_lists_helper.sh
+                     ${CMAKE_SOURCE_DIR}/packaging/helper/zapret2applet-helper)
+
     qt_add_executable(test_profileanalyzer tests/test_profileanalyzer.cpp
         src/profileanalyzer.cpp src/profileanalyzer.h)
     target_include_directories(test_profileanalyzer PRIVATE src)

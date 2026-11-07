@@ -19,6 +19,7 @@ BuildRequires:  curl
 BuildRequires:  tar
 Requires:       polkit
 Requires:       curl
+Requires:       python3
 Requires:       tar
 Requires:       coreutils
 Requires:       systemd
