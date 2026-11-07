@@ -1397,4 +1397,48 @@ If the service is running, it will be stopped for the duration of the update and
     <message><source>Найденные стратегии являются рекомендациями blockcheck2 и требуют ручной проверки перед применением.</source><translation>Strategies found are recommendations from blockcheck2 and should be reviewed manually before applying.</translation></message>
     <message><source>Копировать стратегию: %1</source><translation>Copy strategy: %1</translation></message>
 </context>
+
+  <context>
+    <name>UpdateController</name>
+    <message><source>Доступна чистая установка %1.</source><translation>Clean installation of %1 is available.</translation></message>
+    <message><source>Доступна новая версия: %1.</source><translation>New version available: %1.</translation></message>
+    <message><source>Установлена актуальная версия.</source><translation>The latest version is installed.</translation></message>
+    <message><source>Не удалось проверить обновления: %1</source><translation>Could not check for updates: %1</translation></message>
+    <message><source>zapret2 не установлен. Проверьте наличие релиза для установки.</source><translation>zapret2 is not installed. Check for a release to install.</translation></message>
+    <message><source>Версия zapret2 определена.</source><translation>Installed zapret2 version detected.</translation></message>
+    <message><source>не установлена</source><translation>not installed</translation></message>
+    <message><source>… [строка журнала сокращена]</source><translation>… [log line truncated]</translation></message>
+    <message><source>Проверяю обновления…</source><translation>Checking for updates…</translation></message>
+    <message><source>Устанавливаю zapret2 %1…</source><translation>Installing zapret2 %1…</translation></message>
+    <message><source>Обновляю zapret2 до %1…</source><translation>Updating zapret2 to %1…</translation></message>
+    <message><source>zapret2 установлен: %1.</source><translation>zapret2 %1 installed.</translation></message>
+    <message><source>zapret2 обновлён до %1.</source><translation>zapret2 updated to %1.</translation></message>
+    <message><source>Установка отменена: диалог авторизации закрыт.</source><translation>Installation canceled: the authorization dialog was closed.</translation></message>
+    <message><source>Обновление отменено: диалог авторизации закрыт.</source><translation>Update canceled: the authorization dialog was closed.</translation></message>
+    <message><source>Установка не выполнена (код %1). Подробности — в журнале.</source><translation>Installation failed (exit code %1). See the log for details.</translation></message>
+    <message><source>Обновление не выполнено (код %1). Подробности — в журнале.</source><translation>Update failed (exit code %1). See the log for details.</translation></message>
+  </context>
+  <context>
+    <name>UpdatePage</name>
+    <message><source>Обновления</source><translation>Updates</translation></message>
+    <message><source>Чистая установка zapret2</source><translation>Clean install of zapret2</translation></message>
+    <message><source>Обновление zapret2</source><translation>Update zapret2</translation></message>
+    <message><source>Установить zapret2 %1 в /opt/zapret2? Будет проверена структура архива и SHA-256 бинарных компонентов, создана конфигурация по умолчанию с NFQWS2_ENABLE=0 и установлен systemd unit. Служба не будет запущена или добавлена в автозагрузку. Потребуется пароль администратора.</source><translation>Install zapret2 %1 to /opt/zapret2? The archive layout and SHA-256 checksums of binary components will be verified, a default configuration with NFQWS2_ENABLE=0 will be created, and the systemd unit will be installed. The service will not be started or enabled. Administrator authentication is required.</translation></message>
+    <message><source>Обновить zapret2 с %1 до %2? Если служба запущена, она будет остановлена на время обновления и запущена снова. Потребуется пароль администратора.</source><translation>Update zapret2 from %1 to %2? If the service is running, it will be stopped during the update and started again afterwards. Administrator authentication is required.</translation></message>
+    <message><source>Версия zapret2</source><translation>zapret2 version</translation></message>
+    <message><source>Установлена:</source><translation>Installed:</translation></message>
+    <message><source>Последняя версия:</source><translation>Latest version:</translation></message>
+    <message><source>Проверить обновления</source><translation>Check for updates</translation></message>
+    <message><source>Установить %1</source><translation>Install %1</translation></message>
+    <message><source>Обновить до %1</source><translation>Update to %1</translation></message>
+    <message><source>Что нового…</source><translation>Release notes…</translation></message>
+    <message><source>Загрузка, проверка контрольных сумм, резервное копирование и откат выполняются привилегированным помощником. Подписи upstream-релиза отсутствуют: SHA-256 защищает от повреждения файлов, но не от компрометации репозитория.</source><translation>Downloads, checksum verification, backups, and rollback are handled by the privileged helper. Upstream releases are not signed: SHA-256 protects against file corruption, not repository compromise.</translation></message>
+    <message><source>Журнал обновления</source><translation>Update log</translation></message>
+    <message><source>Очистить</source><translation>Clear</translation></message>
+  </context>
+  <context>
+    <name>Main</name>
+    <message><source>Предварительный интерфейс на QML и Kirigami. Он проходит поэтапную проверку; основная версия приложения пока использует стабильный интерфейс.</source><translation>Preview interface built with QML and Kirigami. It is being validated incrementally; the stable interface remains the production application.</translation></message>
+  </context>
+
 </TS>
