@@ -84,7 +84,7 @@ private slots:
 
     void parsesUpstreamOutputFixture()
     {
-        QFile fixture(QFINDTESTDATA("fixtures/blockcheck2-1.0.7.log"));
+        QFile fixture(QStringLiteral(QZAPRET_SOURCE_DIR "/tests/fixtures/blockcheck2-1.0.7.log"));
         QVERIFY(fixture.open(QIODevice::ReadOnly | QIODevice::Text));
         const QStringList lines = QString::fromUtf8(fixture.readAll()).split(
             QLatin1Char('\n'), Qt::SkipEmptyParts);
@@ -103,5 +103,5 @@ private slots:
     }
 };
 
-QTEST_MAIN(TestZapretCompatibility)
+QTEST_GUILESS_MAIN(TestZapretCompatibility)
 #include "test_zapretcompatibility.moc"
