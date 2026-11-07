@@ -9,15 +9,14 @@ class SettingsDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit SettingsDialog(QWidget *parent = nullptr);
+    explicit SettingsDialog(bool trayAvailable, QWidget *parent = nullptr);
 
 signals:
     void languageRestartRequired();
 
-private slots:
-    void applySettings();
-
 private:
+    bool applySettings();
+
     QComboBox *m_language = nullptr;
     QComboBox *m_theme = nullptr;
     QCheckBox *m_autoCheck = nullptr;
