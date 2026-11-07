@@ -5,6 +5,7 @@
 #include <QQmlContext>
 
 #include "applicationcontroller.h"
+#include "configcontroller.h"
 #include "settingsmanager.h"
 
 int main(int argc, char *argv[])
@@ -16,9 +17,10 @@ int main(int argc, char *argv[])
 
     ApplicationController controller;
     SettingsManager settingsManager;
+    ConfigController configController;
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty(QStringLiteral("appController"), &controller);
-    engine.rootContext()->setContextProperty(QStringLiteral("settingsManager"), &settingsManager);
+    engine.rootContext()->setContextProperty(QStringLiteral("settingsManager"), &settingsManager);\n    engine.rootContext()->setContextProperty(QStringLiteral("configController"), &configController);
     engine.loadFromModule(QStringLiteral("org.avsprv.zapret2applet"), QStringLiteral("Main"));
 
     if (engine.rootObjects().isEmpty())
