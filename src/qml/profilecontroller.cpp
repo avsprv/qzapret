@@ -120,8 +120,19 @@ void ProfileController::copy(int index)
 void ProfileController::remove(int index)
 {
     if (!m_loaded || m_busy || index<0 || index>=m_profiles.size() || m_profiles.size()<=1) return;
-    m_profiles.removeAt(index); setSelectedIndex(m_profiles.isEmpty() ? -1 : qMin(index,m_profiles.size()-1));
-    setDirty(true); emit profilesChanged(); setStatus(tr("Профиль удалён. Изменения ещё не сохранены."));
+    const int previousSelection = m_selectedIndex;
+    m_profiles.removeAt(index);
+
+    int nextSelection = previousSelection;
+    if (previousSelection == index)
+        nextSelection = qMin(index, m_profiles.size() - 1);
+    else if (previousSelection > index)
+        nextSelection = previousSelection - 1;
+
+    setSelectedIndex(nextSelection);
+    setDirty(true);
+    emit profilesChanged();
+    setStatus(tr("Профиль удалён. Изменения ещё не сохранены."));
 }
 void ProfileController::save()
 {
