@@ -71,8 +71,22 @@ QWidget *MainWindow::buildStatusPage()
     m_guiCheck = new QCheckBox(tr("Запускать zapret2applet при входе в сеанс (в трей)"));
     m_guiCheck->setChecked(Autostart::isEnabled());
 
-    connect(m_startBtn, &QPushButton::clicked, m_backend, &ZapretBackend::start);
-    connect(m_stopBtn, &QPushButton::clicked, m_backend, &ZapretBackend::stop);
+    connect(m_startBtn, &QPushButton::clicked, this, [this] {
+        if (m_blockcheck->isRunning()) {
+            QMessageBox::information(this, tr("Идёт подбор"),
+                                     tr("Дождитесь завершения подбора стратегий перед управлением сервисом."));
+            return;
+        }
+        m_backend->start();
+    });
+    connect(m_stopBtn, &QPushButton::clicked, this, [this] {
+        if (m_blockcheck->isRunning()) {
+            QMessageBox::information(this, tr("Идёт подбор"),
+                                     tr("Дождитесь завершения подбора стратегий перед управлением сервисом."));
+            return;
+        }
+        m_backend->stop();
+    });
     // clicked, а не toggled: состояние чекбокса потом приводится к реальному через refresh()
     connect(m_bootCheck, &QCheckBox::clicked, m_backend, &ZapretBackend::setBootEnabled);
     connect(m_guiCheck, &QCheckBox::clicked, this, [this](bool on) {
@@ -117,8 +131,14 @@ void MainWindow::buildTray()
     auto *quitAct = menu->addAction(tr("Выход"));
 
     connect(show, &QAction::triggered, this, &MainWindow::toggleWindow);
-    connect(m_trayStart, &QAction::triggered, m_backend, &ZapretBackend::start);
-    connect(m_trayStop, &QAction::triggered, m_backend, &ZapretBackend::stop);
+    connect(m_trayStart, &QAction::triggered, this, [this] {
+        if (!m_blockcheck->isRunning())
+            m_backend->start();
+    });
+    connect(m_trayStop, &QAction::triggered, this, [this] {
+        if (!m_blockcheck->isRunning())
+            m_backend->stop();
+    });
     connect(quitAct, &QAction::triggered, this, &MainWindow::quit);
     connect(m_tray, &QSystemTrayIcon::activated, this, [this](QSystemTrayIcon::ActivationReason r) {
         if (r == QSystemTrayIcon::Trigger)
