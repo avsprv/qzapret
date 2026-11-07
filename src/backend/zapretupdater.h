@@ -4,8 +4,7 @@
 
 class QProcess;
 
-// Обновление zapret2: `zapret2applet-helper update vX.Y.Z` через pkexec. Скачивание, проверка и
-// установка — в хелпере (от root); здесь только запуск и разбор вывода.
+// Установка и обновление zapret2 через привилегированный helper; здесь только запуск и разбор вывода.
 class ZapretUpdater : public QObject
 {
     Q_OBJECT
