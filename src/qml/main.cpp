@@ -11,6 +11,7 @@
 #include "i18n.h"
 #include "profilecontroller.h"
 #include "logscontroller.h"
+#include "listscontroller.h"
 #include "settingsmanager.h"
 
 namespace {
@@ -36,6 +37,7 @@ int main(int argc, char *argv[])
     ConfigController configController;
     ProfileController profileController;
     LogsController logsController;
+    ListsController listsController;
 
     const QLocale initialLocale = localeForLanguage(settingsManager.language());
     QLocale::setDefault(initialLocale);
@@ -46,6 +48,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty(QStringLiteral("configController"), &configController);
     engine.rootContext()->setContextProperty(QStringLiteral("profileController"), &profileController);
     engine.rootContext()->setContextProperty(QStringLiteral("logsController"), &logsController);
+    engine.rootContext()->setContextProperty(QStringLiteral("listsController"), &listsController);
     engine.loadFromModule(QStringLiteral("org.avsprv.zapret2applet"), QStringLiteral("Main"));
 
     if (engine.rootObjects().isEmpty())
