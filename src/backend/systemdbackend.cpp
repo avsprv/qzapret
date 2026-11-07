@@ -57,8 +57,10 @@ ZapretBackend::State parseUnitState(const QString &out)
 
 void SystemdBackend::refresh()
 {
-    query(QStringLiteral("is-active"), [this](const QString &out) {
-        emit stateChanged(parseUnitState(out));
+    const quint64 generation = ++m_stateQueryGeneration;
+    query(QStringLiteral("is-active"), [this, generation](const QString &out) {
+        if (generation == m_stateQueryGeneration)
+            emit stateChanged(parseUnitState(out));
     });
     query(QStringLiteral("is-enabled"), [this](const QString &out) {
         emit bootEnabledChanged(out == QLatin1String("enabled"));
@@ -67,19 +69,21 @@ void SystemdBackend::refresh()
 
 void SystemdBackend::verifyState()
 {
-    query(QStringLiteral("is-active"), [this](const QString &out) {
+    const quint64 generation = ++m_stateQueryGeneration;
+    query(QStringLiteral("is-active"), [this, generation](const QString &out) {
         const State state = parseUnitState(out);
-        emit stateChanged(state);
+        if (generation == m_stateQueryGeneration)
+            emit stateChanged(state);
         emit stateVerified(state);
     });
 }
 
 void SystemdBackend::verifyState(quint64 requestId)
 {
+    // Lifecycle verification is private to its requesting operation. Publishing
+    // it as stateChanged would let a late response overwrite the application UI.
     query(QStringLiteral("is-active"), [this, requestId](const QString &out) {
-        const State state = parseUnitState(out);
-        emit stateChanged(state);
-        emit stateVerifiedForRequest(requestId, state);
+        emit stateVerifiedForRequest(requestId, parseUnitState(out));
     });
 }
 
@@ -105,15 +109,18 @@ void SystemdBackend::startNextUnitAction()
         return;
 
     m_actionInProgress = true;
+    ++m_stateQueryGeneration; // invalidate refreshes started before this action
     const PendingUnitAction pending = m_pendingActions.dequeue();
     const QString action = pending.action;
     const quint64 requestId = pending.requestId;
     auto *proc = new QProcess(this);
     auto completed = std::make_shared<bool>(false);
     const auto reportResult = [this, action, requestId](bool success) {
-        query(QStringLiteral("is-active"), [this, action, success, requestId](const QString &out) {
+        const quint64 generation = ++m_stateQueryGeneration;
+        query(QStringLiteral("is-active"), [this, action, success, requestId, generation](const QString &out) {
             const State state = parseUnitState(out);
-            emit stateChanged(state);
+            if (generation == m_stateQueryGeneration)
+                emit stateChanged(state);
             if (requestId == 0)
                 emit unitActionFinished(action, state, success);
             else
