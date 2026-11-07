@@ -559,5 +559,22 @@ If the service is running, it will be stopped for the duration of the update and
     <message><source>Список %1 прочитан. Файл не изменялся.</source><translation>List %1 was read. The file was not modified.</translation></message>
     <message><source>Не удалось прочитать %1: %2</source><translation>Could not read %1: %2</translation></message>
     <message><source>Не удалось запустить хелпер: %1</source><translation>Could not start the helper: %1</translation></message>
+    <message><source>Сохранить хостлист</source><translation>Save hostlist</translation></message>
+    <message><source>Редактировать можно только три исходных пользовательских хостлиста. Каждая непустая строка должна содержать одно доменное имя, IP-адрес или CIDR. Пустые строки допустимы; домены должны быть ASCII или punycode. Производные IP-файлы доступны только для просмотра: zapret2 пересоздаёт их при разрешении доменов. Перед сохранением helper создаёт резервную копию и атомарно заменяет файл. Сервис автоматически не перезапускается.</source><translation>Only the three source user hostlists can be edited. Each non-empty line must contain one domain name, IP address, or CIDR. Empty lines are allowed; domains must be ASCII or punycode. Derived IP files are read-only: zapret2 regenerates them during domain resolution. The helper creates a backup and atomically replaces the file. The service is not restarted automatically.</translation></message>
+    <message><source>Несохранённые изменения</source><translation>Unsaved changes</translation></message>
+    <message><source>Текущий хостлист изменён. Отбросить изменения и переключиться?</source><translation>The current hostlist has unsaved changes. Discard them and switch?</translation></message>
+    <message><source>Файл превышает ограничение 1 MiB.</source><translation>File exceeds the 1 MiB limit.</translation></message>
+    <message><source>Слишком много строк (максимум 50000).</source><translation>Too many lines (maximum 50000).</translation></message>
+    <message><source>Строка %1 длиннее 4095 символов.</source><translation>Line %1 exceeds 4095 characters.</translation></message>
+    <message><source>Строка %1 содержит пробельный или управляющий символ.</source><translation>Line %1 contains whitespace or a control character.</translation></message>
+    <message><source>Строка %1: используйте ASCII-домен или его punycode-представление.</source><translation>Line %1: use an ASCII domain or its punycode representation.</translation></message>
+    <message><source>Домен в строке %1 имеет недопустимую длину.</source><translation>Domain on line %1 has an invalid length.</translation></message>
+    <message><source>Некорректный домен или IP/CIDR в строке %1: %2</source><translation>Invalid domain or IP/CIDR on line %1: %2</translation></message>
+    <message><source>Файл %1 ещё не создан. Можно добавить записи и сохранить его.</source><translation>File %1 does not exist yet. You can add entries and save it.</translation></message>
+    <message><source>Некорректный хостлист</source><translation>Invalid hostlist</translation></message>
+    <message><source>Создать резервную копию и атомарно сохранить %1? Производные IP-списки будут обновлены только штатными механизмами zapret2. Сервис автоматически не перезапускается.</source><translation>Create a backup and atomically save %1? Derived IP lists will be updated only by zapret2's normal mechanisms. The service will not restart automatically.</translation></message>
+    <message><source>Проверяю и сохраняю %1…</source><translation>Validating and saving %1…</translation></message>
+    <message><source>Список %1 сохранён; резервная копия создана.</source><translation>List %1 saved; backup created.</translation></message>
+    <message><source>Не удалось сохранить %1: %2</source><translation>Could not save %1: %2</translation></message>
 </context>
 </TS>
