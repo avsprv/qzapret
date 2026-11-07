@@ -1,5 +1,6 @@
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QTemporaryDir>
 #include <QtTest>
 
@@ -90,7 +91,11 @@ private slots:
 
     void validatesPinnedUpstreamScriptContract()
     {
-        QFile script(QStringLiteral(QZAPRET_UPSTREAM_SOURCE_DIR "/blockcheck2.sh"));
+        const QString scriptPath = QStringLiteral(QZAPRET_UPSTREAM_SOURCE_DIR "/blockcheck2.sh");
+        if (!QFileInfo::exists(scriptPath))
+            QSKIP("Pinned upstream submodule is not included in this source archive");
+
+        QFile script(scriptPath);
         QVERIFY(script.open(QIODevice::ReadOnly | QIODevice::Text));
         const QString text = QString::fromUtf8(script.readAll());
         for (const QString &marker : {
