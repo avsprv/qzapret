@@ -519,7 +519,7 @@ install)
     env -i PATH=/usr/sbin:/usr/bin:/sbin:/bin HOME=/root LANG=C.UTF-8 \
         sh "$stage/install_bin.sh" > "$tmp/install_bin.log" 2>&1 \
         || { cat "$tmp/install_bin.log" >&2; die "install_bin.sh failed: no compatible binaries"; }
-    [ -x "$stage/nfq2/nfqws2" ] && [ -x "$stage/ip2net/ip2net" ] && [ -x "$stage/mdig/mdig" \
+    [ -x "$stage/nfq2/nfqws2" ] && [ -x "$stage/ip2net/ip2net" ] && [ -x "$stage/mdig/mdig" ] \
         || die "binary links were not created"
     "$stage/nfq2/nfqws2" --version >/dev/null 2>&1 || die "nfqws2 does not run on this system"
     printf '0.0.0.0\n' | "$stage/ip2net/ip2net" >/dev/null 2>&1 || die "ip2net does not run on this system"
