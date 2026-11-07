@@ -1,5 +1,6 @@
 #include "configpage.h"
 
+#include <QCryptographicHash>
 #include <QDateTime>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -182,7 +183,9 @@ void ConfigPage::saveConfig()
         setBusy(false);
         m_status->setText(tr("Не удалось запустить хелпер: %1").arg(reason));
     });
-    Helper::start(proc, {QStringLiteral("config-write")});
+    const QString expectedHash = QString::fromLatin1(
+        QCryptographicHash::hash(m_configBytes, QCryptographicHash::Sha256).toHex());
+    Helper::start(proc, {QStringLiteral("config-write"), expectedHash});
 }
 
 void ConfigPage::rollbackConfig()

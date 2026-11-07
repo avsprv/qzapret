@@ -691,6 +691,18 @@ If the service is running, it will be stopped for the duration of the update and
     <message><source>NFQWS2_OPT не содержит параметров.</source><translation>NFQWS2_OPT contains no arguments.</translation></message>
     <message><source>Обнаружен пустой профиль рядом с --new.</source><translation>An empty profile was found next to --new.</translation></message>
     <message><source>Слишком много профилей или параметров.</source><translation>Too many profiles or arguments.</translation></message>
+    <message><source>Несохранённые изменения</source><translation>Unsaved changes</translation></message>
+    <message><source>Есть несохранённые изменения профилей. Отбросить их и заново прочитать config?</source><translation>Profile changes are not saved. Discard them and reload config?</translation></message>
+    <message><source>Один аргумент на строку. Не добавляйте кавычки, shell-подстановки или разделитель --new. Пробелы внутри аргумента не поддерживаются.</source><translation>One argument per line. Do not add quotes, shell expansions, or the --new delimiter. Spaces inside arguments are not supported.</translation></message>
+    <message><source>Некорректный профиль</source><translation>Invalid profile</translation></message>
+    <message><source>Профиль должен содержать хотя бы один аргумент.</source><translation>A profile must contain at least one argument.</translation></message>
+    <message><source>Разделитель --new добавляется автоматически и не может быть аргументом профиля.</source><translation>The --new delimiter is inserted automatically and cannot be a profile argument.</translation></message>
+    <message><source>Не удалось определить позицию нового профиля.</source><translation>Could not determine the insertion position for the new profile.</translation></message>
+    <message><source>Не удалось определить профиль для изменения.</source><translation>Could not determine which profile to edit.</translation></message>
+    <message><source>Количество профилей должно быть от 1 до 128.</source><translation>The number of profiles must be between 1 and 128.</translation></message>
+    <message><source>Профиль не может быть пустым.</source><translation>A profile cannot be empty.</translation></message>
+    <message><source>Параметр содержит пробелы или shell-символы, которые нельзя безопасно сериализовать.</source><translation>An argument contains whitespace or shell characters that cannot be serialized safely.</translation></message>
+    <message><source>Конфигурация превышает ограничение 1 MiB.</source><translation>Configuration exceeds the 1 MiB limit.</translation></message>
 </context>
 <context>
     <name>MainWindow</name>
