@@ -86,6 +86,19 @@ void SystemdBackend::setBootEnabled(bool enabled)
 
 void SystemdBackend::runUnitAction(const QString &action, quint64 requestId)
 {
+    m_pendingActions.enqueue({action, requestId});
+    startNextUnitAction();
+}
+
+void SystemdBackend::startNextUnitAction()
+{
+    if (m_actionInProgress || m_pendingActions.isEmpty())
+        return;
+
+    m_actionInProgress = true;
+    const PendingUnitAction pending = m_pendingActions.dequeue();
+    const QString action = pending.action;
+    const quint64 requestId = pending.requestId;
     auto *proc = new QProcess(this);
     auto completed = std::make_shared<bool>(false);
     const auto reportResult = [this, action, requestId](bool success) {
@@ -96,6 +109,9 @@ void SystemdBackend::runUnitAction(const QString &action, quint64 requestId)
                 emit unitActionFinished(action, state, success);
             else
                 emit unitActionFinishedForRequest(requestId, action, state, success);
+
+            m_actionInProgress = false;
+            startNextUnitAction();
         });
         query(QStringLiteral("is-enabled"), [this](const QString &out) {
             emit bootEnabledChanged(out == QLatin1String("enabled"));
