@@ -1,3 +1,5 @@
+#include <cstdlib>
+
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
