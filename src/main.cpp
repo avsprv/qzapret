@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QCommandLineParser>
+#include <QLocale>
 
 #include "appsettings.h"
 #include "i18n.h"
