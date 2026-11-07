@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QVariantList>
 #include <QString>
+#include <QUrl>
 #include "backend/blockcheckrunner.h"
 #include "backend/zapretbackend.h"
 
@@ -47,6 +48,7 @@ public:
     Q_INVOKABLE void confirmStop(bool accepted);
     Q_INVOKABLE void cancel();
     Q_INVOKABLE void copyStrategy(int index);
+    Q_INVOKABLE bool saveLog(const QUrl &url);
 
 signals:
     void optionsChanged();
