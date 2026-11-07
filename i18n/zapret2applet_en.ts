@@ -315,6 +315,26 @@
     <message><source>Уведомления о сторонних компонентах</source><translation>Third-party notices</translation></message>
     <message><source>Upstream-проект zapret2</source><translation>zapret2 upstream project</translation></message>
     <message><source>Лицензия приложения (MIT)</source><translation>Application license (MIT)</translation></message>
+    <message><source>Мониторинг</source><translation>Monitoring</translation></message>
+    <message><source>Показывается журнал только фиксированной службы zapret2.service. Чтение выполняется через read-only действие Polkit; журнал не изменяет состояние службы.</source><translation>Only the fixed zapret2.service journal is displayed. Reading uses a read-only Polkit action and does not change the service state.</translation></message>
+    <message><source>Последние 50 строк</source><translation>Last 50 lines</translation></message>
+    <message><source>Последние 100 строк</source><translation>Last 100 lines</translation></message>
+    <message><source>Последние 200 строк</source><translation>Last 200 lines</translation></message>
+    <message><source>Последние 500 строк</source><translation>Last 500 lines</translation></message>
+    <message><source>Обновить журнал</source><translation>Refresh log</translation></message>
+    <message><source>Автообновление каждые 10 секунд</source><translation>Refresh automatically every 10 seconds</translation></message>
+    <message><source>Количество строк журнала</source><translation>Number of log lines</translation></message>
+    <message><source>Журнал службы zapret2</source><translation>zapret2 service log</translation></message>
+    <message><source>Последние записи журнала systemd службы zapret2.service</source><translation>Recent systemd journal entries for zapret2.service</translation></message>
+    <message><source>Недопустимое количество строк журнала.</source><translation>Invalid log line count.</translation></message>
+    <message><source>Чтение журнала zapret2.service…</source><translation>Reading zapret2.service journal…</translation></message>
+    <message><source>Полученный журнал превысил допустимый размер; чтение остановлено.</source><translation>The received journal exceeded the allowed size; reading was stopped.</translation></message>
+    <message><source>Не удалось прочитать журнал (код %1).</source><translation>Could not read journal (exit code %1).</translation></message>
+    <message><source>Не удалось прочитать журнал: %1</source><translation>Could not read journal: %1</translation></message>
+    <message><source>Журнал превышает ограничение 1 MiB; данные не отображены.</source><translation>The journal exceeds the 1 MiB limit; content was not displayed.</translation></message>
+    <message><source>Журнал содержит некорректный UTF-8; данные не отображены.</source><translation>The journal contains invalid UTF-8; content was not displayed.</translation></message>
+    <message><source>Журнал обновлён: получено %1 байт.</source><translation>Journal refreshed: %1 bytes received.</translation></message>
+    <message><source>Не удалось запустить helper: %1</source><translation>Could not start helper: %1</translation></message>
 </context>
 <context>
     <name>BlockcheckRunner</name>
