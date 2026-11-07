@@ -15,6 +15,7 @@ public:
     int verifyCalls = 0;
     int stopCalls = 0;
     int startCalls = 0;
+    quint64 lastRequestId = 0;
 
     void refresh() override {}
     void verifyState() override
@@ -23,17 +24,38 @@ public:
         if (autoVerify)
             emit stateVerified(state);
     }
+    void verifyState(quint64 requestId) override
+    {
+        lastRequestId = requestId;
+        ++verifyCalls;
+        if (autoVerify)
+            emit stateVerifiedForRequest(requestId, state);
+    }
     void start() override
     {
         ++startCalls;
         if (autoStart)
             completeStart(State::Active, true);
     }
+    void start(quint64 requestId) override
+    {
+        lastRequestId = requestId;
+        ++startCalls;
+        if (autoStart)
+            completeStart(requestId, State::Active, true);
+    }
     void stop() override
     {
         ++stopCalls;
         if (autoStop)
             completeStop(State::Inactive, true);
+    }
+    void stop(quint64 requestId) override
+    {
+        lastRequestId = requestId;
+        ++stopCalls;
+        if (autoStop)
+            completeStop(requestId, State::Inactive, true);
     }
     void setBootEnabled(bool) override {}
 
@@ -42,10 +64,20 @@ public:
         state = result;
         emit unitActionFinished(QStringLiteral("stop"), state, success);
     }
+    void completeStop(quint64 requestId, State result, bool success)
+    {
+        state = result;
+        emit unitActionFinishedForRequest(requestId, QStringLiteral("stop"), state, success);
+    }
     void completeStart(State result, bool success)
     {
         state = result;
         emit unitActionFinished(QStringLiteral("start"), state, success);
+    }
+    void completeStart(quint64 requestId, State result, bool success)
+    {
+        state = result;
+        emit unitActionFinishedForRequest(requestId, QStringLiteral("start"), state, success);
     }
 };
 
@@ -114,6 +146,8 @@ private slots:
     void restoreFailureReportsError();
     void verificationTimeoutFinishesSafely();
     void restoreTimeoutReportsError();
+    void ignoresLateVerificationFromPreviousOperation();
+    void ignoresLateRestoreResultFromPreviousOperation();
 };
 
 void BlockcheckControllerTest::clampsRepeatCount()
@@ -372,7 +406,7 @@ void BlockcheckControllerTest::verificationTimeoutFinishesSafely()
     QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Error);
     QCOMPARE(runner.starts, 0);
 
-    emit backend.stateVerified(ZapretBackend::State::Active);
+    emit backend.stateVerifiedForRequest(backend.lastRequestId, ZapretBackend::State::Active);
     QCOMPARE(runner.starts, 0);
     QVERIFY(!controller.busy());
 }
@@ -391,6 +425,54 @@ void BlockcheckControllerTest::restoreTimeoutReportsError()
     QTRY_VERIFY_WITH_TIMEOUT(!controller.busy(), 1000);
     QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Error);
     QVERIFY(controller.status().contains(QStringLiteral("Не удалось подтвердить восстановление")));
+}
+
+
+void BlockcheckControllerTest::ignoresLateVerificationFromPreviousOperation()
+{
+    FakeZapretBackend backend;
+    backend.autoVerify = false;
+    FakeBlockcheckRunner runner;
+    BlockcheckController controller(&backend, &runner, 10);
+
+    controller.start();
+    const quint64 firstRequest = backend.lastRequestId;
+    QTRY_VERIFY_WITH_TIMEOUT(!controller.busy(), 1000);
+
+    backend.autoVerify = true;
+    backend.state = ZapretBackend::State::Inactive;
+    controller.start();
+    QCOMPARE(runner.starts, 1);
+
+    backend.state = ZapretBackend::State::Active;
+    emit backend.stateVerifiedForRequest(firstRequest, ZapretBackend::State::Active);
+    QCOMPARE(runner.starts, 1);
+    QVERIFY(!controller.busy());
+}
+
+void BlockcheckControllerTest::ignoresLateRestoreResultFromPreviousOperation()
+{
+    FakeZapretBackend backend;
+    backend.state = ZapretBackend::State::Active;
+    backend.autoStart = false;
+    FakeBlockcheckRunner runner;
+    BlockcheckController controller(&backend, &runner, 10);
+
+    controller.start();
+    controller.confirmStop(true);
+    const quint64 oldRequest = backend.lastRequestId;
+    backend.completeStart(oldRequest, ZapretBackend::State::Unknown, false);
+    QTRY_VERIFY_WITH_TIMEOUT(!controller.busy(), 1000);
+
+    backend.autoVerify = true;
+    backend.state = ZapretBackend::State::Inactive;
+    controller.start();
+    QCOMPARE(runner.starts, 1);
+    emit backend.unitActionFinishedForRequest(oldRequest, QStringLiteral("start"),
+                                               ZapretBackend::State::Active, true);
+    QVERIFY(!controller.busy());
+    QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Success);
+    QCOMPARE(runner.starts, 1);
 }
 
 QTEST_GUILESS_MAIN(BlockcheckControllerTest)
