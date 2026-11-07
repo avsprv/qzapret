@@ -188,6 +188,7 @@ void BlockcheckPage::onStartClicked()
     m_lastOptions = o;
     m_resumeService = false;
     m_cancelRequested = false;
+    m_scanStarted = false;
     m_phase = LifecyclePhase::Checking;
     setBusy(true);
     m_log->appendPlainText(tr("Проверяю состояние сервиса zapret2…"));
@@ -258,6 +259,7 @@ void BlockcheckPage::onBackendState(ZapretBackend::State state)
 void BlockcheckPage::beginScan()
 {
     m_phase = LifecyclePhase::Scanning;
+    m_scanStarted = true;
     setBusy(true);
     m_log->appendPlainText(tr("Сервис остановлен. Запускаю blockcheck2…"));
     m_runner->start(m_lastOptions);
@@ -282,10 +284,15 @@ void BlockcheckPage::finishLifecycle(const QString &message)
     m_stopTimeout->stop();
     m_phase = LifecyclePhase::Idle;
     m_resumeService = false;
+    const bool notify = m_scanStarted;
+    const bool canceled = m_cancelRequested;
+    m_scanStarted = false;
     m_cancelRequested = false;
     setBusy(false);
     if (!message.isEmpty())
         m_log->appendPlainText(message);
+    if (notify)
+        emit scanFinished(m_found, canceled);
 }
 
 void BlockcheckPage::saveLog()
@@ -354,11 +361,9 @@ void BlockcheckPage::onFinished(int exitCode, bool canceled)
     m_log->appendPlainText(tr("Ошибок выполнения: %1").arg(errors));
     m_log->appendPlainText(tr("Код завершения: %1").arg(exitCode));
     m_log->appendPlainText(tr("Статус: %1").arg(status));
-    if (m_resumeService) {
-        m_cancelRequested = canceled;
+    m_cancelRequested = canceled;
+    if (m_resumeService)
         restoreService(tr("Диагностика завершена."));
-    } else {
+    else
         finishLifecycle();
-        emit scanFinished(m_found, canceled);
-    }
 }
