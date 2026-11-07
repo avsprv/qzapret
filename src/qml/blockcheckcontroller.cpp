@@ -16,7 +16,11 @@ BlockcheckController::BlockcheckController(QObject *parent)
     m_lifecycleTimeout->setInterval(30000);
     connect(m_lifecycleTimeout, &QTimer::timeout, this, [this] {
         if (m_phase == Phase::Checking) finish(tr("Не удалось получить подтверждённое состояние службы. Диагностика не запущена."));
-        else if (m_phase == Phase::WaitingForStop) {\n            m_stopTimedOut = true;\n            appendLog(tr("Операция остановки выполняется дольше ожидаемого. Новая команда запуска не отправляется до получения результата остановки."));\n            setStatus(tr("Ожидание завершения операции остановки службы…"));\n        }
+        else if (m_phase == Phase::WaitingForStop) {
+            m_stopTimedOut = true;
+            appendLog(tr("Операция остановки выполняется дольше ожидаемого. Новая команда запуска не отправляется до получения результата остановки."));
+            setStatus(tr("Ожидание завершения операции остановки службы…"));
+        }
         else if (m_phase == Phase::WaitingForStart) { m_resumeService=false; finish(tr("Не удалось подтвердить восстановление службы. Проверьте systemd.")); }
     });
     connect(m_backend, &ZapretBackend::stateVerified, this, &BlockcheckController::handleVerifiedState);
@@ -144,6 +148,16 @@ void BlockcheckController::cancel() {
 void BlockcheckController::handleUnitAction(const QString &action, ZapretBackend::State state, bool success) {
     if (m_phase==Phase::WaitingForStop && action==QLatin1String("stop")) {
         m_lifecycleTimeout->stop();
+        if (m_stopTimedOut) {
+            m_stopTimedOut = false;
+            if (state == ZapretBackend::State::Active) {
+                m_resumeService = false;
+                finish(tr("Операция остановки завершилась с активной службой. Диагностика не запускалась."));
+            } else {
+                restoreService(tr("Получен результат операции остановки после тайм-аута."));
+            }
+            return;
+        }
         if (success && state==ZapretBackend::State::Inactive) {
             if (m_cancelRequested) restoreService(tr("Диагностика отменена до запуска."));
             else beginScan();
