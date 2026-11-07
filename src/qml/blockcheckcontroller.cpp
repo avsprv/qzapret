@@ -171,6 +171,10 @@ void BlockcheckController::copyStrategy(int index) {
 void BlockcheckController::cancel() {
     if (m_phase==Phase::Checking || m_phase==Phase::AwaitingConfirmation) { finish(tr("Диагностика отменена до запуска."), StatusType::Warning); return; }
     if (m_phase==Phase::WaitingForStop) { m_cancelRequested=true; setStatus(tr("Отмена запрошена; ожидается подтверждение остановки службы."), StatusType::Warning); return; }
+    if (m_phase==Phase::WaitingForStart) {
+        setStatus(tr("Восстановление службы нельзя прервать. Ожидается подтверждение результата."), StatusType::Warning);
+        return;
+    }
     if (m_phase==Phase::Scanning) { m_cancelRequested=true; m_runner->cancel(); }
 }
 void BlockcheckController::handleUnitAction(quint64 requestId, const QString &action, ZapretBackend::State state, bool success) {
