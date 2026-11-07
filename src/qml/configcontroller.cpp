@@ -52,7 +52,7 @@ void ConfigController::finishProcess(QProcess *process, const QString &operation
         }
     });
     connect(process, &QProcess::finished, this,
-            [this, process, operation](int code, QProcess::ExitStatus exitStatus) {
+            [this, process, operation, input](int code, QProcess::ExitStatus exitStatus) {
         const QByteArray out = process->readAllStandardOutput();
         const QString error = QString::fromUtf8(process->readAllStandardError()).trimmed();
         m_process = nullptr;
