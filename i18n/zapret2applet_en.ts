@@ -616,11 +616,11 @@ If the service is running, it will be stopped for the duration of the update and
     <message><source>Чистая установка zapret2</source><translation>Clean installation of zapret2</translation></message>
     <message><source>Установить zapret2 %1 в /opt/zapret2?
 
-Будут загружены и проверены файлы релиза, создана конфигурация по умолчанию с NFQWS2_ENABLE=0 и установлен systemd unit.
+Будет проверена структура архива и SHA-256 бинарных компонентов, создана конфигурация по умолчанию с NFQWS2_ENABLE=0 и установлен systemd unit.
 
 Служба не будет запущена или добавлена в автозагрузку. Сетевой трафик не будет перенаправляться. Потребуется пароль администратора.</source><translation>Install zapret2 %1 to /opt/zapret2?
 
-The release files will be downloaded and verified, a default configuration with NFQWS2_ENABLE=0 will be created, and the systemd unit will be installed.
+The archive structure and binary-component SHA-256 checksums will be verified, a default configuration with NFQWS2_ENABLE=0 will be created, and the systemd unit will be installed.
 
 The service will not be started or enabled at boot. Network traffic will not be redirected. Administrator authentication is required.</translation></message>
     <message><source>Дождитесь завершения подбора стратегий перед установкой.</source><translation>Wait for the strategy scan to finish before installing.</translation></message>
