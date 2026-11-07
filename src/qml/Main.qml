@@ -53,7 +53,7 @@ Kirigami.ApplicationWindow {
             Kirigami.Action {
                 text: qsTr("Обновления")
                 icon.name: "system-software-update"
-                onTriggered: root.pageStack.push(placeholderPage, { pageTitle: text })
+                onTriggered: root.pageStack.push(updatePageComponent)
             },
             Kirigami.Action {
                 text: qsTr("Настройки")
@@ -168,7 +168,7 @@ Kirigami.ApplicationWindow {
                     Layout.fillWidth: true
                     visible: true
                     type: Kirigami.MessageType.Information
-                    text: qsTr("Это первый этап миграции на QML и Kirigami. Остальные разделы будут переноситься поэтапно; текущая версия приложения пока сохраняет прежний интерфейс.")
+                    text: qsTr("Предварительный интерфейс на QML и Kirigami. Он проходит поэтапную проверку; основная версия приложения пока использует стабильный интерфейс.")
                 }
             }
         }
@@ -210,20 +210,7 @@ Kirigami.ApplicationWindow {
     }
 
     Component {
-        id: placeholderPage
-
-        Kirigami.Page {
-            property string pageTitle: ""
-
-            title: pageTitle
-
-            Controls.Label {
-                anchors.centerIn: parent
-                width: Math.min(parent.width - Kirigami.Units.largeSpacing * 2, 520)
-                horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.WordWrap
-                text: qsTr("Этот раздел будет перенесён на QML на следующем этапе миграции.")
-            }
-        }
+        id: updatePageComponent
+        UpdatePage {}
     }
 }
