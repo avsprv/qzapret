@@ -41,6 +41,23 @@ bc_pid() {
 need_arg() { [ "$1" -ge 2 ] || die "missing value for $2"; }
 
 case "${1:-}" in
+lists-read)
+    [ "$#" -eq 2 ] || die "usage: lists-read NAME"
+    case "$2" in
+        zapret-hosts-user.txt|zapret-hosts-user-exclude.txt|zapret-hosts-user-ipban.txt|zapret-ip-user.txt|zapret-ip-user6.txt|zapret-ip-exclude.txt|zapret-ip-exclude6.txt|zapret-ip-user-ipban.txt|zapret-ip-user-ipban6.txt) ;;
+        *) die "list name is not allowlisted" ;;
+    esac
+    [ -d "$BASE" ] && [ ! -L "$BASE" ] || die "zapret2 not found in $BASE"
+    ipset_dir="$BASE/ipset"
+    [ -d "$ipset_dir" ] && [ ! -L "$ipset_dir" ] || die "ipset directory is missing or unsafe"
+    list="$ipset_dir/$2"
+    [ -e "$list" ] || die "list file does not exist"
+    [ -f "$list" ] && [ ! -L "$list" ] || die "list is not a regular file"
+    size=$(wc -c < "$list" | tr -d '[:space:]')
+    case "$size" in ''|*[!0-9]*) die "cannot determine list size" ;; esac
+    [ "$size" -le 1048576 ] || die "list exceeds the 1 MiB read limit"
+    cat "$list"
+    ;;
 config-read)
     [ "$#" -eq 1 ] || die "usage: config-read"
     [ -d "$BASE" ] && [ ! -L "$BASE" ] || die "zapret2 not found in $BASE"

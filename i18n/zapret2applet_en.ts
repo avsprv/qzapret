@@ -534,4 +534,30 @@ If the service is running, it will be stopped for the duration of the update and
     <message><source>Обнаружен пустой профиль рядом с --new.</source><translation>An empty profile was found next to --new.</translation></message>
     <message><source>Слишком много профилей или параметров.</source><translation>Too many profiles or arguments.</translation></message>
 </context>
+<context>
+    <name>MainWindow</name>
+    <message><source>Списки</source><translation>Lists</translation></message>
+</context>
+<context>
+    <name>ListsManagerPage</name>
+    <message><source>Выберите пользовательский список и нажмите «Прочитать».</source><translation>Select a user list and click “Read”.</translation></message>
+    <message><source>Включающий хостлист — zapret-hosts-user.txt</source><translation>Include hostlist — zapret-hosts-user.txt</translation></message>
+    <message><source>Исключающий хостлист — zapret-hosts-user-exclude.txt</source><translation>Exclude hostlist — zapret-hosts-user-exclude.txt</translation></message>
+    <message><source>Хостлист IP-ban — zapret-hosts-user-ipban.txt</source><translation>IP-ban hostlist — zapret-hosts-user-ipban.txt</translation></message>
+    <message><source>Включающий IPv4 — zapret-ip-user.txt</source><translation>Include IPv4 — zapret-ip-user.txt</translation></message>
+    <message><source>Включающий IPv6 — zapret-ip-user6.txt</source><translation>Include IPv6 — zapret-ip-user6.txt</translation></message>
+    <message><source>Исключающий IPv4 — zapret-ip-exclude.txt</source><translation>Exclude IPv4 — zapret-ip-exclude.txt</translation></message>
+    <message><source>Исключающий IPv6 — zapret-ip-exclude6.txt</source><translation>Exclude IPv6 — zapret-ip-exclude6.txt</translation></message>
+    <message><source>IP-ban IPv4 — zapret-ip-user-ipban.txt</source><translation>IP-ban IPv4 — zapret-ip-user-ipban.txt</translation></message>
+    <message><source>IP-ban IPv6 — zapret-ip-user-ipban6.txt</source><translation>IP-ban IPv6 — zapret-ip-user-ipban6.txt</translation></message>
+    <message><source>Прочитать</source><translation>Read</translation></message>
+    <message><source>Содержимое выбранного списка появится здесь.</source><translation>The selected list content will appear here.</translation></message>
+    <message><source>Отображаются только стандартные пользовательские файлы из /opt/zapret2/ipset. Генерируемые и загружаемые списки доступны только для чтения через другие механизмы zapret2 и не редактируются здесь. На этом этапе просмотр не изменяет файлы.</source><translation>Only standard user files from /opt/zapret2/ipset are shown. Generated and downloaded lists are managed by zapret2 and are not edited here. This initial viewer does not modify files.</translation></message>
+    <message><source>Выбран другой список. Нажмите «Прочитать».</source><translation>A different list is selected. Click “Read”.</translation></message>
+    <message><source>Читаю список %1…</source><translation>Reading list %1…</translation></message>
+    <message><source>Список превышает ограничение 1 MiB.</source><translation>List exceeds the 1 MiB limit.</translation></message>
+    <message><source>Список %1 прочитан. Файл не изменялся.</source><translation>List %1 was read. The file was not modified.</translation></message>
+    <message><source>Не удалось прочитать %1: %2</source><translation>Could not read %1: %2</translation></message>
+    <message><source>Не удалось запустить хелпер: %1</source><translation>Could not start the helper: %1</translation></message>
+</context>
 </TS>
