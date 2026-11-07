@@ -166,13 +166,27 @@ BlockcheckRunner::Options BlockcheckPage::collectOptions() const
 void BlockcheckPage::setBusy(bool busy)
 {
     for (QWidget *w : std::initializer_list<QWidget *>{m_domains, m_ipvs, m_http, m_tls12, m_tls13,
-                                                       m_http3, m_repeats, m_scan, m_startBtn})
+                                                       m_http3, m_repeats, m_scan})
         w->setEnabled(!busy);
+    m_startBtn->setEnabled(!busy && !m_updateBusy);
     m_cancelBtn->setEnabled(busy);
+    emit busyChanged(busy);
+}
+
+void BlockcheckPage::setUpdateBusy(bool busy)
+{
+    m_updateBusy = busy;
+    if (m_phase == LifecyclePhase::Idle)
+        m_startBtn->setEnabled(!busy);
 }
 
 void BlockcheckPage::onStartClicked()
 {
+    if (m_updateBusy) {
+        QMessageBox::information(this, tr("Обновление zapret2"),
+                                 tr("Дождитесь завершения обновления перед запуском диагностики."));
+        return;
+    }
     const auto o = collectOptions();
     if (o.domains.isEmpty() || o.domains.size() > 10) {
         QMessageBox::warning(this, tr("Подбор стратегий"), tr("Укажите от 1 до 10 доменов."));
