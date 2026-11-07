@@ -392,6 +392,7 @@ blockcheck)
     done
 
     n=0
+    set -f
     for d in $domains; do
         validate_domain_name "$d" || die "bad domain: $d"
         n=$((n + 1))
