@@ -1,6 +1,6 @@
 # zapret2applet
 
-**Неофициальная графическая оболочка для [zapret2](https://github.com/bol-van/zapret2) в Linux.**
+**Графическая оболочка для [zapret2](https://github.com/bol-van/zapret2) в Linux.**
 
 [![CI](https://github.com/avsprv/zapret2applet/actions/workflows/ci.yml/badge.svg)](https://github.com/avsprv/zapret2applet/actions/workflows/ci.yml)
 [![Packages](https://github.com/avsprv/zapret2applet/actions/workflows/packages.yml/badge.svg)](https://github.com/avsprv/zapret2applet/actions/workflows/packages.yml)
