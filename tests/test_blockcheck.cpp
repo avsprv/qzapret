@@ -64,6 +64,7 @@ private slots:
         f.write("#!/bin/sh\n"
                 "echo '* checking privileges'\n"
                 "printf '!!!!! curl_test_https_tls12: working strategy found for ipv4 a.org : nfqws2 --one !!!!!\\r\\n'\n"
+                "echo '!!!!! curl_test_https_tls12: working strategy found for ipv4 a.org : nfqws2 --one !!!!!'\n"
                 "echo '!!!!! curl_test_http: working strategy found for ipv4 a.org : nfqws2 --two --three !!!!!'\n"
                 "printf 'tail-without-newline'\n"
                 "exit 0\n");
@@ -81,7 +82,8 @@ private slots:
         runner.start({});
         QVERIFY(done.wait(5000));
 
-        QCOMPARE(found.count(), 2);
+        QCOMPARE(found.count(), 2); // повтор одной стратегии не создаёт дубликат результата
+        QCOMPARE(lines.count(), 5); // исходный журнал сохраняет и повторную строку
         QCOMPARE(found.at(0).at(0).value<BlockcheckRunner::Result>().args, QStringLiteral("--one"));
         QCOMPARE(found.at(1).at(0).value<BlockcheckRunner::Result>().args, QStringLiteral("--two --three"));
         QCOMPARE(done.at(0).at(0).toInt(), 0);
