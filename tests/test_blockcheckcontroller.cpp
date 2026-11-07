@@ -146,7 +146,7 @@ private slots:
     void stopFailureAttemptsRecoveryAndWarns();
     void restoreFailureReportsError();
     void verificationTimeoutFinishesSafely();
-    void restoreTimeoutReportsError();
+    void restoreTimeoutKeepsBusyUntilLateResult();
     void ignoresLateVerificationFromPreviousOperation();
     void ignoresLateRestoreResultFromPreviousOperation();
 };
@@ -421,7 +421,7 @@ void BlockcheckControllerTest::verificationTimeoutFinishesSafely()
     QVERIFY(!controller.busy());
 }
 
-void BlockcheckControllerTest::restoreTimeoutReportsError()
+void BlockcheckControllerTest::restoreTimeoutKeepsBusyUntilLateResult()
 {
     FakeZapretBackend backend;
     backend.state = ZapretBackend::State::Active;
