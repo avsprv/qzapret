@@ -61,9 +61,8 @@ These versions reflect the baseline availability of Qt 6.8; they do not guarante
 
 ## Installation
 
-1. Install [zapret2](https://github.com/bol-van/zapret2) by following its official instructions.
-2. Download the package from [Releases](https://github.com/avsprv/zapret2applet/releases).
-3. Install it:
+1. Download the zapret2applet package from [Releases](https://github.com/avsprv/zapret2applet/releases).
+2. Install it:
 
 **Fedora (.rpm):**
 ```bash
@@ -75,7 +74,7 @@ sudo dnf install ./zapret2applet-*.rpm
 sudo apt install ./zapret2applet_*.deb
 ```
 
-4. Launch zapret2applet from your application menu.
+3. Launch zapret2applet from your application menu. If zapret2 is not installed yet, open the Updates tab and perform a clean installation. Configure the service and its dependencies before starting it.
 
 If a prebuilt package is unavailable, follow the [build from source](#building-from-source) instructions.
 
