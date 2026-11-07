@@ -57,13 +57,12 @@ Building requires **Qt 6.8+**, CMake 3.21+, a C++20 compiler, and Ninja. The app
 
 These versions reflect the baseline availability of Qt 6.8; they do not guarantee support for every distribution release. **Ubuntu 25.04 has reached end of life** and should not be installed just for this application. On Ubuntu, use a currently supported release with Qt 6.8+ and validate the specific release separately.
 
-**zapret2 must be installed separately.** The application manages an existing installation (usually /opt/zapret2) but does not perform the initial setup.
+**A clean zapret2 installation is available on the Updates tab.** The application downloads the latest stable release, validates the archive structure and SHA-256 checksums of binary components, creates `/opt/zapret2`, and installs the systemd unit. Existing installation directories and unit files are never overwritten. The initial configuration is created with `NFQWS2_ENABLE=0`; the service is neither started nor enabled at boot. Before starting it, check the dependencies, select and configure the firewall, and explicitly enable the required options in the configuration. The interactive upstream installer is not invoked.
 
 ## Installation
 
-1. Install [zapret2](https://github.com/bol-van/zapret2) by following its official instructions.
-2. Download the package from [Releases](https://github.com/avsprv/zapret2applet/releases).
-3. Install it:
+1. Download the zapret2applet package from [Releases](https://github.com/avsprv/zapret2applet/releases).
+2. Install it:
 
 **Fedora (.rpm):**
 ```bash
@@ -75,7 +74,7 @@ sudo dnf install ./zapret2applet-*.rpm
 sudo apt install ./zapret2applet_*.deb
 ```
 
-4. Launch zapret2applet from your application menu.
+3. Launch zapret2applet from your application menu. If zapret2 is not installed yet, open the Updates tab and perform a clean installation. Configure the service and its dependencies before starting it.
 
 If a prebuilt package is unavailable, follow the [build from source](#building-from-source) instructions.
 

@@ -609,6 +609,25 @@ If the service is running, it will be stopped for the duration of the update and
         <source>Дождитесь завершения подбора стратегий перед обновлением.</source>
         <translation>Wait for the strategy scan to finish before updating.</translation>
     </message>
+
+    <message><source>zapret2 не установлен. Проверьте наличие релиза для установки.</source><translation>zapret2 is not installed. Check for an available release to install.</translation></message>
+    <message><source>zapret2 не установлен. Доступна чистая установка %1.</source><translation>zapret2 is not installed. A clean installation of %1 is available.</translation></message>
+    <message><source>Установить %1</source><translation>Install %1</translation></message>
+    <message><source>Чистая установка zapret2</source><translation>Clean installation of zapret2</translation></message>
+    <message><source>Установить zapret2 %1 в /opt/zapret2?
+
+Будет проверена структура архива и SHA-256 бинарных компонентов, создана конфигурация по умолчанию с NFQWS2_ENABLE=0 и установлен systemd unit.
+
+Служба не будет запущена или добавлена в автозагрузку. Сетевой трафик не будет перенаправляться. Потребуется пароль администратора.</source><translation>Install zapret2 %1 to /opt/zapret2?
+
+The archive structure and binary-component SHA-256 checksums will be verified, a default configuration with NFQWS2_ENABLE=0 will be created, and the systemd unit will be installed.
+
+The service will not be started or enabled at boot. Network traffic will not be redirected. Administrator authentication is required.</translation></message>
+    <message><source>Дождитесь завершения подбора стратегий перед установкой.</source><translation>Wait for the strategy scan to finish before installing.</translation></message>
+    <message><source>Устанавливаю zapret2 %1…</source><translation>Installing zapret2 %1…</translation></message>
+    <message><source>zapret2 установлен: %1.</source><translation>zapret2 has been installed: %1.</translation></message>
+    <message><source>Установка отменена: диалог авторизации закрыт.</source><translation>Installation canceled: the authorization dialog was dismissed.</translation></message>
+    <message><source>Установка не выполнена (код %1). Подробности — в журнале ниже.</source><translation>Installation failed (code %1). See the log below for details.</translation></message>
 </context>
 <context>
     <name>ZapretUpdater</name>

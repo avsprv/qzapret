@@ -80,7 +80,12 @@ UpdatePage::UpdatePage(ZapretBackend *backend, QWidget *parent)
     layout->addWidget(m_log, 1);
 
     connect(m_checkBtn, &QPushButton::clicked, this, [this] { checkNow(false); });
-    connect(m_updateBtn, &QPushButton::clicked, this, &UpdatePage::confirmAndUpdate);
+    connect(m_updateBtn, &QPushButton::clicked, this, [this] {
+        if (m_installed.isEmpty())
+            confirmAndInstall();
+        else
+            confirmAndUpdate();
+    });
     connect(m_notesBtn, &QPushButton::clicked, this, [this] {
         if (!m_latestTag.isEmpty())
             QDesktopServices::openUrl(QUrl(ZapretVersion::releaseUrl(m_latestTag)));
@@ -156,6 +161,7 @@ void UpdatePage::checkNow(bool automatic)
     refreshInstalled();
     m_statusLabel->setText(tr("Проверяю обновления…"));
     m_checkBtn->setEnabled(false);
+    m_updateBtn->setEnabled(false);
     m_checker->check();
 }
 
@@ -175,7 +181,9 @@ void UpdatePage::refreshUi()
     const bool newer = known && ZapretVersion::compare(m_installed, m_latestTag) < 0;
 
     if (m_installed.isEmpty())
-        m_statusLabel->setText(tr("zapret2 не установлен: zapret2applet обновляет только существующую установку."));
+        m_statusLabel->setText(m_latestTag.isEmpty()
+                                   ? tr("zapret2 не установлен. Проверьте наличие релиза для установки.")
+                                   : tr("zapret2 не установлен. Доступна чистая установка %1.").arg(m_latestTag));
     else if (m_latestTag.isEmpty())
         m_statusLabel->setText(tr("Версия на GitHub ещё не проверялась."));
     else if (newer)
@@ -183,15 +191,17 @@ void UpdatePage::refreshUi()
     else
         m_statusLabel->setText(tr("Установлена актуальная версия."));
 
-    m_updateBtn->setText(newer ? tr("Обновить до %1").arg(m_latestTag) : tr("Обновить"));
-    m_updateBtn->setEnabled(newer && !busy && !m_serviceBusy);
+    const bool canInstall = m_installed.isEmpty() && !m_latestTag.isEmpty();
+    m_updateBtn->setText(canInstall ? tr("Установить %1").arg(m_latestTag)
+                                    : (newer ? tr("Обновить до %1").arg(m_latestTag) : tr("Обновить")));
+    m_updateBtn->setEnabled((canInstall || newer) && !busy && !m_checker->isRunning() && !m_serviceBusy);
     m_checkBtn->setEnabled(!busy && !m_checker->isRunning());
     m_notesBtn->setEnabled(!m_latestTag.isEmpty());
 }
 
 void UpdatePage::confirmAndUpdate()
 {
-    if (m_latestTag.isEmpty() || m_installed.isEmpty() || isBusy())
+    if (m_latestTag.isEmpty() || m_installed.isEmpty() || isBusy() || m_checker->isRunning())
         return;
     if (m_serviceBusy) {
         QMessageBox::information(this, tr("Идёт подбор"),
@@ -215,17 +225,52 @@ void UpdatePage::confirmAndUpdate()
     m_updater->start(m_latestTag);
 }
 
+void UpdatePage::confirmAndInstall()
+{
+    if (m_latestTag.isEmpty() || !m_installed.isEmpty() || isBusy() || m_checker->isRunning())
+        return;
+    if (m_serviceBusy) {
+        QMessageBox::information(this, tr("Идёт подбор"),
+                                 tr("Дождитесь завершения подбора стратегий перед установкой."));
+        return;
+    }
+    const auto answer = QMessageBox::question(
+        this, tr("Чистая установка zapret2"),
+        tr("Установить zapret2 %1 в /opt/zapret2?\n\n"
+           "Будет проверена структура архива и SHA-256 бинарных компонентов, создана конфигурация по умолчанию "
+           "с NFQWS2_ENABLE=0 и установлен systemd unit.\n\n"
+           "Служба не будет запущена или добавлена в автозагрузку. "
+           "Сетевой трафик не будет перенаправляться. Потребуется пароль администратора.")
+            .arg(m_latestTag));
+    if (answer != QMessageBox::Yes)
+        return;
+
+    m_installing = true;
+    m_log->clear();
+    m_statusLabel->setText(tr("Устанавливаю zapret2 %1…").arg(m_latestTag));
+    m_updateBtn->setEnabled(false);
+    m_checkBtn->setEnabled(false);
+    emit busyChanged(true);
+    m_updater->startInstall(m_latestTag);
+}
+
 void UpdatePage::onUpdateFinished(int code)
 {
     emit busyChanged(false);
+    const bool wasInstalling = m_installing;
+    m_installing = false;
     refreshInstalled();
     refreshUi();
     m_backend->refresh();
 
     if (code == 0)
-        m_statusLabel->setText(tr("zapret2 обновлён до %1.").arg(m_latestTag));
+        m_statusLabel->setText(wasInstalling ? tr("zapret2 установлен: %1.").arg(m_latestTag)
+                                             : tr("zapret2 обновлён до %1.").arg(m_latestTag));
     else if (Helper::isAuthDismissed(code))
-        m_statusLabel->setText(tr("Обновление отменено: диалог авторизации закрыт."));
+        m_statusLabel->setText(wasInstalling ? tr("Установка отменена: диалог авторизации закрыт.")
+                                             : tr("Обновление отменено: диалог авторизации закрыт."));
     else
-        m_statusLabel->setText(tr("Обновление не выполнено (код %1). Подробности — в журнале ниже.").arg(code));
+        m_statusLabel->setText(wasInstalling
+                                   ? tr("Установка не выполнена (код %1). Подробности — в журнале ниже.").arg(code)
+                                   : tr("Обновление не выполнено (код %1). Подробности — в журнале ниже.").arg(code));
 }

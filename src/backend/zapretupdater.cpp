@@ -12,6 +12,16 @@ ZapretUpdater::ZapretUpdater(QObject *parent)
 
 void ZapretUpdater::start(const QString &tag)
 {
+    startOperation(QStringLiteral("update"), tag);
+}
+
+void ZapretUpdater::startInstall(const QString &tag)
+{
+    startOperation(QStringLiteral("install"), tag);
+}
+
+void ZapretUpdater::startOperation(const QString &operation, const QString &tag)
+{
     if (m_proc)
         return;
     static const QRegularExpression valid(QStringLiteral(R"(^v\d+(\.\d+)*$)"));
@@ -45,7 +55,7 @@ void ZapretUpdater::start(const QString &tag)
         emit failedToStart(msg);
         emit finished(-1);
     });
-    Helper::start(m_proc, {QStringLiteral("update"), tag});
+    Helper::start(m_proc, {operation, tag});
 }
 
 void ZapretUpdater::drain()

@@ -11,8 +11,7 @@ class UpdateChecker;
 class ZapretUpdater;
 class ZapretBackend;
 
-// Вкладка «Обновления»: версия установленного zapret2, проверка новой версии на GitHub и
-// обновление через привилегированный хелпер.
+// Вкладка «Обновления»: версия установленного zapret2, чистая установка и обновление через привилегированный хелпер.
 class UpdatePage : public QWidget
 {
     Q_OBJECT
@@ -33,6 +32,7 @@ private:
     void refreshInstalled();
     void refreshUi();
     void confirmAndUpdate();
+    void confirmAndInstall();
     void onUpdateFinished(int code);
 
     ZapretBackend *m_backend;
@@ -53,4 +53,5 @@ private:
     QString m_latestTag; // "v1.0.7" или пусто
     bool m_automaticCheck = false;
     bool m_serviceBusy = false;
+    bool m_installing = false;
 };
