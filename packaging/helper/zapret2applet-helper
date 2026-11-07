@@ -497,6 +497,7 @@ install)
     fi
 
     mkdir "$tmp/extract"
+    umask 022
     tar -xzf "$tmp/z.tgz" -C "$tmp/extract" --no-same-owner || die "extract failed"
     stage="$tmp/extract/$name"
     [ -d "$stage" ] && [ ! -L "$stage" ] || die "unexpected archive layout"
