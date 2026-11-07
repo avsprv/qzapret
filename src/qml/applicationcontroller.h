@@ -14,6 +14,7 @@ class ApplicationController final : public QObject
     Q_PROPERTY(bool serviceActive READ serviceActive NOTIFY serviceStateChanged)
     Q_PROPERTY(QString serviceStateCode READ serviceStateCode NOTIFY serviceStateChanged)
     Q_PROPERTY(bool bootEnabled READ bootEnabled NOTIFY bootEnabledChanged)
+    Q_PROPERTY(bool operationsBusy READ operationsBusy NOTIFY operationsBusyChanged)
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
 
 public:
@@ -23,6 +24,8 @@ public:
     bool serviceActive() const;
     QString serviceStateCode() const;
     bool bootEnabled() const;
+    bool operationsBusy() const;
+    void setOperationsBusy(bool busy);
     QString errorMessage() const;
 
     Q_INVOKABLE void refresh();
@@ -34,6 +37,7 @@ signals:
     void serviceStateChanged();
     void errorMessageChanged();
     void bootEnabledChanged();
+    void operationsBusyChanged();
 
 private:
     void setState(ZapretBackend::State state);
@@ -41,5 +45,6 @@ private:
     SystemdBackend *m_backend = nullptr;
     ZapretBackend::State m_state = ZapretBackend::State::Unknown;
     bool m_bootEnabled = false;
+    bool m_operationsBusy = false;
     QString m_errorMessage;
 };
