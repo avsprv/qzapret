@@ -15,12 +15,15 @@ public:
 
     void refresh() override;
     void verifyState() override;
+    void verifyState(quint64 requestId) override;
     void start() override;
+    void start(quint64 requestId) override;
     void stop() override;
+    void stop(quint64 requestId) override;
     void setBootEnabled(bool enabled) override;
 
 private:
-    void runUnitAction(const QString &action);
+    void runUnitAction(const QString &action, quint64 requestId = 0);
     void query(const QString &verb, const std::function<void(const QString &)> &onResult);
 
     QString m_unit;
