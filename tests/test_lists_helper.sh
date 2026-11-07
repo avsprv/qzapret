@@ -43,7 +43,7 @@ grep -q 'list created' "$tmp/create.out"
 grep -q 'new.example' "$tmp/base/ipset/zapret-hosts-user-exclude.txt"
 echo "ok: creates a missing source hostlist"
 
-if printf 'invalid domain with spaces\n' | "$H" lists-write zapret-hosts-user.txt >/dev/null 2>&1; then
+if printf 'invalid..domain\n' | "$H" lists-write zapret-hosts-user.txt >/dev/null 2>&1; then
     echo "FAIL: malformed hostlist text was accepted"; exit 1
 fi
 grep -q 'updated.example' "$tmp/base/ipset/zapret-hosts-user.txt"
