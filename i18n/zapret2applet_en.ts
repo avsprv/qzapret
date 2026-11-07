@@ -1479,5 +1479,21 @@
         <source>Готово.</source>
         <translation>Done.</translation>
     </message>
+    <message>
+        <source>Восстановление службы выполняется дольше ожидаемого. Новые команды управления заблокированы до получения результата.</source>
+        <translation>Service restoration is taking longer than expected. New control commands are blocked until the result is received.</translation>
+    </message>
+    <message>
+        <source>Ожидание подтверждения восстановления службы…</source>
+        <translation>Waiting for confirmation that the service has been restored…</translation>
+    </message>
+    <message>
+        <source>Служба zapret2 восстановлена с задержкой. Проверьте состояние приложения.</source>
+        <translation>The zapret2 service was restored after a delay. Check the application state.</translation>
+    </message>
+    <message>
+        <source>Не удалось подтвердить восстановление службы после тайм-аута. Проверьте systemd.</source>
+        <translation>Could not confirm service restoration after the timeout. Check systemd.</translation>
+    </message>
 </context>
 </TS>
