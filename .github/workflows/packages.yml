@@ -39,6 +39,21 @@ jobs:
           dpkg-deb --info dist/*.deb
           dpkg-deb --contents dist/*.deb
           lintian -I dist/*.deb
+      - name: Smoke-test DEB installation and removal
+        run: |
+          set -eu
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ./dist/*.deb
+          test "$(dpkg-query -W -f='${Status}' zapret2applet)" = "install ok installed"
+          test -x /usr/bin/zapret2applet
+          helper="$(dpkg-query -L zapret2applet | grep '/zapret2applet-helper$')"
+          policy="$(dpkg-query -L zapret2applet | grep '/org.zapret2applet.policy$')"
+          test -n "$helper" && test -x "$helper"
+          test -n "$policy" && test -f "$policy"
+          DEBIAN_FRONTEND=noninteractive apt-get purge -y zapret2applet
+          ! dpkg-query -W zapret2applet >/dev/null 2>&1
+          test ! -e /usr/bin/zapret2applet
+          test ! -e "$helper"
+          test ! -e "$policy"
       - uses: actions/upload-artifact@v4
         with:
           name: zapret2applet-deb
@@ -84,6 +99,30 @@ jobs:
           rpm -qpl dist/zapret2applet-*.rpm
           rpm -qpR dist/zapret2applet-*.rpm
           rpmlint dist/*.rpm
+      - name: Smoke-test RPM installation and removal
+        run: |
+          set -eu
+          package=""
+          for candidate in dist/*.rpm; do
+            [ -f "$candidate" ] || continue
+            if [ "$(rpm -qp --qf '%{NAME}' "$candidate")" = "zapret2applet" ]; then
+              package="$candidate"
+              break
+            fi
+          done
+          test -n "$package"
+          dnf install -y "$package"
+          rpm -q zapret2applet
+          test -x /usr/bin/zapret2applet
+          helper="$(rpm -ql zapret2applet | grep '/zapret2applet-helper$')"
+          policy="$(rpm -ql zapret2applet | grep '/org.zapret2applet.policy$')"
+          test -n "$helper" && test -x "$helper"
+          test -n "$policy" && test -f "$policy"
+          dnf remove -y zapret2applet
+          ! rpm -q zapret2applet >/dev/null 2>&1
+          test ! -e /usr/bin/zapret2applet
+          test ! -e "$helper"
+          test ! -e "$policy"
       - uses: actions/upload-artifact@v4
         with:
           name: zapret2applet-rpm
