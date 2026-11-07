@@ -584,16 +584,21 @@ update)
     echo "Checking archive ..."
     tar -tzf "$tmp/z.tgz" > "$tmp/list" 2>/dev/null || die "corrupt archive"
     [ -s "$tmp/list" ] || die "empty archive"
+    entries=$(wc -l < "$tmp/list" | tr -d '[:space:]')
+    [ "$entries" -le 50000 ] || die "archive contains too many entries"
+    tar -tvzf "$tmp/z.tgz" | awk '$1 ~ /^-/ { total += $3; files++ } END { if (files > 50000 || total > 536870912) exit 1 }' \
+        || die "archive exceeds the extraction limits"
     if grep -qE '(^/|(^|/)\.\.(/|$))' "$tmp/list"; then die "unsafe paths in archive"; fi
     if grep -qv "^$name/" "$tmp/list"; then die "unexpected content outside $name/"; fi
-    # только обычные файлы и каталоги: ни ссылок, ни устройств
+    # Только обычные файлы и каталоги: ни ссылок, ни устройств.
     if tar -tvzf "$tmp/z.tgz" | cut -c1 | grep -qv '[-d]'; then die "links or special files in archive"; fi
 
     mkdir "$tmp/x"
     tar -xzf "$tmp/z.tgz" -C "$tmp/x" --no-same-owner || die "extract failed"
     stage="$tmp/x/$name"
-    [ -d "$stage" ] || die "unexpected archive layout"
+    [ -d "$stage" ] && [ ! -L "$stage" ] || die "unexpected archive layout"
     chmod -R ug-s "$stage"
+    chmod -R go-w "$stage"
 
     echo "Verifying checksums of binaries (sha256sum.txt from the release) ..."
     [ -s "$tmp/sums.txt" ] || die "empty sha256sum.txt"
