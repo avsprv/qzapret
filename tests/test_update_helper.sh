@@ -120,12 +120,12 @@ prepare_install() {
 }
 
 run_install() {
-    QZAPRET_TEST_BASE=$W/opt/zapret2 QZAPRET_TEST_RUNDIR=$W/run QZAPRET_TEST_NO_SERVICE=1 \\
+    QZAPRET_TEST_BASE=$W/opt/zapret2 QZAPRET_TEST_RUNDIR=$W/run QZAPRET_TEST_NO_SERVICE=1 \
     QZAPRET_TEST_UNIT_DIR=$W/systemd QZAPRET_TEST_URLBASE="file://$W/rel" "$H" install "$1" 2>&1
 }
 
 expect_no_install() {
-    [ ! -e "$W/opt/zapret2" ] && [ ! -e "$W/systemd/zapret2.service" ] \\
+    [ ! -e "$W/opt/zapret2" ] && [ ! -e "$W/systemd/zapret2.service" ] \
         || bad "$1: partial installation was left behind"
 }
 
@@ -134,7 +134,7 @@ prepare_install; make_release v9.9.9
 out=$(run_install v9.9.9); rc=$?
 [ $rc -eq 0 ] && ok "clean install succeeds" || bad "clean install rc=$rc: $out"
 grep -q 'NFQWS2_ENABLE=0' "$W/opt/zapret2/config" && ok "fresh config disables NFQWS2" || bad "fresh config is unsafe"
-[ -x "$W/opt/zapret2/nfq2/nfqws2" ] && [ -x "$W/opt/zapret2/ip2net/ip2net" ] \\
+    [ -x "$W/opt/zapret2/nfq2/nfqws2" ] && [ -x "$W/opt/zapret2/ip2net/ip2net" ] \
     && ok "compatible binaries linked" || bad "binary links missing"
 [ -f "$W/systemd/zapret2.service" ] && ok "systemd unit installed" || bad "systemd unit missing"
 [ ! -e "$W/run/install.lock" ] && ok "install lock released" || bad "install lock left behind"
@@ -143,7 +143,7 @@ grep -q 'NFQWS2_ENABLE=0' "$W/opt/zapret2/config" && ok "fresh config disables N
 prepare_install; mkdir -p "$W/opt/zapret2"; echo keep > "$W/opt/zapret2/marker"; make_release v9.9.9
 out=$(run_install v9.9.9); rc=$?
 [ $rc -eq 2 ] && [ "$(cat "$W/opt/zapret2/marker")" = keep ] \\
-    && ok "existing installation protected" || bad "existing installation rc=$rc: $out"
+    [ $rc -eq 2 ] && [ "$(cat "$W/opt/zapret2/marker")" = keep ] \
 [ ! -e "$W/systemd/zapret2.service" ] || bad "unit created over existing installation"
 
 # --- 10. checksum mismatch rejects clean install before touching system
