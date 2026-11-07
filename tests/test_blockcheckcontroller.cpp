@@ -110,6 +110,8 @@ private slots:
     void scanFailureRemainsErrorAfterServiceRestore();
     void scanCancellationRemainsWarningAfterServiceRestore();
     void stopTimeoutWaitsForLateResultBeforeRestoring();
+    void stopFailureAttemptsRecoveryAndWarns();
+    void restoreFailureReportsError();
     void verificationTimeoutFinishesSafely();
     void restoreTimeoutReportsError();
 };
@@ -321,6 +323,41 @@ void BlockcheckControllerTest::stopTimeoutWaitsForLateResultBeforeRestoring()
     QCOMPARE(backend.startCalls, 1);
     QVERIFY(!controller.busy());
     QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Warning);
+}
+
+void BlockcheckControllerTest::stopFailureAttemptsRecoveryAndWarns()
+{
+    FakeZapretBackend backend;
+    backend.state = ZapretBackend::State::Active;
+    backend.autoStop = false;
+    FakeBlockcheckRunner runner;
+    BlockcheckController controller(&backend, &runner, 100);
+
+    controller.start();
+    controller.confirmStop(true);
+    backend.completeStop(ZapretBackend::State::Inactive, false);
+
+    QCOMPARE(backend.startCalls, 1);
+    QVERIFY(!controller.busy());
+    QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Warning);
+    QVERIFY(controller.status().contains(QStringLiteral("Не удалось подтвердить остановку")));
+}
+
+void BlockcheckControllerTest::restoreFailureReportsError()
+{
+    FakeZapretBackend backend;
+    backend.state = ZapretBackend::State::Active;
+    backend.autoStart = false;
+    FakeBlockcheckRunner runner;
+    BlockcheckController controller(&backend, &runner, 100);
+
+    controller.start();
+    controller.confirmStop(true);
+    backend.completeStart(ZapretBackend::State::Unknown, false);
+
+    QVERIFY(!controller.busy());
+    QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Error);
+    QVERIFY(controller.status().contains(QStringLiteral("Не удалось восстановить службу")));
 }
 
 void BlockcheckControllerTest::verificationTimeoutFinishesSafely()
