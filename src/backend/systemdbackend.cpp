@@ -25,20 +25,35 @@ void SystemdBackend::query(const QString &verb, const std::function<void(const Q
     proc->start(QStringLiteral("systemctl"), {verb, m_unit});
 }
 
+namespace {
+ZapretBackend::State parseUnitState(const QString &out)
+{
+    if (out == QLatin1String("active"))
+        return ZapretBackend::State::Active;
+    if (out == QLatin1String("inactive"))
+        return ZapretBackend::State::Inactive;
+    if (out == QLatin1String("failed"))
+        return ZapretBackend::State::Failed;
+    return ZapretBackend::State::Unknown;
+}
+} // namespace
+
 void SystemdBackend::refresh()
 {
     query(QStringLiteral("is-active"), [this](const QString &out) {
-        State s = State::Unknown;
-        if (out == QLatin1String("active"))
-            s = State::Active;
-        else if (out == QLatin1String("inactive"))
-            s = State::Inactive;
-        else if (out == QLatin1String("failed"))
-            s = State::Failed;
-        emit stateChanged(s);
+        emit stateChanged(parseUnitState(out));
     });
     query(QStringLiteral("is-enabled"), [this](const QString &out) {
         emit bootEnabledChanged(out == QLatin1String("enabled"));
+    });
+}
+
+void SystemdBackend::verifyState()
+{
+    query(QStringLiteral("is-active"), [this](const QString &out) {
+        const State state = parseUnitState(out);
+        emit stateChanged(state);
+        emit stateVerified(state);
     });
 }
 
@@ -53,18 +68,33 @@ void SystemdBackend::setBootEnabled(bool enabled)
 void SystemdBackend::runUnitAction(const QString &action)
 {
     auto *proc = new QProcess(this);
-    connect(proc, &QProcess::finished, this, [this, proc](int code, QProcess::ExitStatus) {
-        if (code != 0 && !Helper::isAuthDismissed(code)) {
+    const auto reportResult = [this, action](bool success) {
+        query(QStringLiteral("is-active"), [this, action, success](const QString &out) {
+            const State state = parseUnitState(out);
+            emit stateChanged(state);
+            emit unitActionFinished(action, state, success);
+        });
+        query(QStringLiteral("is-enabled"), [this](const QString &out) {
+            emit bootEnabledChanged(out == QLatin1String("enabled"));
+        });
+    };
+
+    connect(proc, &QProcess::finished, this,
+            [this, proc, action, reportResult](int code, QProcess::ExitStatus status) {
+        const bool success = code == 0 && status == QProcess::NormalExit;
+        if (!success && !Helper::isAuthDismissed(code)) {
             const QString err = QString::fromUtf8(proc->readAllStandardError()).trimmed();
             emit errorOccurred(tr("Операция не выполнена (код %1): %2").arg(code).arg(err));
         }
         proc->deleteLater();
-        refresh();
+        reportResult(success);
     });
-    connect(proc, &QProcess::errorOccurred, this, [this, proc](QProcess::ProcessError e) {
+    connect(proc, &QProcess::errorOccurred, this,
+            [this, proc, reportResult](QProcess::ProcessError e) {
         if (e == QProcess::FailedToStart) {
             emit errorOccurred(tr("Не удалось запустить pkexec/хелпер: %1").arg(proc->errorString()));
             proc->deleteLater(); // finished() после FailedToStart не приходит
+            reportResult(false);
         }
     });
     Helper::start(proc, {QStringLiteral("unit"), action});

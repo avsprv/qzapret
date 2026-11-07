@@ -20,10 +20,12 @@ public:
     explicit UpdatePage(ZapretBackend *backend, QWidget *parent = nullptr);
 
     bool isBusy() const;
+    void setServiceBusy(bool busy);
 
 signals:
     // Автоматическая проверка нашла версию новее установленной (один раз на версию).
     void updateAvailable(const QString &tag);
+    void busyChanged(bool busy);
 
 private:
     void checkNow(bool automatic);
@@ -50,4 +52,5 @@ private:
     QString m_installed; // "1.0.6" или пусто
     QString m_latestTag; // "v1.0.7" или пусто
     bool m_automaticCheck = false;
+    bool m_serviceBusy = false;
 };

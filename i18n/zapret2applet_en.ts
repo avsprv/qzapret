@@ -42,6 +42,30 @@
         <translation>Copy strategy</translation>
     </message>
     <message>
+        <source>Сохранить журнал…</source>
+        <translation>Save log…</translation>
+    </message>
+    <message>
+        <source>Сохранить журнал</source>
+        <translation>Save log</translation>
+    </message>
+    <message>
+        <source>Текстовые файлы (*.txt);;Все файлы (*)</source>
+        <translation>Text files (*.txt);;All files (*)</translation>
+    </message>
+    <message>
+        <source>Ошибка сохранения</source>
+        <translation>Save error</translation>
+    </message>
+    <message>
+        <source>Не удалось открыть файл для записи: %1</source>
+        <translation>Could not open file for writing: %1</translation>
+    </message>
+    <message>
+        <source>Не удалось сохранить журнал: %1</source>
+        <translation>Could not save log: %1</translation>
+    </message>
+    <message>
         <location filename="../src/blockcheckpage.cpp" line="39"/>
         <source>домены через пробел (до 10)</source>
         <translation>space-separated domains (up to 10)</translation>
@@ -146,6 +170,132 @@
         <location filename="../src/blockcheckpage.cpp" line="213"/>
         <source>Запускаю zapret2 обратно…</source>
         <translation>Starting zapret2 again…</translation>
+    </message>
+    <message>
+        <source>Сводка диагностики:</source>
+        <translation>Diagnostic summary:</translation>
+    </message>
+    <message>
+        <source>Домены (%1): %2</source>
+        <translation>Domains (%1): %2</translation>
+    </message>
+    <message>
+        <source>Протоколы: %1</source>
+        <translation>Protocols: %1</translation>
+    </message>
+    <message>
+        <source>Уникальных стратегий: %1</source>
+        <translation>Unique strategies: %1</translation>
+    </message>
+    <message>
+        <source>Ошибок выполнения: %1</source>
+        <translation>Execution errors: %1</translation>
+    </message>
+    <message>
+        <source>Код завершения: %1</source>
+        <translation>Exit code: %1</translation>
+    </message>
+    <message>
+        <source>Статус: %1</source>
+        <translation>Status: %1</translation>
+    </message>
+    <message>
+        <source>Отменено</source>
+        <translation>Canceled</translation>
+    </message>
+    <message>
+        <source>Ошибка выполнения</source>
+        <translation>Execution failed</translation>
+    </message>
+    <message>
+        <source>Завершено: рабочие стратегии не найдены</source>
+        <translation>Completed: no working strategies found</translation>
+    </message>
+    <message>
+        <source>Завершено успешно</source>
+        <translation>Completed successfully</translation>
+    </message>
+    <message>
+        <source>Проверяю состояние сервиса zapret2…</source>
+        <translation>Checking zapret2 service state…</translation>
+    </message>
+    <message>
+        <source>Отмена запрошена. Дожидаюсь результата остановки сервиса…</source>
+        <translation>Cancellation requested. Waiting for the service stop result…</translation>
+    </message>
+    <message>
+        <source>Ошибка управления сервисом: %1</source>
+        <translation>Service management error: %1</translation>
+    </message>
+    <message>
+        <source>Подбор отменён. Сервис не изменён.</source>
+        <translation>Scan canceled. The service was not changed.</translation>
+    </message>
+    <message>
+        <source>Не удалось достоверно определить состояние сервиса. Диагностика не запущена.</source>
+        <translation>Could not verify the service state. Diagnostics were not started.</translation>
+    </message>
+    <message>
+        <source>Останавливаю zapret2 и проверяю результат…</source>
+        <translation>Stopping zapret2 and verifying the result…</translation>
+    </message>
+    <message>
+        <source>Диагностика отменена до запуска.</source>
+        <translation>Diagnostics canceled before starting.</translation>
+    </message>
+    <message>
+        <source>Не удалось подтвердить остановку сервиса. Диагностика не запущена.</source>
+        <translation>Could not confirm that the service stopped. Diagnostics were not started.</translation>
+    </message>
+    <message>
+        <source>Сервис остановлен. Запускаю blockcheck2…</source>
+        <translation>Service stopped. Starting blockcheck2…</translation>
+    </message>
+    <message>
+        <source>Запускаю zapret2 и проверяю восстановление…</source>
+        <translation>Starting zapret2 and verifying recovery…</translation>
+    </message>
+    <message>
+        <source>Не удалось получить подтверждённое состояние сервиса. Диагностика не запущена.</source>
+        <translation>Could not obtain a verified service state. Diagnostics were not started.</translation>
+    </message>
+    <message>
+        <source>Не получено подтверждение остановки сервиса за отведённое время.</source>
+        <translation>The service stop was not confirmed within the allowed time.</translation>
+    </message>
+    <message>
+        <source>Не удалось подтвердить запуск zapret2. Проверьте systemctl status zapret2.service.</source>
+        <translation>Could not confirm that zapret2 started. Check systemctl status zapret2.service.</translation>
+    </message>
+    <message>
+        <source>Диагностика завершена.</source>
+        <translation>Diagnostics completed.</translation>
+    </message>
+    <message>
+        <source>Проверка состояния отменена. Диагностика не запускалась.</source>
+        <translation>Service state check canceled. Diagnostics were not started.</translation>
+    </message>
+    <message>
+        <source>Остановка не подтверждена: сервис остаётся активным. Диагностика не запущена.</source>
+        <translation>Stop was not confirmed: the service is still active. Diagnostics were not started.</translation>
+    </message>
+    <message>
+        <source>Сервис zapret2 снова активен.</source>
+        <translation>The zapret2 service is active again.</translation>
+    </message>
+    <message>
+        <source>Не удалось восстановить сервис zapret2. Проверьте состояние systemd.</source>
+        <translation>Could not restore the zapret2 service. Check the systemd state.</translation>
+    </message>
+    <message>
+        <source>Дождитесь завершения обновления перед запуском диагностики.</source>
+        <translation>Wait for the update to finish before starting diagnostics.</translation>
+    </message>
+    <message>
+        <source>Установка zapret2 не прошла проверку совместимости. Отсутствуют или не поддерживаются компоненты:
+%1</source>
+        <translation>The zapret2 installation failed the compatibility check. Missing or unsupported components:
+%1</translation>
     </message>
 </context>
 <context>
@@ -293,6 +443,10 @@
         <location filename="../src/mainwindow.cpp" line="197"/>
         <source>Дождитесь завершения обновления zapret2 перед выходом.</source>
         <translation>Wait for the zapret2 update to finish before quitting.</translation>
+    </message>
+    <message>
+        <source>Дождитесь завершения подбора стратегий перед управлением сервисом.</source>
+        <translation>Wait for the strategy scan to finish before managing the service.</translation>
     </message>
 </context>
 <context>
@@ -446,6 +600,10 @@ If the service is running, it will be stopped for the duration of the update and
         <location filename="../src/updatepage.cpp" line="215"/>
         <source>Обновление не выполнено (код %1). Подробности — в журнале ниже.</source>
         <translation>Update failed (code %1). See the log below for details.</translation>
+    </message>
+    <message>
+        <source>Дождитесь завершения подбора стратегий перед обновлением.</source>
+        <translation>Wait for the strategy scan to finish before updating.</translation>
     </message>
 </context>
 <context>

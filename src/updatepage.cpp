@@ -112,6 +112,8 @@ UpdatePage::UpdatePage(ZapretBackend *backend, QWidget *parent)
 
     connect(m_updater, &ZapretUpdater::logLine, m_log, &QPlainTextEdit::appendPlainText);
     connect(m_updater, &ZapretUpdater::failedToStart, this, [this](const QString &msg) {
+        emit busyChanged(false);
+        refreshUi();
         QMessageBox::warning(this, tr("Ошибка"), msg);
     });
     connect(m_updater, &ZapretUpdater::finished, this, &UpdatePage::onUpdateFinished);
@@ -128,6 +130,12 @@ UpdatePage::UpdatePage(ZapretBackend *backend, QWidget *parent)
 bool UpdatePage::isBusy() const
 {
     return m_updater->isRunning();
+}
+
+void UpdatePage::setServiceBusy(bool busy)
+{
+    m_serviceBusy = busy;
+    refreshUi();
 }
 
 void UpdatePage::maybeAutoCheck()
@@ -176,7 +184,7 @@ void UpdatePage::refreshUi()
         m_statusLabel->setText(tr("Установлена актуальная версия."));
 
     m_updateBtn->setText(newer ? tr("Обновить до %1").arg(m_latestTag) : tr("Обновить"));
-    m_updateBtn->setEnabled(newer && !busy);
+    m_updateBtn->setEnabled(newer && !busy && !m_serviceBusy);
     m_checkBtn->setEnabled(!busy && !m_checker->isRunning());
     m_notesBtn->setEnabled(!m_latestTag.isEmpty());
 }
@@ -185,6 +193,11 @@ void UpdatePage::confirmAndUpdate()
 {
     if (m_latestTag.isEmpty() || m_installed.isEmpty() || isBusy())
         return;
+    if (m_serviceBusy) {
+        QMessageBox::information(this, tr("Идёт подбор"),
+                                 tr("Дождитесь завершения подбора стратегий перед обновлением."));
+        return;
+    }
     const auto answer = QMessageBox::question(
         this, tr("Обновление zapret2"),
         tr("Обновить zapret2 с v%1 до %2?\n\n"
@@ -198,11 +211,13 @@ void UpdatePage::confirmAndUpdate()
     m_statusLabel->setText(tr("Обновляю до %1…").arg(m_latestTag));
     m_updateBtn->setEnabled(false);
     m_checkBtn->setEnabled(false);
+    emit busyChanged(true);
     m_updater->start(m_latestTag);
 }
 
 void UpdatePage::onUpdateFinished(int code)
 {
+    emit busyChanged(false);
     refreshInstalled();
     refreshUi();
     m_backend->refresh();

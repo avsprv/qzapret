@@ -33,6 +33,14 @@ MainWindow::MainWindow(QWidget *parent)
     tabs->addTab(m_blockcheck, tr("Подбор стратегий"));
     m_update = new UpdatePage(m_backend, this);
     tabs->addTab(m_update, tr("Обновления"));
+    connect(m_blockcheck, &BlockcheckPage::busyChanged, this, [this](bool busy) {
+        m_update->setServiceBusy(busy);
+        m_backend->refresh();
+    });
+    connect(m_update, &UpdatePage::busyChanged, this, [this](bool busy) {
+        m_blockcheck->setUpdateBusy(busy);
+        m_backend->refresh();
+    });
     setCentralWidget(tabs);
 
     connect(m_backend, &ZapretBackend::stateChanged, this, &MainWindow::onStateChanged);
@@ -71,8 +79,22 @@ QWidget *MainWindow::buildStatusPage()
     m_guiCheck = new QCheckBox(tr("Запускать zapret2applet при входе в сеанс (в трей)"));
     m_guiCheck->setChecked(Autostart::isEnabled());
 
-    connect(m_startBtn, &QPushButton::clicked, m_backend, &ZapretBackend::start);
-    connect(m_stopBtn, &QPushButton::clicked, m_backend, &ZapretBackend::stop);
+    connect(m_startBtn, &QPushButton::clicked, this, [this] {
+        if (m_blockcheck->isRunning() || m_update->isBusy()) {
+            QMessageBox::information(this, tr("Идёт подбор"),
+                                     tr("Дождитесь завершения подбора стратегий перед управлением сервисом."));
+            return;
+        }
+        m_backend->start();
+    });
+    connect(m_stopBtn, &QPushButton::clicked, this, [this] {
+        if (m_blockcheck->isRunning() || m_update->isBusy()) {
+            QMessageBox::information(this, tr("Идёт подбор"),
+                                     tr("Дождитесь завершения подбора стратегий перед управлением сервисом."));
+            return;
+        }
+        m_backend->stop();
+    });
     // clicked, а не toggled: состояние чекбокса потом приводится к реальному через refresh()
     connect(m_bootCheck, &QCheckBox::clicked, m_backend, &ZapretBackend::setBootEnabled);
     connect(m_guiCheck, &QCheckBox::clicked, this, [this](bool on) {
@@ -117,8 +139,14 @@ void MainWindow::buildTray()
     auto *quitAct = menu->addAction(tr("Выход"));
 
     connect(show, &QAction::triggered, this, &MainWindow::toggleWindow);
-    connect(m_trayStart, &QAction::triggered, m_backend, &ZapretBackend::start);
-    connect(m_trayStop, &QAction::triggered, m_backend, &ZapretBackend::stop);
+    connect(m_trayStart, &QAction::triggered, this, [this] {
+        if (!m_blockcheck->isRunning() && !m_update->isBusy())
+            m_backend->start();
+    });
+    connect(m_trayStop, &QAction::triggered, this, [this] {
+        if (!m_blockcheck->isRunning() && !m_update->isBusy())
+            m_backend->stop();
+    });
     connect(quitAct, &QAction::triggered, this, &MainWindow::quit);
     connect(m_tray, &QSystemTrayIcon::activated, this, [this](QSystemTrayIcon::ActivationReason r) {
         if (r == QSystemTrayIcon::Trigger)
@@ -144,14 +172,15 @@ void MainWindow::onStateChanged(ZapretBackend::State state)
     }
     m_status->setText(tr("Статус: %1").arg(text));
     const bool active = state == ZapretBackend::State::Active;
-    m_startBtn->setEnabled(!active);
-    m_stopBtn->setEnabled(active);
+    const bool locked = m_blockcheck->isRunning() || m_update->isBusy();
+    m_startBtn->setEnabled(!active && !locked);
+    m_stopBtn->setEnabled(active && !locked);
 
     if (m_tray) {
         m_tray->setIcon(QIcon::fromTheme(iconName, style()->standardIcon(QStyle::SP_ComputerIcon)));
         m_tray->setToolTip(tr("zapret2applet: %1").arg(text));
-        m_trayStart->setEnabled(!active);
-        m_trayStop->setEnabled(active);
+        m_trayStart->setEnabled(!active && !locked);
+        m_trayStop->setEnabled(active && !locked);
     }
 }
 

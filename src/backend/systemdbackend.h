@@ -14,6 +14,7 @@ public:
     explicit SystemdBackend(QObject *parent = nullptr);
 
     void refresh() override;
+    void verifyState() override;
     void start() override;
     void stop() override;
     void setBootEnabled(bool enabled) override;
