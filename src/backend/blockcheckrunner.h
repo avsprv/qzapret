@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QProcess>
+#include <QSet>
 #include <QString>
 #include <QStringList>
 #include <optional>
@@ -55,5 +56,6 @@ private:
 
     QProcess *m_proc = nullptr;
     QByteArray m_buf;
+    QSet<QString> m_seenResults;
     bool m_cancelRequested = false;
 };
