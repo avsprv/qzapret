@@ -45,10 +45,17 @@ int main(int argc, char *argv[])
 
     updateController.setBlockcheckBusy(blockcheckController.busy());
     blockcheckController.setUpdateBusy(updateController.busy());
-    QObject::connect(&blockcheckController, &BlockcheckController::busyChanged,
-                     &updateController, [&] { updateController.setBlockcheckBusy(blockcheckController.busy()); });
-    QObject::connect(&updateController, &UpdateController::stateChanged,
-                     &blockcheckController, [&] { blockcheckController.setUpdateBusy(updateController.busy()); });
+    controller.setOperationsBusy(blockcheckController.busy() || updateController.busy());
+    QObject::connect(&blockcheckController, &BlockcheckController::busyChanged, &app,
+                     [&] {
+        updateController.setBlockcheckBusy(blockcheckController.busy());
+        controller.setOperationsBusy(blockcheckController.busy() || updateController.busy());
+    });
+    QObject::connect(&updateController, &UpdateController::stateChanged, &app,
+                     [&] {
+        blockcheckController.setUpdateBusy(updateController.busy());
+        controller.setOperationsBusy(blockcheckController.busy() || updateController.busy());
+    });
 
     const QLocale initialLocale = localeForLanguage(settingsManager.language());
     QLocale::setDefault(initialLocale);
