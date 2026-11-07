@@ -11,6 +11,7 @@
 #include <QPushButton>
 #include <QStyle>
 #include <QSystemTrayIcon>
+#include <QSignalBlocker>
 #include <QTabWidget>
 #include <QTimer>
 #include <QVBoxLayout>
