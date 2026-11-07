@@ -58,7 +58,7 @@ void BlockcheckController::appendLog(const QString &line) {
     QString boundedLine = line;
     if (boundedLine.size() > 64 * 1024)
         boundedLine = boundedLine.left(64 * 1024) + QStringLiteral("… [строка журнала сокращена]");
-    m_logText += (m_logText.isEmpty() ? QString() : QStringLiteral("\\n")) + boundedLine;
+    m_logText += (m_logText.isEmpty() ? QString() : QStringLiteral("\n")) + boundedLine;
     if (m_logText.size() > maxLogChars)
         m_logText.remove(0, m_logText.size() - maxLogChars);
     emit logTextChanged();
