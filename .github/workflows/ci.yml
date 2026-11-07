@@ -21,5 +21,7 @@ jobs:
         run: cmake -S . -B build -G Ninja
       - name: Build
         run: cmake --build build
+      - name: Lint QML
+        run: cmake --build build --target zapret2applet-qml-preview_qmllint
       - name: Test
         run: ctest --test-dir build --output-on-failure
