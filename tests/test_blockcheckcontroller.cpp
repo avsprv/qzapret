@@ -439,13 +439,17 @@ void BlockcheckControllerTest::ignoresLateVerificationFromPreviousOperation()
     const quint64 firstRequest = backend.lastRequestId;
     QTRY_VERIFY_WITH_TIMEOUT(!controller.busy(), 1000);
 
-    backend.autoVerify = true;
-    backend.state = ZapretBackend::State::Inactive;
+    backend.autoVerify = false;
     controller.start();
-    QCOMPARE(runner.starts, 1);
+    const quint64 secondRequest = backend.lastRequestId;
+    QVERIFY(secondRequest != firstRequest);
 
-    backend.state = ZapretBackend::State::Active;
     emit backend.stateVerifiedForRequest(firstRequest, ZapretBackend::State::Active);
+    QVERIFY(controller.busy());
+    QCOMPARE(runner.starts, 0);
+
+    backend.state = ZapretBackend::State::Inactive;
+    emit backend.stateVerifiedForRequest(secondRequest, ZapretBackend::State::Inactive);
     QCOMPARE(runner.starts, 1);
     QVERIFY(!controller.busy());
 }
@@ -465,14 +469,24 @@ void BlockcheckControllerTest::ignoresLateRestoreResultFromPreviousOperation()
     QTRY_VERIFY_WITH_TIMEOUT(!controller.busy(), 1000);
 
     backend.autoVerify = true;
-    backend.state = ZapretBackend::State::Inactive;
+    backend.state = ZapretBackend::State::Active;
+    backend.autoStart = false;
     controller.start();
-    QCOMPARE(runner.starts, 1);
+    controller.confirmStop(true);
+    QCOMPARE(runner.starts, 2);
+    const quint64 newRequest = backend.lastRequestId;
+    QVERIFY(newRequest != oldRequest);
+    QVERIFY(controller.busy());
+
     emit backend.unitActionFinishedForRequest(oldRequest, QStringLiteral("start"),
+                                               ZapretBackend::State::Active, true);
+    QVERIFY(controller.busy());
+
+    emit backend.unitActionFinishedForRequest(newRequest, QStringLiteral("start"),
                                                ZapretBackend::State::Active, true);
     QVERIFY(!controller.busy());
     QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Success);
-    QCOMPARE(runner.starts, 1);
+    QCOMPARE(runner.starts, 2);
 }
 
 QTEST_GUILESS_MAIN(BlockcheckControllerTest)
