@@ -39,6 +39,16 @@ bc_pid() {
 need_arg() { [ "$1" -ge 2 ] || die "missing value for $2"; }
 
 case "${1:-}" in
+config-read)
+    [ "$#" -eq 1 ] || die "usage: config-read"
+    [ -d "$BASE" ] && [ ! -L "$BASE" ] || die "zapret2 not found in $BASE"
+    config="$BASE/config"
+    [ -f "$config" ] && [ ! -L "$config" ] || die "config is missing or is not a regular file"
+    size=$(wc -c < "$config" | tr -d '[:space:]')
+    case "$size" in ''|*[!0-9]*) die "cannot determine config size" ;; esac
+    [ "$size" -le 1048576 ] || die "config exceeds the 1 MiB read limit"
+    cat "$config"
+    ;;
 unit)
     case "${2:-}" in
         start|stop|enable|disable) exec systemctl "$2" "$UNIT" ;;

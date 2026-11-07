@@ -24,6 +24,8 @@ set(QZAPRET_SOURCES
     src/autostart.h
     src/blockcheckpage.cpp
     src/blockcheckpage.h
+    src/configpage.cpp
+    src/configpage.h
     src/mainwindow.cpp
     src/mainwindow.h
     src/updatepage.cpp
@@ -115,5 +117,9 @@ if(BUILD_TESTING)
 
     add_test(NAME helper_validation
              COMMAND sh ${CMAKE_SOURCE_DIR}/tests/test_helper.sh
+                     ${CMAKE_SOURCE_DIR}/packaging/helper/zapret2applet-helper)
+
+    add_test(NAME config_helper
+             COMMAND sh ${CMAKE_SOURCE_DIR}/tests/test_config_helper.sh
                      ${CMAKE_SOURCE_DIR}/packaging/helper/zapret2applet-helper)
 endif()
