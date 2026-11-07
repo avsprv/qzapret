@@ -6,6 +6,7 @@
 
 #include "backend/updatechecker.h"
 #include "backend/zapretupdater.h"
+#include "backend/zapretpaths.h"
 #include "settingsmanager.h"
 
 namespace {
@@ -26,8 +27,12 @@ UpdateController::UpdateController(SettingsManager *settings, QObject *parent)
     m_periodicTimer->setInterval(kPeriodicTimerIntervalMs);
     connect(m_periodicTimer, &QTimer::timeout, this, &UpdateController::maybeAutoCheck);
     connect(m_settings, &SettingsManager::autoCheckUpdatesChanged, this, [this] {
-        if (m_settings->autoCheckUpdates())
+        if (m_settings->autoCheckUpdates()) {
+            m_periodicTimer->start();
             maybeAutoCheck();
+        } else {
+            m_periodicTimer->stop();
+        }
     });
     connect(m_checker, &UpdateChecker::finished, this, [this](const QString &tag) {
         m_checking = false;
@@ -91,8 +96,9 @@ QString UpdateController::releaseNotesUrl() const
 {
     return m_latestTag.isEmpty() ? QString() : ZapretVersion::releaseUrl(m_latestTag);
 }
+bool UpdateController::installed() const { return !m_installed.isEmpty(); }
 bool UpdateController::checking() const { return m_checking; }
-bool UpdateController::busy() const { return m_updater->isRunning(); }
+bool UpdateController::busy() const { return m_busy; }
 bool UpdateController::blockcheckBusy() const { return m_blockcheckBusy; }
 
 bool UpdateController::canInstall() const
@@ -122,15 +128,19 @@ void UpdateController::maybeAutoCheck()
     const qint64 last = QSettings().value(QStringLiteral("update/lastCheck"), 0).toLongLong();
     if (QDateTime::currentSecsSinceEpoch() - last < kAutoCheckIntervalSecs)
         return;
-    checkNow();
-    m_automaticCheck = true;
+    startCheck(true);
 }
 
 void UpdateController::checkNow()
 {
+    startCheck(false);
+}
+
+void UpdateController::startCheck(bool automatic)
+{
     if (m_checking || busy())
         return;
-    m_automaticCheck = false;
+    m_automaticCheck = automatic;
     refreshInstalled();
     m_checking = true;
     setStatus(tr("Проверяю обновления…"));
@@ -140,7 +150,7 @@ void UpdateController::checkNow()
 
 void UpdateController::refreshInstalled()
 {
-    m_installed = ZapretVersion::installed(QStringLiteral("/opt/zapret2"));
+    m_installed = ZapretVersion::installed(ZapretPaths::baseDir());
     emit stateChanged();
 }
 
@@ -163,6 +173,14 @@ void UpdateController::setStatus(const QString &status)
     emit stateChanged();
 }
 
+void UpdateController::clearLog()
+{
+    if (busy())
+        return;
+    m_logText.clear();
+    emit logTextChanged();
+}
+
 void UpdateController::install()
 {
     if (!canInstall())
@@ -180,6 +198,7 @@ void UpdateController::update()
 void UpdateController::startOperation(bool installing)
 {
     m_installing = installing;
+    m_busy = true;
     m_logText.clear();
     emit logTextChanged();
     setStatus(installing ? tr("Устанавливаю zapret2 %1…").arg(m_latestTag)
@@ -205,5 +224,6 @@ void UpdateController::handleUpdateFinished(int exitCode)
                                : tr("Обновление не выполнено (код %1). Подробности — в журнале.").arg(exitCode));
     }
     m_installing = false;
+    m_busy = false;
     emit stateChanged();
 }
