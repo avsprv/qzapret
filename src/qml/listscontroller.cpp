@@ -86,10 +86,12 @@ QString ListsController::validateHostlist(const QString &value) const
     const QByteArray bytes = value.toUtf8();
     if (bytes.size() > 1024 * 1024)
         return tr("Файл превышает ограничение 1 MiB.");
-    const QStringList lines = value.split(QLatin1Char('\n'));
+    QStringList lines = value.split(QLatin1Char('\n'));
+    if (value.endsWith(QLatin1Char('\n')) && !lines.isEmpty())
+        lines.removeLast();
     if (lines.size() > 50000)
         return tr("Слишком много строк (максимум 50000).");
-    static const QRegularExpression labelPattern(QStringLiteral("^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$"));
+    static const QRegularExpression labelPattern(QStringLiteral("^[A-Za-z0-9_-]+$"));
     static const QRegularExpression numericPattern(QStringLiteral("^[0-9.]+$"));
     for (qsizetype i = 0; i < lines.size(); ++i) {
         const QString raw = lines.at(i);
