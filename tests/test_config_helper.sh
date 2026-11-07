@@ -66,6 +66,10 @@ if printf 'BAD=1\n' | "$H" config-write >/dev/null 2>&1; then
 fi
 echo "ok: rejects symlink config"
 
+# Restore a regular config before testing backup-root validation.
+rm -f "$tmp/base/config"
+printf 'SAFE=1\n' > "$tmp/base/config"
+
 # The backup root must not be redirected through a symlink.
 rm -rf "$tmp/backups"
 ln -s "$tmp" "$tmp/backups"
