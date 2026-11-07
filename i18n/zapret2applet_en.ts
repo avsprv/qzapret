@@ -688,7 +688,17 @@ The service will not be started or enabled at boot. Network traffic will not be 
     <message><source>Откат конфигурации</source><translation>Restore configuration</translation></message>
     <message><source>Восстановить последнюю резервную копию /opt/zapret2/config? Текущая версия также будет сохранена в резервную копию.</source><translation>Restore the latest backup of /opt/zapret2/config? The current version will also be backed up.</translation></message>
     <message><source>Восстанавливаю резервную копию…</source><translation>Restoring backup…</translation></message>
-    <message><source>Не удалось выполнить откат: %1</source><translation>Could not restore backup: %1</translation></message>
+    <message><source>Не удалось выполнить откат: %1</source><translation>Could not restore backup: %1</translation></message>    <message><source>Файл config является shell include. Он не исполняется при проверке. Перед записью helper повторно проверяет синтаксис, контрольную сумму и создаёт резервную копию. Служба автоматически не перезапускается.</source><translation>The config file is a shell include and is not executed during validation. Before writing, the helper rechecks its syntax and checksum and creates a backup. The service is not restarted automatically.</translation></message>
+    <message><source>Прочитать</source><translation>Read</translation></message>
+    <message><source>Проверить</source><translation>Validate</translation></message>
+    <message><source>Сохранить</source><translation>Save</translation></message>
+    <message><source>Откатить</source><translation>Restore backup</translation></message>
+    <message><source>Нажмите «Прочитать», чтобы загрузить /opt/zapret2/config</source><translation>Select “Read” to load /opt/zapret2/config</translation></message>
+    <message><source>Сохранить конфигурацию?</source><translation>Save configuration?</translation></message>
+    <message><source>Перед записью будет создана резервная копия. Helper проверит контрольную сумму, повторно проверит shell-синтаксис и атомарно заменит файл. Служба не будет перезапущена.</source><translation>A backup will be created before writing. The helper will verify the checksum, validate shell syntax again, and replace the file atomically. The service will not be restarted.</translation></message>
+    <message><source>Откатить конфигурацию?</source><translation>Restore configuration backup?</translation></message>
+    <message><source>Будет восстановлена последняя резервная копия. Текущая конфигурация также будет сохранена в резервную копию.</source><translation>The latest backup will be restored. The current configuration will also be saved as a backup.</translation></message>
+
 </context>
 <context>
     <name>ProfilePage</name>
@@ -1187,5 +1197,67 @@ If the service is running, it will be stopped for the duration of the update and
     <message><source>Выход</source><translation>Quit</translation></message>
     <message><source>Язык интерфейса</source><translation>Interface language</translation></message>
     <message><source>Изменение языка будет применено после следующего запуска приложения.</source><translation>The language change will take effect the next time the application starts.</translation></message>
+  </context>
+  <context>
+    <name>Main</name>
+    <message><source>zapret2applet</source><translation>zapret2applet</translation></message>
+    <message><source>Статус</source><translation>Status</translation></message>
+    <message><source>Конфигурация</source><translation>Configuration</translation></message>
+    <message><source>Профили</source><translation>Profiles</translation></message>
+    <message><source>Списки</source><translation>Lists</translation></message>
+    <message><source>Мониторинг</source><translation>Monitoring</translation></message>
+    <message><source>Подбор стратегий</source><translation>Strategy scan</translation></message>
+    <message><source>Обновления</source><translation>Updates</translation></message>
+    <message><source>Настройки</source><translation>Settings</translation></message>
+    <message><source>О программе</source><translation>About</translation></message>
+    <message><source>Обновить</source><translation>Refresh</translation></message>
+    <message><source>Состояние zapret2</source><translation>zapret2 state</translation></message>
+    <message><source>Управление системной службой zapret2</source><translation>Manage the zapret2 system service</translation></message>
+    <message><source>Запускать zapret2 при загрузке системы</source><translation>Start zapret2 at system boot</translation></message>
+    <message><source>Запустить</source><translation>Start</translation></message>
+    <message><source>Остановить</source><translation>Stop</translation></message>
+    <message><source>Проверить</source><translation>Check</translation></message>
+    <message><source>Это первый этап миграции на QML и Kirigami. Остальные разделы будут переноситься поэтапно; текущая версия приложения пока сохраняет прежний интерфейс.</source><translation>This is the first stage of the QML and Kirigami migration. Other sections will be migrated incrementally; the current production version still uses the existing interface.</translation></message>
+    <message><source>Этот раздел будет перенесён на QML на следующем этапе миграции.</source><translation>This section will be migrated to QML in a later stage.</translation></message>
+  </context>
+  <context>
+    <name>SettingsPage</name>
+    <message><source>Настройки</source><translation>Settings</translation></message>
+    <message><source>Внешний вид</source><translation>Appearance</translation></message>
+    <message><source>Тема оформления</source><translation>Color theme</translation></message>
+    <message><source>Системная</source><translation>System</translation></message>
+    <message><source>Светлая</source><translation>Light</translation></message>
+    <message><source>Тёмная</source><translation>Dark</translation></message>
+    <message><source>Язык интерфейса</source><translation>Interface language</translation></message>
+    <message><source>Системный</source><translation>System</translation></message>
+    <message><source>Русский</source><translation>Russian</translation></message>
+    <message><source>English</source><translation>English</translation></message>
+    <message><source>Обновления</source><translation>Updates</translation></message>
+    <message><source>Автоматически проверять обновления</source><translation>Check for updates automatically</translation></message>
+    <message><source>Поведение</source><translation>Behavior</translation></message>
+    <message><source>Сворачивать приложение в системный трей при закрытии окна</source><translation>Minimize to the system tray when closing the window</translation></message>
+    <message><source>Параметры уже сохраняются в прежние ключи QSettings. Системная тема Kirigami применяется автоматически; принудительные светлая и тёмная схемы и переключение языка будут подключены на следующем этапе.</source><translation>Settings are stored using the existing QSettings keys. Kirigami follows the system theme automatically. Forced light and dark themes and language switching will be available in a later migration stage.</translation></message>
+  </context>
+  <context>
+    <name>ProfilesPage</name>
+    <message><source>Профили</source><translation>Profiles</translation></message>
+    <message><source>Профили извлекаются статически из NFQWS2_OPT. Shell-код и Lua не исполняются. Запись выполняется через helper с проверкой SHA-256, shell-синтаксиса и резервным копированием. Служба автоматически не перезапускается.</source><translation>Profiles are parsed statically from NFQWS2_OPT. Shell code and Lua are never executed. Changes are written through the helper with SHA-256 and shell syntax validation and a backup. The service is not restarted automatically.</translation></message>
+    <message><source>Отменить изменения</source><translation>Discard changes</translation></message>
+    <message><source>Обновить</source><translation>Refresh</translation></message>
+    <message><source>Создать</source><translation>Create</translation></message>
+    <message><source>Сохранить</source><translation>Save</translation></message>
+    <message><source> параметров</source><translation> parameters</translation></message>
+    <message><source>Изменить</source><translation>Edit</translation></message>
+    <message><source>Копировать</source><translation>Duplicate</translation></message>
+    <message><source>Удалить</source><translation>Delete</translation></message>
+    <message><source>Новый профиль</source><translation>New profile</translation></message>
+    <message><source>Изменить профиль</source><translation>Edit profile</translation></message>
+    <message><source>Один аргумент на строку. Не добавляйте --new, кавычки, shell-подстановки или пробелы внутри аргумента.</source><translation>Enter one argument per line. Do not add --new, quotes, shell substitutions, or spaces inside an argument.</translation></message>
+    <message><source>Отменить изменения?</source><translation>Discard changes?</translation></message>
+    <message><source>Все несохранённые изменения профилей будут потеряны. Конфигурация будет повторно загружена с диска.</source><translation>All unsaved profile changes will be lost. The configuration will be reloaded from disk.</translation></message>
+    <message><source>Сохранить профили?</source><translation>Save profiles?</translation></message>
+    <message><source>Helper проверит контрольную сумму и shell-синтаксис, создаст резервную копию и атомарно заменит конфигурацию. Служба не будет перезапущена.</source><translation>The helper will verify the checksum and shell syntax, create a backup, and atomically replace the configuration. The service will not be restarted.</translation></message>
+    <message><source>Удалить профиль?</source><translation>Delete profile?</translation></message>
+    <message><source>Удалить выбранный профиль? Изменения можно отменить повторной загрузкой конфигурации.</source><translation>Delete the selected profile? You can undo this by reloading the configuration.</translation></message>
   </context>
 </TS>
