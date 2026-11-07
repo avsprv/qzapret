@@ -11,6 +11,7 @@ RUNDIR=/run/zapret2applet
 URLBASE=https://github.com/bol-van/zapret2/releases/download
 PROTO='=https'
 NOSVC=0
+JOURNALCTL=journalctl
 
 # Переопределения ТОЛЬКО для тестов. Игнорируются, если хелпер установлен в системный
 # каталог; кроме того, pkexec сам очищает окружение вызывающего.
@@ -22,6 +23,7 @@ case "$0" in
         if [ -n "${QZAPRET_TEST_RUNDIR:-}" ]; then RUNDIR=$QZAPRET_TEST_RUNDIR; fi
         if [ -n "${QZAPRET_TEST_URLBASE:-}" ]; then URLBASE=$QZAPRET_TEST_URLBASE; PROTO='=https,file'; fi
         if [ -n "${QZAPRET_TEST_NO_SERVICE:-}" ]; then NOSVC=1; fi
+        if [ -n "${QZAPRET_TEST_JOURNALCTL:-}" ]; then JOURNALCTL=$QZAPRET_TEST_JOURNALCTL; fi
         ;;
 esac
 PIDFILE=$RUNDIR/blockcheck.pid
@@ -103,6 +105,31 @@ lists-write)
         echo "OK: list updated; backup: $backup"
     else
         echo "OK: list created; no previous file existed"
+    fi
+    ;;
+logs-read)
+    [ "$#" -eq 2 ] || die "usage: logs-read {50|100|200|500}"
+    case "$2" in 50|100|200|500) lines=$2 ;; *) die "log line count is not allowlisted" ;; esac
+    command -v "$JOURNALCTL" >/dev/null 2>&1 || die "journalctl is not available"
+    umask 077
+    tmp=$(mktemp /tmp/zapret2applet-journal.XXXXXX) || die "cannot create temporary journal output"
+    err=$(mktemp /tmp/zapret2applet-journal-error.XXXXXX) || {
+        rm -f "$tmp"
+        die "cannot create temporary journal error output"
+    }
+    trap 'rm -f "$tmp" "$err"' EXIT HUP INT TERM
+    if ! "$JOURNALCTL" --unit="$UNIT" --lines="$lines" --no-pager --output=short-iso > "$tmp" 2> "$err"; then
+        message=$(cat "$err")
+        [ -n "$message" ] || message="journalctl exited unsuccessfully"
+        die "cannot read service journal: $message"
+    fi
+    size=$(wc -c < "$tmp" | tr -d '[:space:]')
+    case "$size" in ''|*[!0-9]*) die "cannot determine journal output size" ;; esac
+    if [ "$size" -gt 1048576 ]; then
+        printf '[zapret2applet: output truncated to the most recent 1 MiB]\n'
+        tail -c 1048500 "$tmp"
+    else
+        cat "$tmp"
     fi
     ;;
 lists-read)
@@ -356,6 +383,6 @@ update)
     echo "OK: zapret2 updated to $tag (previous version kept in $bak)"
     ;;
 *)
-    die "usage: zapret2applet-helper lists-read NAME | lists-write NAME | config-read | config-write [EXPECTED_SHA256] | config-rollback | unit {start|stop|enable|disable} | blockcheck [opts] | blockcheck-cancel | update vX.Y.Z"
+    die "usage: zapret2applet-helper logs-read {50|100|200|500} | lists-read NAME | lists-write NAME | config-read | config-write [EXPECTED_SHA256] | config-rollback | unit {start|stop|enable|disable} | blockcheck [opts] | blockcheck-cancel | update vX.Y.Z"
     ;;
 esac

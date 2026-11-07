@@ -53,6 +53,20 @@
     <annotate key="org.freedesktop.policykit.exec.argv1">config-rollback</annotate>
   </action>
 
+  <action id="org.zapret2applet.logs-read">
+    <description>Read the zapret2 service journal</description>
+    <description xml:lang="ru">Чтение журнала службы zapret2</description>
+    <message>Authentication is required to read the zapret2 service journal</message>
+    <message xml:lang="ru">Для чтения журнала службы zapret2 требуется аутентификация</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">@QZAPRET_HELPER@</annotate>
+    <annotate key="org.freedesktop.policykit.exec.argv1">logs-read</annotate>
+  </action>
+
   <action id="org.zapret2applet.lists-read">
     <description>Read standard user lists</description>
     <description xml:lang="ru">Чтение стандартных пользовательских списков</description>
