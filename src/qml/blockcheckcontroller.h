@@ -75,7 +75,8 @@ private:
     void setBusy(bool value);
     void finish(const QString &message = {}, StatusType type = StatusType::Success);
     void beginScan();
-    void restoreService(const QString &reason, const QString &finalMessage = {},\n                        StatusType finalType = StatusType::Success);
+    void restoreService(const QString &reason, const QString &finalMessage = {},
+                        StatusType finalType = StatusType::Success);
     void handleVerifiedState(ZapretBackend::State state);
     void handleUnitAction(const QString &action, ZapretBackend::State state, bool success);
     void handleFinished(int exitCode, bool canceled);
@@ -96,5 +97,7 @@ private:
     bool m_busy = false, m_updateBusy = false;
     bool m_resumeService = false, m_cancelRequested = false, m_stopTimedOut = false;
     int m_found = 0;
-    BlockcheckRunner::Options m_lastOptions;\n    QString m_pendingFinalMessage;\n    StatusType m_pendingFinalType = StatusType::Success;
+    BlockcheckRunner::Options m_lastOptions;
+    QString m_pendingFinalMessage;
+    StatusType m_pendingFinalType = StatusType::Success;
 };
