@@ -490,5 +490,24 @@ If the service is running, it will be stopped for the duration of the update and
     <message><source>Конфигурация zapret2 (*.conf);;Все файлы (*)</source><translation>zapret2 configuration (*.conf);;All files (*)</translation></message>
     <message><source>Экспорт доступен после чтения конфигурации.</source><translation>Export is available after reading the configuration.</translation></message>
     <message><source>Файл читается через привилегированный read-only helper. Содержимое не исполняется и не интерпретируется приложением.</source><translation>The file is read through a privileged read-only helper. Its contents are not executed or interpreted by the application.</translation></message>
+    <message><source>Проверить синтаксис</source><translation>Validate syntax</translation></message>
+    <message><source>Сохранить в zapret2</source><translation>Save to zapret2</translation></message>
+    <message><source>Откатить последнюю копию</source><translation>Restore latest backup</translation></message>
+    <message><source>config — shell include. Проверка использует только sh -n: файл не исполняется и не загружается через source. Перед каждой записью создаётся резервная копия. Сервис автоматически не перезапускается.</source><translation>config is a shell include. Validation uses sh -n only: the file is not executed or sourced. A backup is created before every write. The service is not restarted automatically.</translation></message>
+    <message><source>Конфигурация загружена. Можно редактировать и проверить перед записью.</source><translation>Configuration loaded. You can edit it and validate it before saving.</translation></message>
+    <message><source>Конфигурация превышает ограничение 1 MiB.</source><translation>Configuration exceeds the 1 MiB limit.</translation></message>
+    <message><source>Не удалось подготовить временный файл для проверки: %1</source><translation>Could not prepare a temporary file for validation: %1</translation></message>
+    <message><source>Проверка shell-синтаксиса не завершилась.</source><translation>Shell syntax validation did not finish.</translation></message>
+    <message><source>Синтаксис корректен. Файл не исполнялся; системная конфигурация не изменена.</source><translation>Syntax is valid. The file was not executed; the system configuration was not changed.</translation></message>
+    <message><source>Ошибка shell-синтаксиса: %1</source><translation>Shell syntax error: %1</translation></message>
+    <message><source>Сохранение конфигурации</source><translation>Save configuration</translation></message>
+    <message><source>Перед записью будет создана резервная копия. Проверить shell-синтаксис и атомарно заменить /opt/zapret2/config? Сервис автоматически не перезапустится.</source><translation>A backup will be created before writing. Validate shell syntax and atomically replace /opt/zapret2/config? The service will not restart automatically.</translation></message>
+    <message><source>Проверяю и сохраняю конфигурацию…</source><translation>Validating and saving configuration…</translation></message>
+    <message><source>Конфигурация сохранена; резервная копия создана.</source><translation>Configuration saved; backup created.</translation></message>
+    <message><source>Не удалось сохранить конфигурацию: %1</source><translation>Could not save configuration: %1</translation></message>
+    <message><source>Откат конфигурации</source><translation>Restore configuration</translation></message>
+    <message><source>Восстановить последнюю резервную копию /opt/zapret2/config? Текущая версия также будет сохранена в резервную копию.</source><translation>Restore the latest backup of /opt/zapret2/config? The current version will also be backed up.</translation></message>
+    <message><source>Восстанавливаю резервную копию…</source><translation>Restoring backup…</translation></message>
+    <message><source>Не удалось выполнить откат: %1</source><translation>Could not restore backup: %1</translation></message>
 </context>
 </TS>
