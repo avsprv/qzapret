@@ -18,9 +18,30 @@ Kirigami.ScrollablePage {
 
         Controls.Label {
             Layout.fillWidth: true
-            wrapMode: Text.WordWrap
-            text: qsTr("Тема пока следует системным настройкам. Выбор светлой и тёмной темы будет добавлен позже.")
+            text: qsTr("Тема оформления")
+        }
+
+        Controls.ComboBox {
+            Layout.fillWidth: true
+            model: [
+                { text: qsTr("Системная"), value: "system" },
+                { text: qsTr("Светлая"), value: "light" },
+                { text: qsTr("Тёмная"), value: "dark" }
+            ]
+            textRole: "text"
             Accessible.name: qsTr("Тема оформления")
+            currentIndex: {
+                const index = model.findIndex(item => item.value === settingsManager.theme)
+                return Math.max(0, index)
+            }
+            onActivated: settingsManager.theme = model[currentIndex].value
+        }
+
+        Controls.Label {
+            Layout.fillWidth: true
+            wrapMode: Text.WordWrap
+            opacity: 0.75
+            text: qsTr("Изменение применяется сразу. Системный режим следует настройкам рабочего стола; принудительная схема зависит от поддержки платформы.")
         }
 
         Controls.Label {
@@ -80,7 +101,7 @@ Kirigami.ScrollablePage {
         Kirigami.InlineMessage {
             Layout.fillWidth: true
             type: Kirigami.MessageType.Information
-            text: qsTr("Параметры сохраняются в прежние ключи QSettings. Переключение языка применяется сразу; принудительные светлая и тёмная схемы будут подключены на следующем этапе.")
+            text: qsTr("Параметры сохраняются в прежние ключи QSettings. Изменения темы и языка применяются сразу.")
         }
     }
 }
