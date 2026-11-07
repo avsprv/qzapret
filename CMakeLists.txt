@@ -194,6 +194,13 @@ if(BUILD_TESTING)
     target_compile_definitions(test_i18n PRIVATE QZAPRET_I18N_DIR="${CMAKE_SOURCE_DIR}/i18n")
     add_test(NAME i18n COMMAND test_i18n)
 
+    qt_add_executable(test_logscontroller tests/test_logscontroller.cpp
+        src/qml/logscontroller.cpp src/qml/logscontroller.h)
+    target_include_directories(test_logscontroller PRIVATE src src/qml)
+    target_link_libraries(test_logscontroller PRIVATE Qt6::Test Qt6::Core)
+    target_compile_definitions(test_logscontroller PRIVATE QZAPRET_HELPER_PATH="/nonexistent")
+    add_test(NAME logs_controller COMMAND test_logscontroller)
+
     qt_add_executable(test_aboutpage tests/test_aboutpage.cpp
         src/aboutpage.cpp src/aboutpage.h)
     target_include_directories(test_aboutpage PRIVATE src)
