@@ -2,6 +2,94 @@
 
 #include "blockcheckcontroller.h"
 
+class FakeZapretBackend final : public ZapretBackend
+{
+    Q_OBJECT
+public:
+    using ZapretBackend::ZapretBackend;
+
+    State state = State::Inactive;
+    bool autoVerify = true;
+    bool autoStop = true;
+    bool autoStart = true;
+    int verifyCalls = 0;
+    int stopCalls = 0;
+    int startCalls = 0;
+
+    void refresh() override {}
+    void verifyState() override
+    {
+        ++verifyCalls;
+        if (autoVerify)
+            emit stateVerified(state);
+    }
+    void start() override
+    {
+        ++startCalls;
+        if (autoStart)
+            completeStart(State::Active, true);
+    }
+    void stop() override
+    {
+        ++stopCalls;
+        if (autoStop)
+            completeStop(State::Inactive, true);
+    }
+    void setBootEnabled(bool) override {}
+
+    void completeStop(State result, bool success)
+    {
+        state = result;
+        emit unitActionFinished(QStringLiteral("stop"), state, success);
+    }
+    void completeStart(State result, bool success)
+    {
+        state = result;
+        emit unitActionFinished(QStringLiteral("start"), state, success);
+    }
+};
+
+class FakeBlockcheckRunner final : public BlockcheckRunner
+{
+    Q_OBJECT
+public:
+    using BlockcheckRunner::BlockcheckRunner;
+
+    bool autoFinish = true;
+    int starts = 0;
+    int cancels = 0;
+    int errors = 0;
+    int exitCode = 0;
+    bool canceled = false;
+    Options lastOptions;
+
+    bool isRunning() const override { return starts > 0 && !finishedOnce; }
+    int errorCount() const override { return errors; }
+    void start(const Options &options) override
+    {
+        ++starts;
+        lastOptions = options;
+        finishedOnce = false;
+        if (autoFinish)
+            complete(exitCode, canceled);
+    }
+    void cancel() override
+    {
+        ++cancels;
+        complete(130, true);
+    }
+    void complete(int code, bool wasCanceled)
+    {
+        if (finishedOnce)
+            return;
+        finishedOnce = true;
+        emit finished(code, wasCanceled);
+    }
+
+private:
+    bool finishedOnce = false;
+};
+
 class BlockcheckControllerTest final : public QObject
 {
     Q_OBJECT
@@ -15,6 +103,15 @@ private slots:
     void busyGuardHasWarningStatus();
     void statusTypeChangesNotifyObservers();
     void statusSeverityPropertyMatchesEnum();
+    void inactiveServiceRunsScanWithoutUnitActions();
+    void activeServiceIsRestoredAfterSuccessfulScan();
+    void decliningStopLeavesServiceUntouched();
+    void cancelWhileStoppingRestoresServiceWithWarning();
+    void scanFailureRemainsErrorAfterServiceRestore();
+    void scanCancellationRemainsWarningAfterServiceRestore();
+    void stopTimeoutWaitsForLateResultBeforeRestoring();
+    void verificationTimeoutFinishesSafely();
+    void restoreTimeoutReportsError();
 };
 
 void BlockcheckControllerTest::clampsRepeatCount()
@@ -76,7 +173,6 @@ void BlockcheckControllerTest::statusSeverityPropertyMatchesEnum()
 {
     BlockcheckController controller;
     QCOMPARE(controller.statusSeverity(), QStringLiteral("Information"));
-
     controller.setDomains(QStringLiteral("example..org"));
     controller.start();
     QCOMPARE(controller.statusSeverity(), QStringLiteral("Error"));
@@ -93,6 +189,171 @@ void BlockcheckControllerTest::rejectsEmptyCheckSelection()
     QVERIFY(!controller.busy());
     QVERIFY(controller.status().contains(QStringLiteral("хотя бы один")));
     QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Error);
+}
+
+void BlockcheckControllerTest::inactiveServiceRunsScanWithoutUnitActions()
+{
+    FakeZapretBackend backend;
+    FakeBlockcheckRunner runner;
+    BlockcheckController controller(&backend, &runner, 100);
+
+    QSignalSpy finished(&controller, &BlockcheckController::scanFinished);
+    controller.start();
+
+    QCOMPARE(backend.verifyCalls, 1);
+    QCOMPARE(backend.stopCalls, 0);
+    QCOMPARE(backend.startCalls, 0);
+    QCOMPARE(runner.starts, 1);
+    QCOMPARE(finished.count(), 1);
+    QVERIFY(!controller.busy());
+    QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Success);
+}
+
+void BlockcheckControllerTest::activeServiceIsRestoredAfterSuccessfulScan()
+{
+    FakeZapretBackend backend;
+    backend.state = ZapretBackend::State::Active;
+    FakeBlockcheckRunner runner;
+    BlockcheckController controller(&backend, &runner, 100);
+
+    QSignalSpy confirmation(&controller, &BlockcheckController::confirmationRequired);
+    controller.start();
+    QCOMPARE(confirmation.count(), 1);
+    QCOMPARE(runner.starts, 0);
+
+    controller.confirmStop(true);
+    QCOMPARE(backend.stopCalls, 1);
+    QCOMPARE(runner.starts, 1);
+    QCOMPARE(backend.startCalls, 1);
+    QVERIFY(!controller.busy());
+    QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Success);
+    QVERIFY(controller.status().contains(QStringLiteral("Служба восстановлена")));
+}
+
+void BlockcheckControllerTest::decliningStopLeavesServiceUntouched()
+{
+    FakeZapretBackend backend;
+    backend.state = ZapretBackend::State::Active;
+    FakeBlockcheckRunner runner;
+    BlockcheckController controller(&backend, &runner, 100);
+
+    controller.start();
+    controller.confirmStop(false);
+
+    QCOMPARE(backend.stopCalls, 0);
+    QCOMPARE(backend.startCalls, 0);
+    QCOMPARE(runner.starts, 0);
+    QVERIFY(!controller.busy());
+    QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Warning);
+}
+
+void BlockcheckControllerTest::cancelWhileStoppingRestoresServiceWithWarning()
+{
+    FakeZapretBackend backend;
+    backend.state = ZapretBackend::State::Active;
+    backend.autoStop = false;
+    FakeBlockcheckRunner runner;
+    BlockcheckController controller(&backend, &runner, 100);
+
+    controller.start();
+    controller.confirmStop(true);
+    controller.cancel();
+    QCOMPARE(runner.starts, 0);
+
+    backend.completeStop(ZapretBackend::State::Inactive, true);
+    QCOMPARE(backend.startCalls, 1);
+    QVERIFY(!controller.busy());
+    QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Warning);
+    QVERIFY(controller.status().contains(QStringLiteral("Подбор отменён")));
+}
+
+void BlockcheckControllerTest::scanFailureRemainsErrorAfterServiceRestore()
+{
+    FakeZapretBackend backend;
+    backend.state = ZapretBackend::State::Active;
+    FakeBlockcheckRunner runner;
+    runner.exitCode = 7;
+    BlockcheckController controller(&backend, &runner, 100);
+
+    controller.start();
+    controller.confirmStop(true);
+
+    QCOMPARE(backend.startCalls, 1);
+    QVERIFY(!controller.busy());
+    QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Error);
+    QVERIFY(controller.status().contains(QStringLiteral("код 7")));
+    QVERIFY(controller.status().contains(QStringLiteral("Служба восстановлена")));
+}
+
+void BlockcheckControllerTest::scanCancellationRemainsWarningAfterServiceRestore()
+{
+    FakeZapretBackend backend;
+    backend.state = ZapretBackend::State::Active;
+    FakeBlockcheckRunner runner;
+    runner.autoFinish = false;
+    BlockcheckController controller(&backend, &runner, 100);
+
+    controller.start();
+    controller.confirmStop(true);
+    controller.cancel();
+
+    QCOMPARE(runner.cancels, 1);
+    QCOMPARE(backend.startCalls, 1);
+    QVERIFY(!controller.busy());
+    QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Warning);
+}
+
+void BlockcheckControllerTest::stopTimeoutWaitsForLateResultBeforeRestoring()
+{
+    FakeZapretBackend backend;
+    backend.state = ZapretBackend::State::Active;
+    backend.autoStop = false;
+    FakeBlockcheckRunner runner;
+    BlockcheckController controller(&backend, &runner, 10);
+
+    controller.start();
+    controller.confirmStop(true);
+    QTRY_COMPARE_WITH_TIMEOUT(controller.statusType(), BlockcheckController::StatusType::Warning, 1000);
+    QVERIFY(controller.busy());
+    QCOMPARE(backend.startCalls, 0);
+
+    backend.completeStop(ZapretBackend::State::Inactive, true);
+    QCOMPARE(backend.startCalls, 1);
+    QVERIFY(!controller.busy());
+    QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Warning);
+}
+
+void BlockcheckControllerTest::verificationTimeoutFinishesSafely()
+{
+    FakeZapretBackend backend;
+    backend.autoVerify = false;
+    FakeBlockcheckRunner runner;
+    BlockcheckController controller(&backend, &runner, 10);
+
+    controller.start();
+    QTRY_VERIFY_WITH_TIMEOUT(!controller.busy(), 1000);
+    QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Error);
+    QCOMPARE(runner.starts, 0);
+
+    emit backend.stateVerified(ZapretBackend::State::Active);
+    QCOMPARE(runner.starts, 0);
+    QVERIFY(!controller.busy());
+}
+
+void BlockcheckControllerTest::restoreTimeoutReportsError()
+{
+    FakeZapretBackend backend;
+    backend.state = ZapretBackend::State::Active;
+    backend.autoStart = false;
+    FakeBlockcheckRunner runner;
+    BlockcheckController controller(&backend, &runner, 10);
+
+    controller.start();
+    controller.confirmStop(true);
+    QCOMPARE(backend.startCalls, 1);
+    QTRY_VERIFY_WITH_TIMEOUT(!controller.busy(), 1000);
+    QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Error);
+    QVERIFY(controller.status().contains(QStringLiteral("Не удалось подтвердить восстановление")));
 }
 
 QTEST_GUILESS_MAIN(BlockcheckControllerTest)
