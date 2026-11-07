@@ -589,4 +589,20 @@ If the service is running, it will be stopped for the duration of the update and
     <message><source>Список %1 сохранён; резервная копия создана.</source><translation>List %1 saved; backup created.</translation></message>
     <message><source>Не удалось сохранить %1: %2</source><translation>Could not save %1: %2</translation></message>
 </context>
+  <context>
+    <name>LogMonitorPage</name>
+    <message><source>Журнал службы ещё не загружен.</source><translation>Service journal has not been loaded yet.</translation></message>
+    <message><source>Последние 50 строк</source><translation>Last 50 lines</translation></message>
+    <message><source>Последние 100 строк</source><translation>Last 100 lines</translation></message>
+    <message><source>Последние 200 строк</source><translation>Last 200 lines</translation></message>
+    <message><source>Последние 500 строк</source><translation>Last 500 lines</translation></message>
+    <message><source>Обновить журнал</source><translation>Refresh journal</translation></message>
+    <message><source>Автообновление каждые 10 секунд</source><translation>Auto-refresh every 10 seconds</translation></message>
+    <message><source>Здесь появятся последние записи журнала zapret2.service.</source><translation>Recent zapret2.service journal entries will appear here.</translation></message>
+    <message><source>Отображается только журнал фиксированной службы zapret2.service. Чтение выполняется через отдельное read-only действие Polkit; произвольные имена служб и параметры journalctl не передаются. Автообновление выключено по умолчанию. Данные не записываются и не изменяют состояние службы.</source><translation>Only the fixed zapret2.service journal is displayed. Reading uses a dedicated read-only Polkit action; arbitrary unit names and journalctl arguments are not accepted. Auto-refresh is off by default. No data is written and the service state is not changed.</translation></message>
+    <message><source>Читаю журнал zapret2.service…</source><translation>Reading zapret2.service journal…</translation></message>
+    <message><source>Журнал обновлён: %1; получено %2 байт.</source><translation>Journal refreshed at %1; received %2 bytes.</translation></message>
+    <message><source>Не удалось прочитать журнал: %1</source><translation>Could not read journal: %1</translation></message>
+    <message><source>Не удалось запустить хелпер: %1</source><translation>Could not start helper: %1</translation></message>
+  </context>
 </TS>

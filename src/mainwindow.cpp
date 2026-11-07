@@ -19,6 +19,7 @@
 #include "blockcheckpage.h"
 #include "configpage.h"
 #include "listsmanagerpage.h"
+#include "logmonitorpage.h"
 #include "profilepage.h"
 #include "updatepage.h"
 
@@ -35,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
     tabs->addTab(new ConfigPage(this), tr("Конфигурация"));
     tabs->addTab(new ProfilePage(this), tr("Профили"));
     tabs->addTab(new ListsManagerPage(this), tr("Списки"));
+    tabs->addTab(new LogMonitorPage(this), tr("Мониторинг"));
     m_blockcheck = new BlockcheckPage(m_backend, this);
     tabs->addTab(m_blockcheck, tr("Подбор стратегий"));
     m_update = new UpdatePage(m_backend, this);
