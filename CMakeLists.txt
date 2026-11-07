@@ -210,7 +210,7 @@ if(BUILD_TESTING)
     qt_add_executable(test_listscontroller tests/test_listscontroller.cpp
         src/qml/listscontroller.cpp src/qml/listscontroller.h)
     target_include_directories(test_listscontroller PRIVATE src src/qml)
-    target_link_libraries(test_listscontroller PRIVATE Qt6::Test Qt6::Core)
+    target_link_libraries(test_listscontroller PRIVATE Qt6::Test Qt6::Core Qt6::Network)
     target_compile_definitions(test_listscontroller PRIVATE QZAPRET_HELPER_PATH="/nonexistent")
     add_test(NAME lists_controller COMMAND test_listscontroller)
 
