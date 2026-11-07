@@ -93,6 +93,10 @@ qt_add_executable(zapret2applet-qml-preview
     src/qml/main.cpp
     src/qml/applicationcontroller.cpp
     src/qml/applicationcontroller.h
+    src/qml/settingsmanager.cpp
+    src/qml/settingsmanager.h
+    src/appsettings.cpp
+    src/appsettings.h
     src/backend/systemdbackend.cpp
     src/backend/systemdbackend.h
     src/backend/zapretbackend.h
@@ -103,10 +107,11 @@ qt_add_qml_module(zapret2applet-qml-preview
     VERSION 1.0
     QML_FILES
         src/qml/Main.qml
+        src/qml/pages/SettingsPage.qml
 )
 target_include_directories(zapret2applet-qml-preview PRIVATE src src/qml)
 target_link_libraries(zapret2applet-qml-preview PRIVATE
-    Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick Qt6::QuickControls2
+    Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick Qt6::QuickControls2 Qt6::Widgets
 )
 target_compile_definitions(zapret2applet-qml-preview PRIVATE
     QZAPRET_VERSION="${PROJECT_VERSION}"
@@ -156,6 +161,13 @@ if(BUILD_TESTING)
     target_include_directories(test_appsettings PRIVATE src)
     target_link_libraries(test_appsettings PRIVATE Qt6::Test Qt6::Core Qt6::Widgets)
     add_test(NAME appsettings COMMAND test_appsettings)
+
+    qt_add_executable(test_settingsmanager tests/test_settingsmanager.cpp
+        src/qml/settingsmanager.cpp src/qml/settingsmanager.h
+        src/appsettings.cpp src/appsettings.h)
+    target_include_directories(test_settingsmanager PRIVATE src src/qml)
+    target_link_libraries(test_settingsmanager PRIVATE Qt6::Test Qt6::Core Qt6::Widgets)
+    add_test(NAME settingsmanager COMMAND test_settingsmanager)
 
     qt_add_executable(test_i18n tests/test_i18n.cpp)
     target_link_libraries(test_i18n PRIVATE Qt6::Test zapret2applet_i18n)
