@@ -22,6 +22,8 @@ set(QZAPRET_SOURCES
     src/appsettings.cpp
     src/appsettings.h
     src/main.cpp
+    src/settingsdialog.cpp
+    src/settingsdialog.h
     src/aboutpage.cpp
     src/aboutpage.h
     src/autostart.cpp
