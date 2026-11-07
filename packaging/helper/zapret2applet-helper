@@ -462,10 +462,7 @@ install)
     umask 077
     mkdir -p "$RUNDIR"
     mkdir "$RUNDIR/install.lock" 2>/dev/null || die "another installation is in progress"
-    tmp=$(mktemp -d "$parent/.zapret2applet-install.XXXXXX") || {
-        rmdir "$RUNDIR/install.lock"
-        die "cannot create temporary installation directory"
-    }
+    tmp=$(mktemp -d "$parent/.zapret2applet-install.XXXXXX") || { rmdir "$RUNDIR/install.lock"; die "cannot create temporary installation directory"; }
     unit_tmp=""
     cleanup_install() {
         [ -z "$unit_tmp" ] || rm -f "$unit_tmp"
@@ -509,190 +506,11 @@ install)
     for required in config.default blockcheck2.sh install_bin.sh docs/changes.txt common/base.sh init.d/sysv/zapret2 init.d/systemd/zapret2.service; do
         [ -f "$stage/$required" ] && [ ! -L "$stage/$required" ] || die "archive is missing required file: $required"
     done
-    newver=$(grep -E '^[0-9]+(\.[0-9]+)+[[:space:]]*    # update vX.Y.Z — скачать релиз zapret2 с github.com/bol-van/zapret2 и обновить $BASE.
-    # Файлы пользователя (config, ipset/zapret-hosts-user*.txt, init.d/*/custom.d) в архиве
-    # отсутствуют, поэтому наложение файлов поверх их не затрагивает.
-    tag=${2:-}
-    case "$tag" in v[0-9]*) ;; *) die "bad tag" ;; esac
-    case "$tag" in *[!0-9.v]*|*..*|*.|v*v*) die "bad tag" ;; esac
-    [ ${#tag} -le 24 ] || die "bad tag"
-    [ -d "$BASE" ] && [ ! -L "$BASE" ] || die "zapret2 not found in $BASE"
-    [ -f "$BASE/install_bin.sh" ] || die "$BASE does not look like zapret2"
-    command -v curl >/dev/null 2>&1 || die "curl is required"
-    command -v sha256sum >/dev/null 2>&1 || die "sha256sum is required"
-    bc_pid >/dev/null && die "blockcheck is running, cancel it first"
-
-    umask 022
-    mkdir -p "$RUNDIR"
-    mkdir "$RUNDIR/update.lock" 2>/dev/null || die "another update is in progress"
-    name="zapret2-$tag"
-    tmp=$(mktemp -d /var/tmp/zapret2applet-update.XXXXXX) || { rmdir "$RUNDIR/update.lock"; die "mktemp failed"; }
-    trap 'rm -rf "$tmp"; rmdir "$RUNDIR/update.lock" 2>/dev/null || true' EXIT
-
-    fetch() {
-        curl -fsSL --proto "$PROTO" --proto-redir '=https' --tlsv1.2 \
-            --connect-timeout 20 --max-time 600 --max-filesize 300000000 -o "$2" "$1"
-    }
-    echo "Downloading $name.tar.gz ..."
-    fetch "$URLBASE/$tag/$name.tar.gz" "$tmp/z.tgz" || die "download failed"
-    fetch "$URLBASE/$tag/sha256sum.txt" "$tmp/sums.txt" || die "download of sha256sum.txt failed"
-
-    echo "Checking archive ..."
-    tar -tzf "$tmp/z.tgz" > "$tmp/list" 2>/dev/null || die "corrupt archive"
-    [ -s "$tmp/list" ] || die "empty archive"
-    if grep -qE '(^/|(^|/)\.\.(/|$))' "$tmp/list"; then die "unsafe paths in archive"; fi
-    if grep -qv "^$name/" "$tmp/list"; then die "unexpected content outside $name/"; fi
-    # только обычные файлы и каталоги: ни ссылок, ни устройств
-    if tar -tvzf "$tmp/z.tgz" | cut -c1 | grep -qv '[-d]'; then die "links or special files in archive"; fi
-
-    mkdir "$tmp/x"
-    tar -xzf "$tmp/z.tgz" -C "$tmp/x" --no-same-owner || die "extract failed"
-    stage="$tmp/x/$name"
-    [ -d "$stage" ] || die "unexpected archive layout"
-    chmod -R ug-s "$stage"
-    chmod -R go-w "$stage"
-
-    echo "Verifying checksums of binaries (sha256sum.txt from the release) ..."
-    [ -s "$tmp/sums.txt" ] || die "empty sha256sum.txt"
-    if grep -qvE "^[0-9a-f]{64}  $name/binaries/[A-Za-z0-9._/+-]+\$" "$tmp/sums.txt"; then
-        die "unexpected sha256sum.txt format"
-    fi
-    ( cd "$tmp/x" && sha256sum -c --quiet "$tmp/sums.txt" ) || die "checksum mismatch, nothing was changed"
-
-    for f in blockcheck2.sh install_bin.sh docs/changes.txt; do
-        [ -f "$stage/$f" ] || die "archive has no $f"
-    done
-    newver=$(grep -E '^[0-9]+(\.[0-9]+)+[[:space:]]*$' "$stage/docs/changes.txt" | tail -n 1 | tr -d '[:space:]')
-    [ "$newver" = "${tag#v}" ] || die "version mismatch: archive says '$newver', expected '${tag#v}'"
-
-    svc() { [ "$NOSVC" = 1 ] || systemctl "$1" "$UNIT"; }
-    was_active=0
-    if [ "$NOSVC" != 1 ] && systemctl is-active --quiet "$UNIT" 2>/dev/null; then was_active=1; fi
-    [ "$was_active" = 1 ] && { echo "Stopping $UNIT ..."; svc stop || die "cannot stop $UNIT"; }
-
-    bak="$BASE.bak"
-    rm -rf "$bak"
-    echo "Backing up the current installation to $bak ..."
-    if ! cp -a "$BASE" "$bak"; then
-        rm -rf "$bak"
-        [ "$was_active" = 1 ] && svc start || true
-        die "backup failed, nothing was changed"
-    fi
-
-    rollback() {
-        echo "Rolling back to the previous version ..." >&2
-        rm -rf "$BASE" && mv "$bak" "$BASE" || echo "zapret2applet-helper: ROLLBACK FAILED, previous version is in $bak" >&2
-        [ "$was_active" = 1 ] && svc start || true
-    }
-
-    echo "Installing $tag into $BASE ..."
-    cp -a "$stage/." "$BASE/" || { rollback; die "copy failed"; }
-    env -i PATH=/usr/sbin:/usr/bin:/sbin:/bin HOME=/root LANG=C.UTF-8 \
-        sh "$BASE/install_bin.sh" </dev/null >"$tmp/install_bin.log" 2>&1 \
-        || { cat "$tmp/install_bin.log" >&2; rollback; die "install_bin.sh failed"; }
-    "$BASE/nfq2/nfqws2" --version >/dev/null 2>&1 || { rollback; die "nfqws2 does not run on this system"; }
-
-    [ "$was_active" = 1 ] && { echo "Starting $UNIT ..."; svc start || echo "zapret2applet-helper: WARNING: cannot start $UNIT" >&2; }
-    echo "OK: zapret2 updated to $tag (previous version kept in $bak)"
-    ;;
-*)
-    die "usage: zapret2applet-helper logs-read {50|100|200|500} | lists-read NAME | lists-write NAME | config-read | config-write [EXPECTED_SHA256] | config-rollback | unit {start|stop|enable|disable} | blockcheck [opts] | blockcheck-cancel | install vX.Y.Z | update vX.Y.Z"
-    ;;
-esac
- "$stage/docs/changes.txt" | tail -n 1 | tr -d '[:space:]')
+    newver=$(grep -E '^[0-9]+(\\.[0-9]+)+[[:space:]]*$' "$stage/docs/changes.txt" | tail -n 1 | tr -d '[:space:]')
     [ "$newver" = "${tag#v}" ] || die "version mismatch: archive says '$newver', expected '${tag#v}'"
 
     config_assignments=$(grep -Ec '^[[:space:]]*NFQWS2_ENABLE[[:space:]]*=' "$stage/config.default" || true)
-    [ "$config_assignments" = 1 ] && grep -q '^NFQWS2_ENABLE=0    # update vX.Y.Z — скачать релиз zapret2 с github.com/bol-van/zapret2 и обновить $BASE.
-    # Файлы пользователя (config, ipset/zapret-hosts-user*.txt, init.d/*/custom.d) в архиве
-    # отсутствуют, поэтому наложение файлов поверх их не затрагивает.
-    tag=${2:-}
-    case "$tag" in v[0-9]*) ;; *) die "bad tag" ;; esac
-    case "$tag" in *[!0-9.v]*|*..*|*.|v*v*) die "bad tag" ;; esac
-    [ ${#tag} -le 24 ] || die "bad tag"
-    [ -d "$BASE" ] && [ ! -L "$BASE" ] || die "zapret2 not found in $BASE"
-    [ -f "$BASE/install_bin.sh" ] || die "$BASE does not look like zapret2"
-    command -v curl >/dev/null 2>&1 || die "curl is required"
-    command -v sha256sum >/dev/null 2>&1 || die "sha256sum is required"
-    bc_pid >/dev/null && die "blockcheck is running, cancel it first"
-
-    umask 022
-    mkdir -p "$RUNDIR"
-    mkdir "$RUNDIR/update.lock" 2>/dev/null || die "another update is in progress"
-    name="zapret2-$tag"
-    tmp=$(mktemp -d /var/tmp/zapret2applet-update.XXXXXX) || { rmdir "$RUNDIR/update.lock"; die "mktemp failed"; }
-    trap 'rm -rf "$tmp"; rmdir "$RUNDIR/update.lock" 2>/dev/null || true' EXIT
-
-    fetch() {
-        curl -fsSL --proto "$PROTO" --proto-redir '=https' --tlsv1.2 \
-            --connect-timeout 20 --max-time 600 --max-filesize 300000000 -o "$2" "$1"
-    }
-    echo "Downloading $name.tar.gz ..."
-    fetch "$URLBASE/$tag/$name.tar.gz" "$tmp/z.tgz" || die "download failed"
-    fetch "$URLBASE/$tag/sha256sum.txt" "$tmp/sums.txt" || die "download of sha256sum.txt failed"
-
-    echo "Checking archive ..."
-    tar -tzf "$tmp/z.tgz" > "$tmp/list" 2>/dev/null || die "corrupt archive"
-    [ -s "$tmp/list" ] || die "empty archive"
-    if grep -qE '(^/|(^|/)\.\.(/|$))' "$tmp/list"; then die "unsafe paths in archive"; fi
-    if grep -qv "^$name/" "$tmp/list"; then die "unexpected content outside $name/"; fi
-    # только обычные файлы и каталоги: ни ссылок, ни устройств
-    if tar -tvzf "$tmp/z.tgz" | cut -c1 | grep -qv '[-d]'; then die "links or special files in archive"; fi
-
-    mkdir "$tmp/x"
-    tar -xzf "$tmp/z.tgz" -C "$tmp/x" --no-same-owner || die "extract failed"
-    stage="$tmp/x/$name"
-    [ -d "$stage" ] || die "unexpected archive layout"
-    chmod -R ug-s "$stage"
-
-    echo "Verifying checksums of binaries (sha256sum.txt from the release) ..."
-    [ -s "$tmp/sums.txt" ] || die "empty sha256sum.txt"
-    if grep -qvE "^[0-9a-f]{64}  $name/binaries/[A-Za-z0-9._/+-]+\$" "$tmp/sums.txt"; then
-        die "unexpected sha256sum.txt format"
-    fi
-    ( cd "$tmp/x" && sha256sum -c --quiet "$tmp/sums.txt" ) || die "checksum mismatch, nothing was changed"
-
-    for f in blockcheck2.sh install_bin.sh docs/changes.txt; do
-        [ -f "$stage/$f" ] || die "archive has no $f"
-    done
-    newver=$(grep -E '^[0-9]+(\.[0-9]+)+[[:space:]]*$' "$stage/docs/changes.txt" | tail -n 1 | tr -d '[:space:]')
-    [ "$newver" = "${tag#v}" ] || die "version mismatch: archive says '$newver', expected '${tag#v}'"
-
-    svc() { [ "$NOSVC" = 1 ] || systemctl "$1" "$UNIT"; }
-    was_active=0
-    if [ "$NOSVC" != 1 ] && systemctl is-active --quiet "$UNIT" 2>/dev/null; then was_active=1; fi
-    [ "$was_active" = 1 ] && { echo "Stopping $UNIT ..."; svc stop || die "cannot stop $UNIT"; }
-
-    bak="$BASE.bak"
-    rm -rf "$bak"
-    echo "Backing up the current installation to $bak ..."
-    if ! cp -a "$BASE" "$bak"; then
-        rm -rf "$bak"
-        [ "$was_active" = 1 ] && svc start || true
-        die "backup failed, nothing was changed"
-    fi
-
-    rollback() {
-        echo "Rolling back to the previous version ..." >&2
-        rm -rf "$BASE" && mv "$bak" "$BASE" || echo "zapret2applet-helper: ROLLBACK FAILED, previous version is in $bak" >&2
-        [ "$was_active" = 1 ] && svc start || true
-    }
-
-    echo "Installing $tag into $BASE ..."
-    cp -a "$stage/." "$BASE/" || { rollback; die "copy failed"; }
-    env -i PATH=/usr/sbin:/usr/bin:/sbin:/bin HOME=/root LANG=C.UTF-8 \
-        sh "$BASE/install_bin.sh" </dev/null >"$tmp/install_bin.log" 2>&1 \
-        || { cat "$tmp/install_bin.log" >&2; rollback; die "install_bin.sh failed"; }
-    "$BASE/nfq2/nfqws2" --version >/dev/null 2>&1 || { rollback; die "nfqws2 does not run on this system"; }
-
-    [ "$was_active" = 1 ] && { echo "Starting $UNIT ..."; svc start || echo "zapret2applet-helper: WARNING: cannot start $UNIT" >&2; }
-    echo "OK: zapret2 updated to $tag (previous version kept in $bak)"
-    ;;
-*)
-    die "usage: zapret2applet-helper logs-read {50|100|200|500} | lists-read NAME | lists-write NAME | config-read | config-write [EXPECTED_SHA256] | config-rollback | unit {start|stop|enable|disable} | blockcheck [opts] | blockcheck-cancel | update vX.Y.Z"
-    ;;
-esac
- "$stage/config.default" \
+    [ "$config_assignments" = 1 ] && grep -q '^NFQWS2_ENABLE=0$' "$stage/config.default" \
         || die "upstream default config does not explicitly disable NFQWS2"
     cp "$stage/config.default" "$stage/config" || die "cannot create initial config"
     chmod 600 "$stage/config" || die "cannot secure initial config"
@@ -701,194 +519,16 @@ esac
     env -i PATH=/usr/sbin:/usr/bin:/sbin:/bin HOME=/root LANG=C.UTF-8 \
         sh "$stage/install_bin.sh" > "$tmp/install_bin.log" 2>&1 \
         || { cat "$tmp/install_bin.log" >&2; die "install_bin.sh failed: no compatible binaries"; }
-    [ -x "$stage/nfq2/nfqws2" ] && [ -x "$stage/ip2net/ip2net" ] && [ -x "$stage/mdig/mdig" ] \
+    [ -x "$stage/nfq2/nfqws2" ] && [ -x "$stage/ip2net/ip2net" ] && [ -x "$stage/mdig/mdig" \
         || die "binary links were not created"
     "$stage/nfq2/nfqws2" --version >/dev/null 2>&1 || die "nfqws2 does not run on this system"
     printf '0.0.0.0\n' | "$stage/ip2net/ip2net" >/dev/null 2>&1 || die "ip2net does not run on this system"
 
     unit="$stage/init.d/systemd/zapret2.service"
-    unit_tmp=$(mktemp "$UNIT_DIR/.zapret2.service.XXXXXX") || die "cannot stage systemd unit"
-    grep -q '^ExecStart=/opt/zapret2/init.d/sysv/zapret2 start    # update vX.Y.Z — скачать релиз zapret2 с github.com/bol-van/zapret2 и обновить $BASE.
-    # Файлы пользователя (config, ipset/zapret-hosts-user*.txt, init.d/*/custom.d) в архиве
-    # отсутствуют, поэтому наложение файлов поверх их не затрагивает.
-    tag=${2:-}
-    case "$tag" in v[0-9]*) ;; *) die "bad tag" ;; esac
-    case "$tag" in *[!0-9.v]*|*..*|*.|v*v*) die "bad tag" ;; esac
-    [ ${#tag} -le 24 ] || die "bad tag"
-    [ -d "$BASE" ] && [ ! -L "$BASE" ] || die "zapret2 not found in $BASE"
-    [ -f "$BASE/install_bin.sh" ] || die "$BASE does not look like zapret2"
-    command -v curl >/dev/null 2>&1 || die "curl is required"
-    command -v sha256sum >/dev/null 2>&1 || die "sha256sum is required"
-    bc_pid >/dev/null && die "blockcheck is running, cancel it first"
-
-    umask 022
-    mkdir -p "$RUNDIR"
-    mkdir "$RUNDIR/update.lock" 2>/dev/null || die "another update is in progress"
-    name="zapret2-$tag"
-    tmp=$(mktemp -d /var/tmp/zapret2applet-update.XXXXXX) || { rmdir "$RUNDIR/update.lock"; die "mktemp failed"; }
-    trap 'rm -rf "$tmp"; rmdir "$RUNDIR/update.lock" 2>/dev/null || true' EXIT
-
-    fetch() {
-        curl -fsSL --proto "$PROTO" --proto-redir '=https' --tlsv1.2 \
-            --connect-timeout 20 --max-time 600 --max-filesize 300000000 -o "$2" "$1"
-    }
-    echo "Downloading $name.tar.gz ..."
-    fetch "$URLBASE/$tag/$name.tar.gz" "$tmp/z.tgz" || die "download failed"
-    fetch "$URLBASE/$tag/sha256sum.txt" "$tmp/sums.txt" || die "download of sha256sum.txt failed"
-
-    echo "Checking archive ..."
-    tar -tzf "$tmp/z.tgz" > "$tmp/list" 2>/dev/null || die "corrupt archive"
-    [ -s "$tmp/list" ] || die "empty archive"
-    if grep -qE '(^/|(^|/)\.\.(/|$))' "$tmp/list"; then die "unsafe paths in archive"; fi
-    if grep -qv "^$name/" "$tmp/list"; then die "unexpected content outside $name/"; fi
-    # только обычные файлы и каталоги: ни ссылок, ни устройств
-    if tar -tvzf "$tmp/z.tgz" | cut -c1 | grep -qv '[-d]'; then die "links or special files in archive"; fi
-
-    mkdir "$tmp/x"
-    tar -xzf "$tmp/z.tgz" -C "$tmp/x" --no-same-owner || die "extract failed"
-    stage="$tmp/x/$name"
-    [ -d "$stage" ] || die "unexpected archive layout"
-    chmod -R ug-s "$stage"
-
-    echo "Verifying checksums of binaries (sha256sum.txt from the release) ..."
-    [ -s "$tmp/sums.txt" ] || die "empty sha256sum.txt"
-    if grep -qvE "^[0-9a-f]{64}  $name/binaries/[A-Za-z0-9._/+-]+\$" "$tmp/sums.txt"; then
-        die "unexpected sha256sum.txt format"
-    fi
-    ( cd "$tmp/x" && sha256sum -c --quiet "$tmp/sums.txt" ) || die "checksum mismatch, nothing was changed"
-
-    for f in blockcheck2.sh install_bin.sh docs/changes.txt; do
-        [ -f "$stage/$f" ] || die "archive has no $f"
-    done
-    newver=$(grep -E '^[0-9]+(\.[0-9]+)+[[:space:]]*$' "$stage/docs/changes.txt" | tail -n 1 | tr -d '[:space:]')
-    [ "$newver" = "${tag#v}" ] || die "version mismatch: archive says '$newver', expected '${tag#v}'"
-
-    svc() { [ "$NOSVC" = 1 ] || systemctl "$1" "$UNIT"; }
-    was_active=0
-    if [ "$NOSVC" != 1 ] && systemctl is-active --quiet "$UNIT" 2>/dev/null; then was_active=1; fi
-    [ "$was_active" = 1 ] && { echo "Stopping $UNIT ..."; svc stop || die "cannot stop $UNIT"; }
-
-    bak="$BASE.bak"
-    rm -rf "$bak"
-    echo "Backing up the current installation to $bak ..."
-    if ! cp -a "$BASE" "$bak"; then
-        rm -rf "$bak"
-        [ "$was_active" = 1 ] && svc start || true
-        die "backup failed, nothing was changed"
-    fi
-
-    rollback() {
-        echo "Rolling back to the previous version ..." >&2
-        rm -rf "$BASE" && mv "$bak" "$BASE" || echo "zapret2applet-helper: ROLLBACK FAILED, previous version is in $bak" >&2
-        [ "$was_active" = 1 ] && svc start || true
-    }
-
-    echo "Installing $tag into $BASE ..."
-    cp -a "$stage/." "$BASE/" || { rollback; die "copy failed"; }
-    env -i PATH=/usr/sbin:/usr/bin:/sbin:/bin HOME=/root LANG=C.UTF-8 \
-        sh "$BASE/install_bin.sh" </dev/null >"$tmp/install_bin.log" 2>&1 \
-        || { cat "$tmp/install_bin.log" >&2; rollback; die "install_bin.sh failed"; }
-    "$BASE/nfq2/nfqws2" --version >/dev/null 2>&1 || { rollback; die "nfqws2 does not run on this system"; }
-
-    [ "$was_active" = 1 ] && { echo "Starting $UNIT ..."; svc start || echo "zapret2applet-helper: WARNING: cannot start $UNIT" >&2; }
-    echo "OK: zapret2 updated to $tag (previous version kept in $bak)"
-    ;;
-*)
-    die "usage: zapret2applet-helper logs-read {50|100|200|500} | lists-read NAME | lists-write NAME | config-read | config-write [EXPECTED_SHA256] | config-rollback | unit {start|stop|enable|disable} | blockcheck [opts] | blockcheck-cancel | update vX.Y.Z"
-    ;;
-esac
- "$unit" \
-        && grep -q '^ExecStop=/opt/zapret2/init.d/sysv/zapret2 stop    # update vX.Y.Z — скачать релиз zapret2 с github.com/bol-van/zapret2 и обновить $BASE.
-    # Файлы пользователя (config, ipset/zapret-hosts-user*.txt, init.d/*/custom.d) в архиве
-    # отсутствуют, поэтому наложение файлов поверх их не затрагивает.
-    tag=${2:-}
-    case "$tag" in v[0-9]*) ;; *) die "bad tag" ;; esac
-    case "$tag" in *[!0-9.v]*|*..*|*.|v*v*) die "bad tag" ;; esac
-    [ ${#tag} -le 24 ] || die "bad tag"
-    [ -d "$BASE" ] && [ ! -L "$BASE" ] || die "zapret2 not found in $BASE"
-    [ -f "$BASE/install_bin.sh" ] || die "$BASE does not look like zapret2"
-    command -v curl >/dev/null 2>&1 || die "curl is required"
-    command -v sha256sum >/dev/null 2>&1 || die "sha256sum is required"
-    bc_pid >/dev/null && die "blockcheck is running, cancel it first"
-
-    umask 022
-    mkdir -p "$RUNDIR"
-    mkdir "$RUNDIR/update.lock" 2>/dev/null || die "another update is in progress"
-    name="zapret2-$tag"
-    tmp=$(mktemp -d /var/tmp/zapret2applet-update.XXXXXX) || { rmdir "$RUNDIR/update.lock"; die "mktemp failed"; }
-    trap 'rm -rf "$tmp"; rmdir "$RUNDIR/update.lock" 2>/dev/null || true' EXIT
-
-    fetch() {
-        curl -fsSL --proto "$PROTO" --proto-redir '=https' --tlsv1.2 \
-            --connect-timeout 20 --max-time 600 --max-filesize 300000000 -o "$2" "$1"
-    }
-    echo "Downloading $name.tar.gz ..."
-    fetch "$URLBASE/$tag/$name.tar.gz" "$tmp/z.tgz" || die "download failed"
-    fetch "$URLBASE/$tag/sha256sum.txt" "$tmp/sums.txt" || die "download of sha256sum.txt failed"
-
-    echo "Checking archive ..."
-    tar -tzf "$tmp/z.tgz" > "$tmp/list" 2>/dev/null || die "corrupt archive"
-    [ -s "$tmp/list" ] || die "empty archive"
-    if grep -qE '(^/|(^|/)\.\.(/|$))' "$tmp/list"; then die "unsafe paths in archive"; fi
-    if grep -qv "^$name/" "$tmp/list"; then die "unexpected content outside $name/"; fi
-    # только обычные файлы и каталоги: ни ссылок, ни устройств
-    if tar -tvzf "$tmp/z.tgz" | cut -c1 | grep -qv '[-d]'; then die "links or special files in archive"; fi
-
-    mkdir "$tmp/x"
-    tar -xzf "$tmp/z.tgz" -C "$tmp/x" --no-same-owner || die "extract failed"
-    stage="$tmp/x/$name"
-    [ -d "$stage" ] || die "unexpected archive layout"
-    chmod -R ug-s "$stage"
-
-    echo "Verifying checksums of binaries (sha256sum.txt from the release) ..."
-    [ -s "$tmp/sums.txt" ] || die "empty sha256sum.txt"
-    if grep -qvE "^[0-9a-f]{64}  $name/binaries/[A-Za-z0-9._/+-]+\$" "$tmp/sums.txt"; then
-        die "unexpected sha256sum.txt format"
-    fi
-    ( cd "$tmp/x" && sha256sum -c --quiet "$tmp/sums.txt" ) || die "checksum mismatch, nothing was changed"
-
-    for f in blockcheck2.sh install_bin.sh docs/changes.txt; do
-        [ -f "$stage/$f" ] || die "archive has no $f"
-    done
-    newver=$(grep -E '^[0-9]+(\.[0-9]+)+[[:space:]]*$' "$stage/docs/changes.txt" | tail -n 1 | tr -d '[:space:]')
-    [ "$newver" = "${tag#v}" ] || die "version mismatch: archive says '$newver', expected '${tag#v}'"
-
-    svc() { [ "$NOSVC" = 1 ] || systemctl "$1" "$UNIT"; }
-    was_active=0
-    if [ "$NOSVC" != 1 ] && systemctl is-active --quiet "$UNIT" 2>/dev/null; then was_active=1; fi
-    [ "$was_active" = 1 ] && { echo "Stopping $UNIT ..."; svc stop || die "cannot stop $UNIT"; }
-
-    bak="$BASE.bak"
-    rm -rf "$bak"
-    echo "Backing up the current installation to $bak ..."
-    if ! cp -a "$BASE" "$bak"; then
-        rm -rf "$bak"
-        [ "$was_active" = 1 ] && svc start || true
-        die "backup failed, nothing was changed"
-    fi
-
-    rollback() {
-        echo "Rolling back to the previous version ..." >&2
-        rm -rf "$BASE" && mv "$bak" "$BASE" || echo "zapret2applet-helper: ROLLBACK FAILED, previous version is in $bak" >&2
-        [ "$was_active" = 1 ] && svc start || true
-    }
-
-    echo "Installing $tag into $BASE ..."
-    cp -a "$stage/." "$BASE/" || { rollback; die "copy failed"; }
-    env -i PATH=/usr/sbin:/usr/bin:/sbin:/bin HOME=/root LANG=C.UTF-8 \
-        sh "$BASE/install_bin.sh" </dev/null >"$tmp/install_bin.log" 2>&1 \
-        || { cat "$tmp/install_bin.log" >&2; rollback; die "install_bin.sh failed"; }
-    "$BASE/nfq2/nfqws2" --version >/dev/null 2>&1 || { rollback; die "nfqws2 does not run on this system"; }
-
-    [ "$was_active" = 1 ] && { echo "Starting $UNIT ..."; svc start || echo "zapret2applet-helper: WARNING: cannot start $UNIT" >&2; }
-    echo "OK: zapret2 updated to $tag (previous version kept in $bak)"
-    ;;
-*)
-    die "usage: zapret2applet-helper logs-read {50|100|200|500} | lists-read NAME | lists-write NAME | config-read | config-write [EXPECTED_SHA256] | config-rollback | unit {start|stop|enable|disable} | blockcheck [opts] | blockcheck-cancel | update vX.Y.Z"
-    ;;
-esac
- "$unit" \
+    grep -q '^ExecStart=/opt/zapret2/init.d/sysv/zapret2 start$' "$unit" \
+        && grep -q '^ExecStop=/opt/zapret2/init.d/sysv/zapret2 stop$' "$unit" \
         || die "upstream systemd unit does not match the expected installation paths"
+    unit_tmp=$(mktemp "$UNIT_DIR/.zapret2.service.XXXXXX") || die "cannot stage systemd unit"
     cp "$unit" "$unit_tmp" || die "cannot stage systemd unit"
     chmod 644 "$unit_tmp" || die "cannot set systemd unit permissions"
 
@@ -996,6 +636,6 @@ update)
     echo "OK: zapret2 updated to $tag (previous version kept in $bak)"
     ;;
 *)
-    die "usage: zapret2applet-helper logs-read {50|100|200|500} | lists-read NAME | lists-write NAME | config-read | config-write [EXPECTED_SHA256] | config-rollback | unit {start|stop|enable|disable} | blockcheck [opts] | blockcheck-cancel | update vX.Y.Z"
+    die "usage: zapret2applet-helper logs-read {50|100|200|500} | lists-read NAME | lists-write NAME | config-read | config-write [EXPECTED_SHA256] | config-rollback | unit {start|stop|enable|disable} | blockcheck [opts] | blockcheck-cancel | install vX.Y.Z | update vX.Y.Z"
     ;;
 esac
