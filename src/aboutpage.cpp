@@ -45,6 +45,7 @@ AboutPage::AboutPage(QWidget *parent)
         "<h3>Проект и документация</h3>"
         "<ul>"
         "<li><a href=\"https://github.com/avsprv/zapret2applet\">Репозиторий zapret2applet</a></li>"
+        "<li><a href=\"https://github.com/avsprv/zapret2applet/blob/main/README.md\">Документация приложения</a></li>"
         "<li><a href=\"https://github.com/avsprv/zapret2applet/releases\">Релизы приложения</a></li>"
         "<li><a href=\"https://github.com/avsprv/zapret2applet/issues\">Сообщить об ошибке</a></li>"
         "<li><a href=\"https://github.com/avsprv/zapret2applet/blob/main/NOTICE.md\">Уведомления о сторонних компонентах</a></li>"
@@ -54,6 +55,5 @@ AboutPage::AboutPage(QWidget *parent)
         "или сопровождающими upstream zapret2.</i></p>")
         .arg(QString::fromLatin1(QZAPRET_VERSION).toHtmlEscaped(),
              QString::fromLatin1(qVersion()).toHtmlEscaped()));
-    details->setOpenExternalLinks(true);
     layout->addWidget(details, 1);
 }
