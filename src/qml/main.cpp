@@ -8,6 +8,7 @@
 
 #include "applicationcontroller.h"
 #include "configcontroller.h"
+#include "blockcheckcontroller.h"
 #include "i18n.h"
 #include "profilecontroller.h"
 #include "logscontroller.h"
@@ -38,6 +39,7 @@ int main(int argc, char *argv[])
     ProfileController profileController;
     LogsController logsController;
     ListsController listsController;
+    BlockcheckController blockcheckController;
 
     const QLocale initialLocale = localeForLanguage(settingsManager.language());
     QLocale::setDefault(initialLocale);
@@ -49,6 +51,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty(QStringLiteral("profileController"), &profileController);
     engine.rootContext()->setContextProperty(QStringLiteral("logsController"), &logsController);
     engine.rootContext()->setContextProperty(QStringLiteral("listsController"), &listsController);
+    engine.rootContext()->setContextProperty(QStringLiteral("blockcheckController"), &blockcheckController);
     engine.loadFromModule(QStringLiteral("org.avsprv.zapret2applet"), QStringLiteral("Main"));
 
     if (engine.rootObjects().isEmpty())
