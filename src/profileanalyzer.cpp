@@ -1,5 +1,5 @@
 #include "profileanalyzer.h"
-#include <QObject>
+#include <QCoreApplication>
 #include <QRegularExpression>
 namespace ProfileAnalyzer {
 Result parse(const QString &config)
@@ -10,12 +10,12 @@ Result parse(const QString &config)
         QRegularExpression::MultilineOption);
     auto matches = assignment.globalMatch(config);
     if (!matches.hasNext()) {
-        result.error = QObject::tr("NFQWS2_OPT не найден или задан несколько раз.");
+        result.error = QCoreApplication::translate("ProfilePage", "NFQWS2_OPT не найден или задан несколько раз.");
         return result;
     }
     const auto match = matches.next();
     if (matches.hasNext()) {
-        result.error = QObject::tr("NFQWS2_OPT не найден или задан несколько раз.");
+        result.error = QCoreApplication::translate("ProfilePage", "NFQWS2_OPT не найден или задан несколько раз.");
         return result;
     }
     qsizetype pos = match.capturedEnd();
@@ -23,7 +23,7 @@ Result parse(const QString &config)
            config.at(pos) == QLatin1Char('\t')))
         ++pos;
     if (pos >= config.size() || config.at(pos) != QLatin1Char('"')) {
-        result.error = QObject::tr("NFQWS2_OPT должен быть статической строкой в двойных кавычках.");
+        result.error = QCoreApplication::translate("ProfilePage", "NFQWS2_OPT должен быть статической строкой в двойных кавычках.");
         return result;
     }
     ++pos;
@@ -37,13 +37,13 @@ Result parse(const QString &config)
             break;
         }
         if (ch == QLatin1Char('$') || ch == QChar(96) || ch == QLatin1Char('\\') || ch.isNull()) {
-            result.error = QObject::tr("NFQWS2_OPT содержит shell-подстановку или escape-последовательность; безопасный статический анализ невозможен.");
+            result.error = QCoreApplication::translate("ProfilePage", "NFQWS2_OPT содержит shell-подстановку или escape-последовательность; безопасный статический анализ невозможен.");
             return result;
         }
         value.append(ch);
     }
     if (!closed) {
-        result.error = QObject::tr("NFQWS2_OPT должен быть статической строкой в двойных кавычках.");
+        result.error = QCoreApplication::translate("ProfilePage", "NFQWS2_OPT должен быть статической строкой в двойных кавычках.");
         return result;
     }
     while (pos < config.size() && (config.at(pos) == QLatin1Char(' ') ||
@@ -51,17 +51,17 @@ Result parse(const QString &config)
         ++pos;
     if (pos < config.size() && config.at(pos) != QLatin1Char('\n') &&
         config.at(pos) != QLatin1Char('#')) {
-        result.error = QObject::tr("После закрывающей кавычки NFQWS2_OPT обнаружено неподдерживаемое выражение.");
+        result.error = QCoreApplication::translate("ProfilePage", "После закрывающей кавычки NFQWS2_OPT обнаружено неподдерживаемое выражение.");
         return result;
     }
     const QStringList arguments = value.split(
         QRegularExpression(QStringLiteral("\\s+")), Qt::SkipEmptyParts);
     if (arguments.isEmpty()) {
-        result.error = QObject::tr("NFQWS2_OPT не содержит параметров.");
+        result.error = QCoreApplication::translate("ProfilePage", "NFQWS2_OPT не содержит параметров.");
         return result;
     }
     if (arguments.size() > 4096) {
-        result.error = QObject::tr("Слишком много профилей или параметров.");
+        result.error = QCoreApplication::translate("ProfilePage", "Слишком много профилей или параметров.");
         return result;
     }
     Profile current;
@@ -75,7 +75,9 @@ Result parse(const QString &config)
     for (const QString &argument : arguments) {
         if (argument == QStringLiteral("--new")) {
             if (!finishProfile()) {
-                result.error = QObject::tr("Обнаружен пустой профиль рядом с --new.");
+                result.error = result.profiles.size() > 128
+                    ? QCoreApplication::translate("ProfilePage", "Слишком много профилей или параметров.")
+                    : QCoreApplication::translate("ProfilePage", "Обнаружен пустой профиль рядом с --new.");
                 result.profiles.clear();
                 return result;
             }
@@ -92,10 +94,10 @@ Result parse(const QString &config)
             current.other.append(argument);
     }
     if (!finishProfile()) {
-        result.error = QObject::tr("Обнаружен пустой профиль рядом с --new.");
+        result.error = QCoreApplication::translate("ProfilePage", "Обнаружен пустой профиль рядом с --new.");
         result.profiles.clear();
     } else if (result.profiles.size() > 128) {
-        result.error = QObject::tr("Слишком много профилей или параметров.");
+        result.error = QCoreApplication::translate("ProfilePage", "Слишком много профилей или параметров.");
         result.profiles.clear();
     }
     return result;

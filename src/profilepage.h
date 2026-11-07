@@ -1,4 +1,6 @@
 #pragma once
+#include <QByteArray>
+#include <QString>
 #include <QWidget>
 class QLabel;
 class QPushButton;
