@@ -3,6 +3,11 @@
 #include <QAction>
 #include <QApplication>
 #include <QGuiApplication>
+#include <QColor>
+#include <QPalette>
+#include <QPen>
+#include <QPointF>
+#include <QRectF>
 #include <QPainter>
 #include <QPixmap>
 #include <QStyleHints>
@@ -14,7 +19,6 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QStyle>
 #include <QSystemTrayIcon>
 #include <QSignalBlocker>
 #include <QTabWidget>
