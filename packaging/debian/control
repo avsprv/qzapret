@@ -4,6 +4,9 @@ Priority: optional
 Maintainer: avsprv <avsprv@users.noreply.github.com>
 Build-Depends: debhelper-compat (= 13),
                cmake (>= 3.21),
+               extra-cmake-modules (>= 6.0),
+               libkirigami-dev,
+               qt6-declarative-dev (>= 6.8),
                ninja-build,
                qt6-base-dev (>= 6.8),
                qt6-tools-dev (>= 6.8),
