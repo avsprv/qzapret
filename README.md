@@ -61,9 +61,8 @@
 
 ## Установка
 
-1. Установите [zapret2](https://github.com/bol-van/zapret2) по официальной инструкции.
-2. Скачайте пакет со страницы [Releases](https://github.com/avsprv/zapret2applet/releases).
-3. Установите его:
+1. Скачайте пакет zapret2applet со страницы [Releases](https://github.com/avsprv/zapret2applet/releases).
+2. Установите его:
 
 **Fedora (.rpm):**
 ```bash
@@ -75,7 +74,7 @@ sudo dnf install ./zapret2applet-*.rpm
 sudo apt install ./zapret2applet_*.deb
 ```
 
-4. Запустите zapret2applet из меню приложений.
+3. Запустите zapret2applet из меню приложений. Если zapret2 ещё не установлен, откройте вкладку «Обновления» и выполните чистую установку. Перед запуском службы настройте конфигурацию и зависимости.
 
 Если готовый пакет недоступен, используйте [сборку из исходников](#сборка-из-исходников).
 
