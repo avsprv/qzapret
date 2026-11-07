@@ -133,8 +133,8 @@ void SystemdBackend::startNextUnitAction()
     });
     connect(proc, &QProcess::errorOccurred, this,
             [this, proc, reportResult, completed](QProcess::ProcessError error) {
-        emit errorOccurred(tr("Ошибка запуска операции systemd: %1").arg(proc->errorString()));
         if (error == QProcess::FailedToStart && !*completed) {
+            emit errorOccurred(tr("Не удалось запустить операцию systemd: %1").arg(proc->errorString()));
             *completed = true;
             proc->deleteLater(); // finished() после FailedToStart не приходит
             reportResult(false);
