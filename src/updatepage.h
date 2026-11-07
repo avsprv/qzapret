@@ -2,7 +2,6 @@
 
 #include <QWidget>
 
-class QCheckBox;
 class QLabel;
 class QPlainTextEdit;
 class QPushButton;
@@ -46,7 +45,6 @@ private:
     QPushButton *m_checkBtn;
     QPushButton *m_updateBtn;
     QPushButton *m_notesBtn;
-    QCheckBox *m_autoCheck;
     QPlainTextEdit *m_log;
 
     QString m_installed; // "1.0.6" или пусто
