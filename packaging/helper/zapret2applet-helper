@@ -13,13 +13,16 @@ PROTO='=https'
 NOSVC=0
 JOURNALCTL=journalctl
 TEST_MODE=0
+SECURE_OWNER=0
+TEST_ENFORCE_SECURITY=0
 
 # Переопределения ТОЛЬКО для тестов. Игнорируются, если хелпер установлен в системный
 # каталог; кроме того, pkexec сам очищает окружение вызывающего.
 case "$0" in
     /usr/*|/opt/*|/etc/*|/bin/*|/sbin/*|/lib/*|/var/*) ;;
     *)
-        if [ -n "${QZAPRET_TEST_BASE:-}" ]; then BASE=$QZAPRET_TEST_BASE; TEST_MODE=1; fi
+        if [ -n "${QZAPRET_TEST_BASE:-}" ]; then BASE=$QZAPRET_TEST_BASE; TEST_MODE=1; SECURE_OWNER=$(id -u); fi
+        if [ -n "${QZAPRET_TEST_ENFORCE_SECURITY:-}" ]; then TEST_ENFORCE_SECURITY=1; fi
         if [ -n "${QZAPRET_TEST_BACKUP_DIR:-}" ]; then BACKUP_ROOT=$QZAPRET_TEST_BACKUP_DIR; fi
         if [ -n "${QZAPRET_TEST_RUNDIR:-}" ]; then RUNDIR=$QZAPRET_TEST_RUNDIR; fi
         if [ -n "${QZAPRET_TEST_URLBASE:-}" ]; then URLBASE=$QZAPRET_TEST_URLBASE; PROTO='=https,file'; fi
@@ -51,15 +54,63 @@ secure_root_dir() {
     info=$(stat -c '%u %a' -- "$1" 2>/dev/null) || return 1
     owner=$(printf '%s\n' "$info" | cut -d ' ' -f 1)
     perms=$(printf '%s\n' "$info" | cut -d ' ' -f 2)
-    [ "$owner" = 0 ] || return 1
+    [ "$owner" = "$SECURE_OWNER" ] || return 1
+    [ $((0$perms & 022)) -eq 0 ] || return 1
+}
+
+secure_private_root_dir() {
+    secure_root_dir "$1" || return 1
+    info=$(stat -c '%a' -- "$1" 2>/dev/null) || return 1
+    [ $((0$info & 077)) -eq 0 ]
+}
+
+secure_root_file() {
+    [ -f "$1" ] && [ ! -L "$1" ] || return 1
+    info=$(stat -c '%u %a' -- "$1" 2>/dev/null) || return 1
+    owner=$(printf '%s\n' "$info" | cut -d ' ' -f 1)
+    perms=$(printf '%s\n' "$info" | cut -d ' ' -f 2)
+    [ "$owner" = "$SECURE_OWNER" ] || return 1
     [ $((0$perms & 022)) -eq 0 ] || return 1
 }
 
 secure_list_dirs() {
-    [ "$TEST_MODE" = 1 ] && return 0
-    secure_root_dir /opt &&
-        secure_root_dir "$BASE" &&
-        secure_root_dir "$BASE/ipset"
+    if [ "$TEST_MODE" = 1 ] && [ "$TEST_ENFORCE_SECURITY" != 1 ]; then return 0; fi
+    if [ "$TEST_MODE" != 1 ]; then secure_root_dir /opt || return 1; fi
+    secure_root_dir "$BASE" && secure_root_dir "$BASE/ipset"
+}
+
+secure_config_paths() {
+    if [ "$TEST_MODE" = 1 ] && [ "$TEST_ENFORCE_SECURITY" != 1 ]; then return 0; fi
+    if [ "$TEST_MODE" != 1 ]; then secure_root_dir /opt || return 1; fi
+    secure_root_dir "$BASE" && secure_root_file "$BASE/config"
+}
+
+prepare_backup_root() {
+    if [ ! -e "$BACKUP_ROOT" ]; then
+        if [ "$TEST_MODE" != 1 ]; then
+            secure_root_dir /var && secure_root_dir /var/backups || return 1
+        fi
+        mkdir "$BACKUP_ROOT" 2>/dev/null || return 1
+        chmod 700 "$BACKUP_ROOT" || return 1
+    fi
+    [ ! -L "$BACKUP_ROOT" ] && secure_private_root_dir "$BACKUP_ROOT"
+}
+
+validate_domain_name() {
+    python3 - "$1" <<'PY'
+import re
+import sys
+
+domain = sys.argv[1]
+if domain.endswith("."):
+    domain = domain[:-1]
+if not domain or len(domain) > 253:
+    sys.exit(1)
+for label in domain.split("."):
+    if (not label or len(label) > 63 or
+        not re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?", label)):
+        sys.exit(1)
+PY
 }
 
 validate_hostlist() {
@@ -149,7 +200,9 @@ lists-write)
     secure_list_dirs || die "list directories must be root-owned and not writable by group or other users"
     list="$ipset_dir/$2"
     [ ! -L "$list" ] || die "list file must not be a symlink"
-    if [ -e "$list" ] && [ ! -f "$list" ]; then die "list is not a regular file"; fi
+    if [ -e "$list" ]; then
+        secure_root_file "$list" || die "list file must be regular, safely owned, and not group- or world-writable"
+    fi
 
     tmp=$(mktemp "$ipset_dir/.list.zapret2applet.XXXXXX") || die "cannot create temporary list"
     trap 'rm -f "$tmp"' EXIT HUP INT TERM
@@ -162,22 +215,14 @@ lists-write)
     chmod 644 "$tmp" || die "cannot set safe list permissions"
     chown --reference="$ipset_dir" "$tmp" || die "cannot set list ownership"
 
-    if [ -e "$BACKUP_ROOT" ] && { [ ! -d "$BACKUP_ROOT" ] || [ -L "$BACKUP_ROOT" ]; }; then
-        die "backup directory is unsafe"
-    fi
-    [ -d "$BACKUP_ROOT" ] || { mkdir -p "$BACKUP_ROOT" && chmod 700 "$BACKUP_ROOT"; } || die "cannot create backup directory"
-    if [ "$TEST_MODE" != 1 ]; then
-        secure_root_dir /var && secure_root_dir /var/backups && secure_root_dir "$BACKUP_ROOT" || die "backup directory must be root-owned and private"
-    fi
+    prepare_backup_root || die "backup directory must be safely owned and private"
     list_backup_root="$BACKUP_ROOT/lists"
     if [ -e "$list_backup_root" ] && { [ ! -d "$list_backup_root" ] || [ -L "$list_backup_root" ]; }; then
         die "list backup directory is unsafe"
     fi
     [ -d "$list_backup_root" ] || { mkdir "$list_backup_root" && chmod 700 "$list_backup_root"; } || die "cannot create list backup directory"
     chmod 700 "$list_backup_root" || die "cannot secure list backup directory"
-    if [ "$TEST_MODE" != 1 ]; then
-        secure_root_dir "$list_backup_root" || die "list backup directory must be root-owned and private"
-    fi
+    secure_private_root_dir "$list_backup_root" || die "list backup directory must be safely owned and private"
 
     backup=""
     if [ -e "$list" ]; then
@@ -232,7 +277,7 @@ lists-read)
     secure_list_dirs || die "list directories must be root-owned and not writable by group or other users"
     list="$ipset_dir/$2"
     [ -e "$list" ] || { echo "zapret2applet-helper: list file does not exist" >&2; exit 3; }
-    [ -f "$list" ] && [ ! -L "$list" ] || die "list is not a regular file"
+    secure_root_file "$list" || die "list file must be regular, safely owned, and not group- or world-writable"
     size=$(wc -c < "$list" | tr -d '[:space:]')
     case "$size" in ''|*[!0-9]*) die "cannot determine list size" ;; esac
     [ "$size" -le 1048576 ] || die "list exceeds the 1 MiB read limit"
@@ -243,6 +288,7 @@ config-read)
     [ -d "$BASE" ] && [ ! -L "$BASE" ] || die "zapret2 not found in $BASE"
     config="$BASE/config"
     [ -f "$config" ] && [ ! -L "$config" ] || die "config is missing or is not a regular file"
+    secure_config_paths || die "config path and file must be safely owned and not group- or world-writable"
     size=$(wc -c < "$config" | tr -d '[:space:]')
     case "$size" in ''|*[!0-9]*) die "cannot determine config size" ;; esac
     [ "$size" -le 1048576 ] || die "config exceeds the 1 MiB read limit"
@@ -253,6 +299,7 @@ config-write)
     [ -d "$BASE" ] && [ ! -L "$BASE" ] || die "zapret2 not found in $BASE"
     config="$BASE/config"
     [ -f "$config" ] && [ ! -L "$config" ] || die "config is missing or is not a regular file"
+    secure_config_paths || die "config path and file must be safely owned and not group- or world-writable"
     expected_hash=""
     if [ "$#" -eq 2 ]; then
         expected_hash=$2
@@ -271,9 +318,7 @@ config-write)
     sh -n "$tmp" || die "shell syntax validation failed; config was not changed"
     chmod --reference="$config" "$tmp" || die "cannot preserve config permissions"
     chown --reference="$config" "$tmp" || die "cannot preserve config ownership"
-    [ -d "$BACKUP_ROOT" ] && [ ! -L "$BACKUP_ROOT" ] || {
-        [ ! -e "$BACKUP_ROOT" ] && mkdir -p "$BACKUP_ROOT" && chmod 700 "$BACKUP_ROOT"
-    } || die "backup directory is unsafe or unavailable"
+    prepare_backup_root || die "backup directory is unsafe or unavailable"
     backup=$(mktemp -d "$BACKUP_ROOT/config-$(date +%Y%m%d-%H%M%S)-XXXXXX") || die "cannot create backup directory"
     cp -p "$config" "$backup/config" || { rm -rf "$backup"; die "cannot create config backup; config was not changed"; }
     chmod 600 "$backup/config" || { rm -rf "$backup"; die "cannot secure config backup; config was not changed"; }
@@ -300,10 +345,12 @@ config-rollback)
     [ -d "$BASE" ] && [ ! -L "$BASE" ] || die "zapret2 not found in $BASE"
     config="$BASE/config"
     [ -f "$config" ] && [ ! -L "$config" ] || die "config is missing or is not a regular file"
-    [ -d "$BACKUP_ROOT" ] && [ ! -L "$BACKUP_ROOT" ] || die "no config backups found"
+    secure_config_paths || die "config path and file must be safely owned and not group- or world-writable"
+    prepare_backup_root || die "backup directory is unsafe or unavailable"
     restore=$(ls -1dt "$BACKUP_ROOT"/config-* 2>/dev/null | head -n 1)
     [ -n "$restore" ] && [ -d "$restore" ] && [ ! -L "$restore" ] || die "no config backups found"
-    [ -f "$restore/config" ] && [ ! -L "$restore/config" ] || die "latest config backup is invalid"
+    secure_private_root_dir "$restore" || die "latest config backup directory is unsafe"
+    secure_root_file "$restore/config" || die "latest config backup file is unsafe"
     tmp=$(mktemp "$BASE/.config.zapret2applet.XXXXXX") || die "cannot create temporary config"
     trap 'rm -f "$tmp"' EXIT HUP INT TERM
     cp "$restore/config" "$tmp" || die "cannot stage backup"
@@ -346,8 +393,7 @@ blockcheck)
 
     n=0
     for d in $domains; do
-        case "$d" in ''|*[!A-Za-z0-9.-]*|-*|.*) die "bad domain: $d" ;; esac
-        [ ${#d} -le 253 ] || die "domain too long"
+        validate_domain_name "$d" || die "bad domain: $d"
         n=$((n + 1))
     done
     [ "$n" -ge 1 ] && [ "$n" -le 10 ] || die "1..10 domains required"
