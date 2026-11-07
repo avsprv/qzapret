@@ -6,6 +6,6 @@ GenericName[ru]=Оболочка для zapret2
 Comment=Unofficial Qt6 GUI for zapret2
 Comment[ru]=Неофициальная Qt6-оболочка для zapret2
 Exec=zapret2applet
-Icon=preferences-system-network
+Icon=zapret2applet
 Categories=Network;Settings;
 Terminal=false

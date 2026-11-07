@@ -1,6 +1,5 @@
 #include "updatepage.h"
 
-#include <QCheckBox>
 #include <QDateTime>
 #include <QDesktopServices>
 #include <QFontDatabase>
@@ -16,6 +15,7 @@
 #include <QUrl>
 #include <QVBoxLayout>
 
+#include "appsettings.h"
 #include "backend/helperpath.h"
 #include "backend/updatechecker.h"
 #include "backend/zapretbackend.h"
@@ -42,8 +42,6 @@ UpdatePage::UpdatePage(ZapretBackend *backend, QWidget *parent)
     m_checkBtn = new QPushButton(tr("Проверить обновления"));
     m_updateBtn = new QPushButton;
     m_notesBtn = new QPushButton(tr("Что нового…"));
-    m_autoCheck = new QCheckBox(tr("Проверять обновления автоматически (раз в сутки, github.com)"));
-    m_autoCheck->setChecked(QSettings().value(QStringLiteral("update/autoCheck"), true).toBool());
 
     m_log = new QPlainTextEdit;
     m_log->setReadOnly(true);
@@ -74,7 +72,6 @@ UpdatePage::UpdatePage(ZapretBackend *backend, QWidget *parent)
     layout->addWidget(group);
     layout->addWidget(m_statusLabel);
     layout->addLayout(buttons);
-    layout->addWidget(m_autoCheck);
     layout->addWidget(note);
     layout->addWidget(new QLabel(tr("Журнал обновления:")));
     layout->addWidget(m_log, 1);
@@ -89,9 +86,6 @@ UpdatePage::UpdatePage(ZapretBackend *backend, QWidget *parent)
     connect(m_notesBtn, &QPushButton::clicked, this, [this] {
         if (!m_latestTag.isEmpty())
             QDesktopServices::openUrl(QUrl(ZapretVersion::releaseUrl(m_latestTag)));
-    });
-    connect(m_autoCheck, &QCheckBox::toggled, this, [](bool on) {
-        QSettings().setValue(QStringLiteral("update/autoCheck"), on);
     });
 
     connect(m_checker, &UpdateChecker::finished, this, [this](const QString &tag) {
@@ -145,7 +139,7 @@ void UpdatePage::setServiceBusy(bool busy)
 
 void UpdatePage::maybeAutoCheck()
 {
-    if (!m_autoCheck->isChecked() || isBusy() || m_checker->isRunning())
+    if (!AppSettings::autoCheckUpdates() || isBusy() || m_checker->isRunning())
         return;
     const qint64 last = QSettings().value(QStringLiteral("update/lastCheck"), 0).toLongLong();
     if (QDateTime::currentSecsSinceEpoch() - last < kAutoCheckIntervalSecs)

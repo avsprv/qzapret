@@ -1,6 +1,8 @@
 #include <QApplication>
 #include <QCommandLineParser>
+#include <QLocale>
 
+#include "appsettings.h"
 #include "i18n.h"
 #include "mainwindow.h"
 
@@ -12,7 +14,14 @@ int main(int argc, char *argv[])
     QApplication::setDesktopFileName(QStringLiteral("zapret2applet"));
     // Окно прячется в трей, поэтому закрытие последнего окна не должно завершать приложение.
     QApplication::setQuitOnLastWindowClosed(false);
-    I18n::install(app);
+    QLocale locale;
+    switch (AppSettings::language()) {
+    case AppSettings::Language::Russian: locale = QLocale(QLocale::Russian); break;
+    case AppSettings::Language::English: locale = QLocale(QLocale::English); break;
+    case AppSettings::Language::System: locale = QLocale(); break;
+    }
+    I18n::install(app, locale);
+    AppSettings::applyTheme(app);
 
     QCommandLineParser parser;
     parser.setApplicationDescription(

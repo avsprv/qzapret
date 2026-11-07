@@ -37,7 +37,7 @@ bool Autostart::setEnabled(bool enabled)
                            "Name=zapret2applet\n"
                            "Comment=Unofficial Qt6 GUI for zapret2\n"
                            "Exec=\"%1\" --minimized\n"
-                           "Icon=preferences-system-network\n"
+                           "Icon=zapret2applet\n"
                            "Terminal=false\n"
                            "X-GNOME-Autostart-enabled=true\n")
                 .arg(exe)
