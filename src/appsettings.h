@@ -2,6 +2,8 @@
 
 #include <QString>
 
+class QApplication;
+
 namespace AppSettings {
 
 // Стабильные значения хранятся в QSettings. Не менять organization/application name
@@ -20,6 +22,7 @@ enum class Language {
 
 Theme theme();
 void setTheme(Theme value);
+void applyTheme(QApplication &app);
 
 Language language();
 void setLanguage(Language value);
