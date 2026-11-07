@@ -18,6 +18,7 @@ class QTimer;
 class BlockcheckPage : public QWidget
 {
     Q_OBJECT
+    enum class LifecyclePhase { Idle, Checking, WaitingForStop, Scanning, WaitingForStart };
 public:
     explicit BlockcheckPage(ZapretBackend *backend, QWidget *parent = nullptr);
     bool isRunning() const { return m_phase != LifecyclePhase::Idle || m_runner->isRunning(); }
@@ -41,7 +42,6 @@ private:
 
     ZapretBackend *m_backend;
     BlockcheckRunner *m_runner;
-    enum class LifecyclePhase { Idle, Checking, WaitingForStop, Scanning, WaitingForStart };
     ZapretBackend::State m_state = ZapretBackend::State::Unknown;
     LifecyclePhase m_phase = LifecyclePhase::Idle;
     bool m_resumeService = false;
