@@ -17,7 +17,6 @@
 
 #include "appsettings.h"
 #include "aboutpage.h"
-#include "autostart.h"
 #include "backend/systemdbackend.h"
 #include "blockcheckpage.h"
 #include "configpage.h"
