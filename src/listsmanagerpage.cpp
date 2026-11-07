@@ -23,17 +23,17 @@ ListsManagerPage::ListsManagerPage(QWidget *parent) : QWidget(parent)
                             QStringLiteral("zapret-hosts-user-exclude.txt"));
     m_listSelector->addItem(tr("Хостлист IP-ban — zapret-hosts-user-ipban.txt"),
                             QStringLiteral("zapret-hosts-user-ipban.txt"));
-    m_listSelector->addItem(tr("Включающий IPv4 — zapret-ip-user.txt"),
+    m_listSelector->addItem(tr("Результирующий IPv4 — zapret-ip-user.txt"),
                             QStringLiteral("zapret-ip-user.txt"));
-    m_listSelector->addItem(tr("Включающий IPv6 — zapret-ip-user6.txt"),
+    m_listSelector->addItem(tr("Результирующий IPv6 — zapret-ip-user6.txt"),
                             QStringLiteral("zapret-ip-user6.txt"));
-    m_listSelector->addItem(tr("Исключающий IPv4 — zapret-ip-exclude.txt"),
+    m_listSelector->addItem(tr("Результирующий IPv4 exclude — zapret-ip-exclude.txt"),
                             QStringLiteral("zapret-ip-exclude.txt"));
-    m_listSelector->addItem(tr("Исключающий IPv6 — zapret-ip-exclude6.txt"),
+    m_listSelector->addItem(tr("Результирующий IPv6 exclude — zapret-ip-exclude6.txt"),
                             QStringLiteral("zapret-ip-exclude6.txt"));
-    m_listSelector->addItem(tr("IP-ban IPv4 — zapret-ip-user-ipban.txt"),
+    m_listSelector->addItem(tr("Результирующий IP-ban IPv4 — zapret-ip-user-ipban.txt"),
                             QStringLiteral("zapret-ip-user-ipban.txt"));
-    m_listSelector->addItem(tr("IP-ban IPv6 — zapret-ip-user-ipban6.txt"),
+    m_listSelector->addItem(tr("Результирующий IP-ban IPv6 — zapret-ip-user-ipban6.txt"),
                             QStringLiteral("zapret-ip-user-ipban6.txt"));
 
     m_readButton = new QPushButton(tr("Прочитать"), this);
