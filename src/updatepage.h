@@ -33,6 +33,7 @@ private:
     void refreshInstalled();
     void refreshUi();
     void confirmAndUpdate();
+    void confirmAndInstall();
     void onUpdateFinished(int code);
 
     ZapretBackend *m_backend;
@@ -53,4 +54,5 @@ private:
     QString m_latestTag; // "v1.0.7" или пусто
     bool m_automaticCheck = false;
     bool m_serviceBusy = false;
+    bool m_installing = false;
 };
