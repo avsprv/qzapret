@@ -211,7 +211,8 @@ void BlockcheckPage::beginScan()
 {
     setBusy(true);
     m_log->appendPlainText(tr("Запускаю blockcheck2…"));
-    m_runner->start(collectOptions());
+    m_lastOptions = collectOptions();
+    m_runner->start(m_lastOptions);
 }
 
 void BlockcheckPage::saveLog()
@@ -248,6 +249,25 @@ void BlockcheckPage::onFinished(int exitCode, bool canceled)
         m_log->appendPlainText(tr("Подбор отменён."));
     else if (exitCode != 0)
         m_log->appendPlainText(tr("blockcheck2 завершился с кодом %1.").arg(exitCode));
+    QStringList protocols;
+    if (m_lastOptions.http) protocols << QStringLiteral("HTTP");
+    if (m_lastOptions.tls12) protocols << QStringLiteral("HTTPS TLS 1.2");
+    if (m_lastOptions.tls13) protocols << QStringLiteral("HTTPS TLS 1.3");
+    if (m_lastOptions.http3) protocols << QStringLiteral("HTTP/3 (QUIC)");
+    const int errors = m_runner->errorCount();
+    const QString status = canceled ? tr("Отменено")
+        : exitCode != 0 ? tr("Ошибка выполнения")
+        : m_found == 0 ? tr("Завершено: рабочие стратегии не найдены")
+                       : tr("Завершено успешно");
+    m_log->appendPlainText(QString());
+    m_log->appendPlainText(tr("Сводка диагностики:"));
+    m_log->appendPlainText(tr("Домены (%1): %2").arg(m_lastOptions.domains.size())
+                               .arg(m_lastOptions.domains.join(QStringLiteral(", "))));
+    m_log->appendPlainText(tr("Протоколы: %1").arg(protocols.join(QStringLiteral(", "))));
+    m_log->appendPlainText(tr("Уникальных стратегий: %1").arg(m_found));
+    m_log->appendPlainText(tr("Ошибок выполнения: %1").arg(errors));
+    m_log->appendPlainText(tr("Код завершения: %1").arg(exitCode));
+    m_log->appendPlainText(tr("Статус: %1").arg(status));
     if (m_resumeService) {
         m_resumeService = false;
         m_log->appendPlainText(tr("Запускаю zapret2 обратно…"));
