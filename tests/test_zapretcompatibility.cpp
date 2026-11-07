@@ -83,6 +83,24 @@ private slots:
             QStringLiteral("blockcheck2.sh: scan level force")));
     }
 
+    void validatesPinnedUpstreamScriptContract()
+    {
+        QFile script(QStringLiteral(QZAPRET_UPSTREAM_SOURCE_DIR "/blockcheck2.sh"));
+        QVERIFY(script.open(QIODevice::ReadOnly | QIODevice::Text));
+        const QString text = QString::fromUtf8(script.readAll());
+        for (const QString &marker : {
+                 QStringLiteral("ENABLE_HTTP"),
+                 QStringLiteral("ENABLE_HTTPS_TLS12"),
+                 QStringLiteral("ENABLE_HTTPS_TLS13"),
+                 QStringLiteral("ENABLE_HTTP3"),
+                 QStringLiteral("REPEATS"),
+                 QStringLiteral("SCANLEVEL"),
+                 QStringLiteral("working strategy found for ipv")}) {
+            QVERIFY2(text.contains(marker), qPrintable(marker));
+        }
+        QVERIFY(text.contains(QStringLiteral("ask_list SCANLEVEL \"veryquick quick standard force\"")));
+    }
+
     void parsesUpstreamOutputFixture()
     {
         QFile fixture(QStringLiteral(QZAPRET_SOURCE_DIR "/tests/fixtures/blockcheck2-1.0.7.log"));
