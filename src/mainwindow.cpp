@@ -2,9 +2,14 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QGuiApplication>
+#include <QPainter>
+#include <QPixmap>
+#include <QStyleHints>
 #include <QCheckBox>
 #include <QCloseEvent>
 #include <QLabel>
+#include <QIcon>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -27,12 +32,49 @@
 #include "settingsdialog.h"
 #include "updatepage.h"
 
+
+namespace {
+QIcon makeTrayIcon(ZapretBackend::State state)
+{
+    const auto scheme = QGuiApplication::styleHints()->colorScheme();
+    const bool dark = scheme == Qt::ColorScheme::Dark
+        || (scheme == Qt::ColorScheme::Unknown
+            && QGuiApplication::palette().color(QPalette::Window).lightness() < 128);
+    const QColor foreground = dark ? QColor(239, 240, 241) : QColor(35, 38, 41);
+    const QColor accent = state == ZapretBackend::State::Inactive ? QColor(246, 190, 48)
+        : state == ZapretBackend::State::Failed ? QColor(218, 68, 83) : foreground;
+
+    QPixmap pixmap(32, 32);
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing);
+    QPen pen(foreground, 2.2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+    painter.setPen(pen);
+    painter.setBrush(Qt::NoBrush);
+    painter.drawRoundedRect(QRectF(3.5, 5.0, 13.0, 9.0), 2.0, 2.0);
+    painter.drawRoundedRect(QRectF(15.5, 11.5, 13.0, 9.0), 2.0, 2.0);
+    painter.drawRoundedRect(QRectF(3.5, 21.0, 13.0, 8.0), 2.0, 2.0);
+    painter.drawLine(QPointF(16.5, 9.5), QPointF(20.0, 9.5));
+    painter.drawLine(QPointF(20.0, 9.5), QPointF(22.0, 11.5));
+    painter.drawLine(QPointF(16.5, 24.5), QPointF(20.0, 24.5));
+    painter.drawLine(QPointF(20.0, 24.5), QPointF(22.0, 22.5));
+    if (state == ZapretBackend::State::Inactive || state == ZapretBackend::State::Failed) {
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(accent);
+        painter.drawEllipse(QRectF(22.0, 21.0, 8.0, 8.0));
+    }
+    painter.end();
+    return QIcon(pixmap);
+}
+} // namespace
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , m_backend(new SystemdBackend(this))
     , m_poll(new QTimer(this))
 {
     setWindowTitle(QStringLiteral("zapret2applet"));
+    setWindowIcon(QIcon::fromTheme(QStringLiteral("zapret2applet")));
     resize(760, 640);
 
     auto *appMenu = menuBar()->addMenu(tr("Приложение"));
@@ -136,8 +178,9 @@ void MainWindow::buildTray()
         return;
 
     m_tray = new QSystemTrayIcon(this);
-    m_tray->setIcon(QIcon::fromTheme(QStringLiteral("security-low"),
-                                     style()->standardIcon(QStyle::SP_ComputerIcon)));
+    updateTrayIcon(ZapretBackend::State::Unknown);
+    connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged,
+            this, [this](Qt::ColorScheme) { updateTrayIcon(m_trayState); });
     m_tray->setToolTip(QStringLiteral("zapret2applet"));
 
     auto *menu = new QMenu(this);
@@ -171,13 +214,10 @@ void MainWindow::buildTray()
 
 void MainWindow::onStateChanged(ZapretBackend::State state)
 {
+    m_trayState = state;
     QString text;
-    QString iconName = QStringLiteral("security-low");
     switch (state) {
-    case ZapretBackend::State::Active:
-        text = tr("работает");
-        iconName = QStringLiteral("security-high");
-        break;
+    case ZapretBackend::State::Active:   text = tr("работает"); break;
     case ZapretBackend::State::Inactive: text = tr("остановлен"); break;
     case ZapretBackend::State::Failed:   text = tr("ошибка юнита"); break;
     default:                             text = tr("неизвестно (zapret2 не установлен?)"); break;
@@ -189,11 +229,18 @@ void MainWindow::onStateChanged(ZapretBackend::State state)
     m_stopBtn->setEnabled(active && !locked);
 
     if (m_tray) {
-        m_tray->setIcon(QIcon::fromTheme(iconName, style()->standardIcon(QStyle::SP_ComputerIcon)));
+        updateTrayIcon(state);
         m_tray->setToolTip(tr("zapret2applet: %1").arg(text));
         m_trayStart->setEnabled(!active && !locked);
         m_trayStop->setEnabled(active && !locked);
     }
+}
+
+
+void MainWindow::updateTrayIcon(ZapretBackend::State state)
+{
+    if (m_tray)
+        m_tray->setIcon(makeTrayIcon(state));
 }
 
 void MainWindow::openSettings()
