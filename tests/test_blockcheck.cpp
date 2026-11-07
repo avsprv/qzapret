@@ -122,6 +122,37 @@ private slots:
         QCOMPARE(runner.errorCount(), 0);
     }
 
+    void runnerBoundsOversizedLines()
+    {
+        QTemporaryDir dir;
+        QVERIFY(dir.isValid());
+        const QString script = dir.filePath(QStringLiteral("fake-helper"));
+        QFile f(script);
+        QVERIFY(f.open(QIODevice::WriteOnly));
+        f.write("#!/bin/sh\\n"
+                "head -c 131072 /dev/zero | tr '\\000' 'x'\\n"
+                "printf '\\n'\\n"
+                "echo '!!!!! curl_test_http: working strategy found for ipv4 a.org : nfqws2 --valid !!!!!'\\n"
+                "exit 0\\n");
+        f.close();
+        f.setPermissions(f.permissions() | QFileDevice::ExeUser);
+
+        qputenv("QZAPRET_HELPER", script.toUtf8());
+        qputenv("QZAPRET_NO_PKEXEC", "1");
+
+        BlockcheckRunner runner;
+        QSignalSpy found(&runner, &BlockcheckRunner::strategyFound);
+        QSignalSpy lines(&runner, &BlockcheckRunner::logLine);
+        QSignalSpy done(&runner, &BlockcheckRunner::finished);
+        runner.start({});
+        QVERIFY(done.wait(5000));
+
+        QVERIFY(!lines.isEmpty());
+        QVERIFY(lines.at(0).at(0).toString().size() < 66 * 1024);
+        QCOMPARE(found.count(), 1);
+        QCOMPARE(found.at(0).at(0).value<BlockcheckRunner::Result>().args, QStringLiteral("--valid"));
+    }
+
     void runnerFailedToStart()
     {
         qputenv("QZAPRET_HELPER", "/nonexistent/helper");
