@@ -135,7 +135,7 @@ qt_add_qml_module(zapret2applet-qml-preview
 )
 target_include_directories(zapret2applet-qml-preview PRIVATE src src/qml)
 target_link_libraries(zapret2applet-qml-preview PRIVATE
-    Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick Qt6::QuickControls2
+    Qt6::Core Qt6::Gui Qt6::Network Qt6::Qml Qt6::Quick Qt6::QuickControls2
     zapret2applet_i18n
 )
 target_compile_definitions(zapret2applet-qml-preview PRIVATE
