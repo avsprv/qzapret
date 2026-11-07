@@ -63,6 +63,19 @@ bool ApplicationController::bootEnabled() const
     return m_bootEnabled;
 }
 
+bool ApplicationController::operationsBusy() const
+{
+    return m_operationsBusy;
+}
+
+void ApplicationController::setOperationsBusy(bool busy)
+{
+    if (m_operationsBusy == busy)
+        return;
+    m_operationsBusy = busy;
+    emit operationsBusyChanged();
+}
+
 QString ApplicationController::errorMessage() const
 {
     return m_errorMessage;
