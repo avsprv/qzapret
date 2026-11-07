@@ -6,6 +6,7 @@ set -eu
 
 UNIT=zapret2.service
 BASE=/opt/zapret2
+BACKUP_ROOT=/var/backups/zapret2applet
 RUNDIR=/run/zapret2applet
 URLBASE=https://github.com/bol-van/zapret2/releases/download
 PROTO='=https'
@@ -17,6 +18,7 @@ case "$0" in
     /usr/*|/opt/*|/etc/*|/bin/*|/sbin/*|/lib/*|/var/*) ;;
     *)
         if [ -n "${QZAPRET_TEST_BASE:-}" ]; then BASE=$QZAPRET_TEST_BASE; fi
+        if [ -n "${QZAPRET_TEST_BACKUP_DIR:-}" ]; then BACKUP_ROOT=$QZAPRET_TEST_BACKUP_DIR; fi
         if [ -n "${QZAPRET_TEST_RUNDIR:-}" ]; then RUNDIR=$QZAPRET_TEST_RUNDIR; fi
         if [ -n "${QZAPRET_TEST_URLBASE:-}" ]; then URLBASE=$QZAPRET_TEST_URLBASE; PROTO='=https,file'; fi
         if [ -n "${QZAPRET_TEST_NO_SERVICE:-}" ]; then NOSVC=1; fi
@@ -39,6 +41,66 @@ bc_pid() {
 need_arg() { [ "$1" -ge 2 ] || die "missing value for $2"; }
 
 case "${1:-}" in
+config-read)
+    [ "$#" -eq 1 ] || die "usage: config-read"
+    [ -d "$BASE" ] && [ ! -L "$BASE" ] || die "zapret2 not found in $BASE"
+    config="$BASE/config"
+    [ -f "$config" ] && [ ! -L "$config" ] || die "config is missing or is not a regular file"
+    size=$(wc -c < "$config" | tr -d '[:space:]')
+    case "$size" in ''|*[!0-9]*) die "cannot determine config size" ;; esac
+    [ "$size" -le 1048576 ] || die "config exceeds the 1 MiB read limit"
+    cat "$config"
+    ;;
+config-write)
+    [ "$#" -eq 1 ] || die "usage: config-write"
+    [ -d "$BASE" ] && [ ! -L "$BASE" ] || die "zapret2 not found in $BASE"
+    config="$BASE/config"
+    [ -f "$config" ] && [ ! -L "$config" ] || die "config is missing or is not a regular file"
+    tmp=$(mktemp "$BASE/.config.zapret2applet.XXXXXX") || die "cannot create temporary config"
+    trap 'rm -f "$tmp"' EXIT HUP INT TERM
+    head -c 1048577 > "$tmp"
+    size=$(wc -c < "$tmp" | tr -d '[:space:]')
+    case "$size" in ''|*[!0-9]*) die "cannot determine staged config size" ;; esac
+    [ "$size" -le 1048576 ] || die "config exceeds the 1 MiB write limit"
+    sh -n "$tmp" || die "shell syntax validation failed; config was not changed"
+    chmod --reference="$config" "$tmp" || die "cannot preserve config permissions"
+    chown --reference="$config" "$tmp" || die "cannot preserve config ownership"
+    [ -d "$BACKUP_ROOT" ] && [ ! -L "$BACKUP_ROOT" ] || {
+        [ ! -e "$BACKUP_ROOT" ] && mkdir -p "$BACKUP_ROOT" && chmod 700 "$BACKUP_ROOT"
+    } || die "backup directory is unsafe or unavailable"
+    backup=$(mktemp -d "$BACKUP_ROOT/config-$(date +%Y%m%d-%H%M%S)-XXXXXX") || die "cannot create backup directory"
+    cp -p "$config" "$backup/config" || { rm -rf "$backup"; die "cannot create config backup; config was not changed"; }
+    chmod 600 "$backup/config" || { rm -rf "$backup"; die "cannot secure config backup; config was not changed"; }
+    sync -f "$tmp" || { rm -rf "$backup"; die "cannot sync staged config; config was not changed"; }
+    mv -f -- "$tmp" "$config" || { rm -rf "$backup"; die "atomic config replacement failed"; }
+    sync -f "$BASE" || true
+    trap - EXIT HUP INT TERM
+    echo "OK: config updated; backup: $backup"
+    ;;
+config-rollback)
+    [ "$#" -eq 1 ] || die "usage: config-rollback"
+    [ -d "$BASE" ] && [ ! -L "$BASE" ] || die "zapret2 not found in $BASE"
+    config="$BASE/config"
+    [ -f "$config" ] && [ ! -L "$config" ] || die "config is missing or is not a regular file"
+    [ -d "$BACKUP_ROOT" ] && [ ! -L "$BACKUP_ROOT" ] || die "no config backups found"
+    restore=$(ls -1dt "$BACKUP_ROOT"/config-* 2>/dev/null | head -n 1)
+    [ -n "$restore" ] && [ -d "$restore" ] && [ ! -L "$restore" ] || die "no config backups found"
+    [ -f "$restore/config" ] && [ ! -L "$restore/config" ] || die "latest config backup is invalid"
+    tmp=$(mktemp "$BASE/.config.zapret2applet.XXXXXX") || die "cannot create temporary config"
+    trap 'rm -f "$tmp"' EXIT HUP INT TERM
+    cp "$restore/config" "$tmp" || die "cannot stage backup"
+    sh -n "$tmp" || die "backup failed shell syntax validation"
+    chmod --reference="$config" "$tmp" || die "cannot preserve config permissions"
+    chown --reference="$config" "$tmp" || die "cannot preserve config ownership"
+    backup=$(mktemp -d "$BACKUP_ROOT/config-$(date +%Y%m%d-%H%M%S)-XXXXXX") || die "cannot preserve current config before rollback"
+    cp -p "$config" "$backup/config" || { rm -rf "$backup"; die "cannot preserve current config; rollback canceled"; }
+    chmod 600 "$backup/config" || { rm -rf "$backup"; die "cannot secure rollback backup"; }
+    sync -f "$tmp" || { rm -rf "$backup"; die "cannot sync rollback config"; }
+    mv -f -- "$tmp" "$config" || { rm -rf "$backup"; die "atomic rollback failed"; }
+    sync -f "$BASE" || true
+    trap - EXIT HUP INT TERM
+    echo "OK: config restored from $restore; previous config backed up to $backup"
+    ;;
 unit)
     case "${2:-}" in
         start|stop|enable|disable) exec systemctl "$2" "$UNIT" ;;

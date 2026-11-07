@@ -19,6 +19,40 @@
     <annotate key="org.freedesktop.policykit.exec.path">@QZAPRET_HELPER@</annotate>
   </action>
 
+  <action id="org.zapret2applet.config-read">
+    <description>Read the zapret2 configuration</description>
+    <description xml:lang="ru">Чтение конфигурации zapret2</description>
+    <message>Authentication is required to read the zapret2 configuration</message>
+    <message xml:lang="ru">Для чтения конфигурации zapret2 требуется аутентификация</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">@QZAPRET_HELPER@</annotate>
+    <annotate key="org.freedesktop.policykit.exec.argv1">config-read</annotate>
+  </action>
+
+
+  <action id="org.zapret2applet.config-write">
+    <description>Write the zapret2 configuration</description>
+    <description xml:lang="ru">Изменение конфигурации zapret2</description>
+    <message>Authentication is required to change the zapret2 configuration</message>
+    <message xml:lang="ru">Для изменения конфигурации zapret2 требуется аутентификация</message>
+    <defaults><allow_any>no</allow_any><allow_inactive>no</allow_inactive><allow_active>auth_admin</allow_active></defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">@QZAPRET_HELPER@</annotate>
+    <annotate key="org.freedesktop.policykit.exec.argv1">config-write</annotate>
+  </action>
+  <action id="org.zapret2applet.config-rollback">
+    <description>Restore the previous zapret2 configuration</description>
+    <description xml:lang="ru">Откат конфигурации zapret2</description>
+    <message>Authentication is required to restore the previous zapret2 configuration</message>
+    <message xml:lang="ru">Для отката конфигурации zapret2 требуется аутентификация</message>
+    <defaults><allow_any>no</allow_any><allow_inactive>no</allow_inactive><allow_active>auth_admin</allow_active></defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">@QZAPRET_HELPER@</annotate>
+    <annotate key="org.freedesktop.policykit.exec.argv1">config-rollback</annotate>
+  </action>
+
   <!-- Обновление zapret2 скачивает из сети и заменяет код, исполняемый от root, поэтому
        запрашивает пароль каждый раз (без auth_admin_keep). Действие выбирается по argv[1]. -->
   <action id="org.zapret2applet.update">

@@ -24,6 +24,12 @@ set(QZAPRET_SOURCES
     src/autostart.h
     src/blockcheckpage.cpp
     src/blockcheckpage.h
+    src/configpage.cpp
+    src/configpage.h
+    src/profileanalyzer.cpp
+    src/profileanalyzer.h
+    src/profilepage.cpp
+    src/profilepage.h
     src/mainwindow.cpp
     src/mainwindow.h
     src/updatepage.cpp
@@ -43,8 +49,6 @@ set(QZAPRET_SOURCES
     src/backend/zapretbackend.h
 )
 
-# Локализация. Исходные строки в коде русские; переводы — i18n/*.ts, вшиваются в ресурсы.
-# Обновить .ts после правки строк: cmake --build build --target update_translations
 qt_add_library(zapret2applet_i18n STATIC src/i18n.cpp src/i18n.h)
 target_include_directories(zapret2applet_i18n PUBLIC src)
 target_link_libraries(zapret2applet_i18n PUBLIC Qt6::Core)
@@ -116,4 +120,14 @@ if(BUILD_TESTING)
     add_test(NAME helper_validation
              COMMAND sh ${CMAKE_SOURCE_DIR}/tests/test_helper.sh
                      ${CMAKE_SOURCE_DIR}/packaging/helper/zapret2applet-helper)
+
+    add_test(NAME config_helper
+             COMMAND sh ${CMAKE_SOURCE_DIR}/tests/test_config_helper.sh
+                     ${CMAKE_SOURCE_DIR}/packaging/helper/zapret2applet-helper)
+
+    qt_add_executable(test_profileanalyzer tests/test_profileanalyzer.cpp
+        src/profileanalyzer.cpp src/profileanalyzer.h)
+    target_include_directories(test_profileanalyzer PRIVATE src)
+    target_link_libraries(test_profileanalyzer PRIVATE Qt6::Test Qt6::Core)
+    add_test(NAME profile_analyzer COMMAND test_profileanalyzer)
 endif()
