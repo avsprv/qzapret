@@ -53,7 +53,16 @@ QString BlockcheckController::status() const { return m_status; }
 bool BlockcheckController::busy() const { return m_busy; }
 bool BlockcheckController::updateBusy() const { return m_updateBusy; }
 void BlockcheckController::setUpdateBusy(bool v) { if (m_updateBusy != v) { m_updateBusy=v; emit updateBusyChanged(); } }
-void BlockcheckController::appendLog(const QString &line) { m_logText += (m_logText.isEmpty() ? QString() : QStringLiteral("\n")) + line; emit logTextChanged(); }
+void BlockcheckController::appendLog(const QString &line) {
+    constexpr qsizetype maxLogChars = 1024 * 1024;
+    QString boundedLine = line;
+    if (boundedLine.size() > 64 * 1024)
+        boundedLine = boundedLine.left(64 * 1024) + QStringLiteral("… [строка журнала сокращена]");
+    m_logText += (m_logText.isEmpty() ? QString() : QStringLiteral("\\n")) + boundedLine;
+    if (m_logText.size() > maxLogChars)
+        m_logText.remove(0, m_logText.size() - maxLogChars);
+    emit logTextChanged();
+}
 void BlockcheckController::setStatus(const QString &v) { if (m_status != v) { m_status=v; emit statusChanged(); } }
 void BlockcheckController::setBusy(bool v) { if (m_busy != v) { m_busy=v; emit busyChanged(); } }
 BlockcheckRunner::Options BlockcheckController::collectOptions() const {
