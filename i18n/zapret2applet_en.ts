@@ -658,6 +658,8 @@ The service will not be started or enabled at boot. Network traffic will not be 
 </context>
 <context>
     <name>ConfigPage</name>
+    <message><source>Содержимое файла конфигурации</source><translation>Configuration file contents</translation></message>
+    <message><source>Редактор shell-конфигурации zapret2. Проверка не исполняет файл.</source><translation>zapret2 shell configuration editor. Validation does not execute the file.</translation></message>
     <message><source>Прочитать config</source><translation>Read config</translation></message>
     <message><source>Экспортировать копию…</source><translation>Export a copy…</translation></message>
     <message><source>Конфигурация ещё не загружена.</source><translation>Configuration has not been loaded yet.</translation></message>
@@ -1222,6 +1224,7 @@ If the service is running, it will be stopped for the duration of the update and
   </context>
   <context>
     <name>SettingsPage</name>
+    <message><source>Тема пока следует системным настройкам. Выбор светлой и тёмной темы будет добавлен позже.</source><translation>The application currently follows the system theme. Light and dark theme selection will be added later.</translation></message>
     <message><source>Настройки</source><translation>Settings</translation></message>
     <message><source>Внешний вид</source><translation>Appearance</translation></message>
     <message><source>Тема оформления</source><translation>Color theme</translation></message>
@@ -1240,6 +1243,8 @@ If the service is running, it will be stopped for the duration of the update and
   </context>
   <context>
     <name>ProfilesPage</name>
+    <message><source>Аргументы профиля</source><translation>Profile arguments</translation></message>
+    <message><source>Один аргумент на строку.</source><translation>One argument per line.</translation></message>
     <message><source>Профили</source><translation>Profiles</translation></message>
     <message><source>Профили извлекаются статически из NFQWS2_OPT. Shell-код и Lua не исполняются. Запись выполняется через helper с проверкой SHA-256, shell-синтаксиса и резервным копированием. Служба автоматически не перезапускается.</source><translation>Profiles are parsed statically from NFQWS2_OPT. Shell code and Lua are never executed. Changes are written through the helper with SHA-256 and shell syntax validation and a backup. The service is not restarted automatically.</translation></message>
     <message><source>Отменить изменения</source><translation>Discard changes</translation></message>
