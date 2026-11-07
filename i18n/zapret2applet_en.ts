@@ -522,151 +522,7 @@
         <translation>Could not determine the latest version from the GitHub response.</translation>
     </message>
 </context>
-<context>
-    <name>UpdatePage</name>
-    <message>
-        <location filename="../src/updatepage.cpp" line="42"/>
-        <source>Проверить обновления</source>
-        <translation>Check for updates</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="44"/>
-        <source>Что нового…</source>
-        <translation>What&apos;s new…</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="45"/>
-        <source>Проверять обновления автоматически (раз в сутки, github.com)</source>
-        <translation>Check for updates automatically (once a day, github.com)</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="53"/>
-        <source>Файлы скачиваются с github.com/bol-van/zapret2. Проверяются sha256-суммы бинарников из sha256sum.txt релиза; подписи у апстрима нет, поэтому это защита от повреждения файлов, а не от компрометации репозитория. Конфигурация и ваши списки сохраняются, копия прежней версии остаётся в «zapret2.bak».</source>
-        <translation>Files are downloaded from github.com/bol-van/zapret2. The sha256 sums of the binaries from the release&apos;s sha256sum.txt are verified; upstream does not sign releases, so this protects against corrupted files, not against a compromised repository. Your configuration and lists are kept, and a copy of the previous version stays in &quot;zapret2.bak&quot;.</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="61"/>
-        <source>Установлена:</source>
-        <translation>Installed:</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="63"/>
-        <source>Последняя версия:</source>
-        <translation>Latest version:</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="79"/>
-        <source>Журнал обновления:</source>
-        <translation>Update log:</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="110"/>
-        <source>Не удалось проверить обновления: %1</source>
-        <translation>Could not check for updates: %1</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="115"/>
-        <source>Ошибка</source>
-        <translation>Error</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="149"/>
-        <source>Проверяю обновления…</source>
-        <translation>Checking for updates…</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="161"/>
-        <source>не найдена в %1</source>
-        <translation>not found in %1</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="170"/>
-        <source>zapret2 не установлен: zapret2applet обновляет только существующую установку.</source>
-        <translation>zapret2 is not installed: zapret2applet only updates an existing installation.</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="172"/>
-        <source>Версия на GitHub ещё не проверялась.</source>
-        <translation>The version on GitHub has not been checked yet.</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="174"/>
-        <source>Доступна новая версия: %1.</source>
-        <translation>A new version is available: %1.</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="176"/>
-        <source>Установлена актуальная версия.</source>
-        <translation>The latest version is installed.</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="178"/>
-        <source>Обновить до %1</source>
-        <translation>Update to %1</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="178"/>
-        <source>Обновить</source>
-        <translation>Update</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="189"/>
-        <source>Обновление zapret2</source>
-        <translation>Update zapret2</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="190"/>
-        <source>Обновить zapret2 с v%1 до %2?
 
-Если сервис запущен, он будет остановлен на время обновления и запущен снова. Потребуется пароль администратора.</source>
-        <translation>Update zapret2 from v%1 to %2?
-
-If the service is running, it will be stopped for the duration of the update and started again. The administrator password is required.</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="198"/>
-        <source>Обновляю до %1…</source>
-        <translation>Updating to %1…</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="211"/>
-        <source>zapret2 обновлён до %1.</source>
-        <translation>zapret2 has been updated to %1.</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="213"/>
-        <source>Обновление отменено: диалог авторизации закрыт.</source>
-        <translation>Update canceled: the authorization dialog was dismissed.</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="215"/>
-        <source>Обновление не выполнено (код %1). Подробности — в журнале ниже.</source>
-        <translation>Update failed (code %1). See the log below for details.</translation>
-    </message>
-    <message>
-        <source>Дождитесь завершения подбора стратегий перед обновлением.</source>
-        <translation>Wait for the strategy scan to finish before updating.</translation>
-    </message>
-
-    <message><source>zapret2 не установлен. Проверьте наличие релиза для установки.</source><translation>zapret2 is not installed. Check for an available release to install.</translation></message>
-    <message><source>zapret2 не установлен. Доступна чистая установка %1.</source><translation>zapret2 is not installed. A clean installation of %1 is available.</translation></message>
-    <message><source>Установить %1</source><translation>Install %1</translation></message>
-    <message><source>Чистая установка zapret2</source><translation>Clean installation of zapret2</translation></message>
-    <message><source>Установить zapret2 %1 в /opt/zapret2?
-
-Будет проверена структура архива и SHA-256 бинарных компонентов, создана конфигурация по умолчанию с NFQWS2_ENABLE=0 и установлен systemd unit.
-
-Служба не будет запущена или добавлена в автозагрузку. Сетевой трафик не будет перенаправляться. Потребуется пароль администратора.</source><translation>Install zapret2 %1 to /opt/zapret2?
-
-The archive structure and binary-component SHA-256 checksums will be verified, a default configuration with NFQWS2_ENABLE=0 will be created, and the systemd unit will be installed.
-
-The service will not be started or enabled at boot. Network traffic will not be redirected. Administrator authentication is required.</translation></message>
-    <message><source>Дождитесь завершения подбора стратегий перед установкой.</source><translation>Wait for the strategy scan to finish before installing.</translation></message>
-    <message><source>Устанавливаю zapret2 %1…</source><translation>Installing zapret2 %1…</translation></message>
-    <message><source>zapret2 установлен: %1.</source><translation>zapret2 has been installed: %1.</translation></message>
-    <message><source>Установка отменена: диалог авторизации закрыт.</source><translation>Installation canceled: the authorization dialog was dismissed.</translation></message>
-    <message><source>Установка не выполнена (код %1). Подробности — в журнале ниже.</source><translation>Installation failed (code %1). See the log below for details.</translation></message>
-</context>
 <context>
     <name>ZapretUpdater</name>
     <message>
@@ -947,128 +803,7 @@ The service will not be started or enabled at boot. Network traffic will not be 
         <translation>Could not determine the latest version from the GitHub response.</translation>
     </message>
 </context>
-<context>
-    <name>UpdatePage</name>
-    <message>
-        <location filename="../src/updatepage.cpp" line="42"/>
-        <source>Проверить обновления</source>
-        <translation>Check for updates</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="44"/>
-        <source>Что нового…</source>
-        <translation>What&apos;s new…</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="45"/>
-        <source>Проверять обновления автоматически (раз в сутки, github.com)</source>
-        <translation>Check for updates automatically (once a day, github.com)</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="53"/>
-        <source>Файлы скачиваются с github.com/bol-van/zapret2. Проверяются sha256-суммы бинарников из sha256sum.txt релиза; подписи у апстрима нет, поэтому это защита от повреждения файлов, а не от компрометации репозитория. Конфигурация и ваши списки сохраняются, копия прежней версии остаётся в «zapret2.bak».</source>
-        <translation>Files are downloaded from github.com/bol-van/zapret2. The sha256 sums of the binaries from the release&apos;s sha256sum.txt are verified; upstream does not sign releases, so this protects against corrupted files, not against a compromised repository. Your configuration and lists are kept, and a copy of the previous version stays in &quot;zapret2.bak&quot;.</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="61"/>
-        <source>Установлена:</source>
-        <translation>Installed:</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="63"/>
-        <source>Последняя версия:</source>
-        <translation>Latest version:</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="79"/>
-        <source>Журнал обновления:</source>
-        <translation>Update log:</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="110"/>
-        <source>Не удалось проверить обновления: %1</source>
-        <translation>Could not check for updates: %1</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="115"/>
-        <source>Ошибка</source>
-        <translation>Error</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="149"/>
-        <source>Проверяю обновления…</source>
-        <translation>Checking for updates…</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="161"/>
-        <source>не найдена в %1</source>
-        <translation>not found in %1</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="170"/>
-        <source>zapret2 не установлен: zapret2applet обновляет только существующую установку.</source>
-        <translation>zapret2 is not installed: zapret2applet only updates an existing installation.</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="172"/>
-        <source>Версия на GitHub ещё не проверялась.</source>
-        <translation>The version on GitHub has not been checked yet.</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="174"/>
-        <source>Доступна новая версия: %1.</source>
-        <translation>A new version is available: %1.</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="176"/>
-        <source>Установлена актуальная версия.</source>
-        <translation>The latest version is installed.</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="178"/>
-        <source>Обновить до %1</source>
-        <translation>Update to %1</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="178"/>
-        <source>Обновить</source>
-        <translation>Update</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="189"/>
-        <source>Обновление zapret2</source>
-        <translation>Update zapret2</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="190"/>
-        <source>Обновить zapret2 с v%1 до %2?
 
-Если сервис запущен, он будет остановлен на время обновления и запущен снова. Потребуется пароль администратора.</source>
-        <translation>Update zapret2 from v%1 to %2?
-
-If the service is running, it will be stopped for the duration of the update and started again. The administrator password is required.</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="198"/>
-        <source>Обновляю до %1…</source>
-        <translation>Updating to %1…</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="211"/>
-        <source>zapret2 обновлён до %1.</source>
-        <translation>zapret2 has been updated to %1.</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="213"/>
-        <source>Обновление отменено: диалог авторизации закрыт.</source>
-        <translation>Update canceled: the authorization dialog was dismissed.</translation>
-    </message>
-    <message>
-        <location filename="../src/updatepage.cpp" line="215"/>
-        <source>Обновление не выполнено (код %1). Подробности — в журнале ниже.</source>
-        <translation>Update failed (code %1). See the log below for details.</translation>
-    </message>
-</context>
 <context>
     <name>ZapretUpdater</name>
     <message>
@@ -1238,28 +973,7 @@ If the service is running, it will be stopped for the duration of the update and
     <message><source>Язык интерфейса</source><translation>Interface language</translation></message>
     <message><source>Изменение языка будет применено после следующего запуска приложения.</source><translation>The language change will take effect the next time the application starts.</translation></message>
   </context>
-  <context>
-    <name>Main</name>
-    <message><source>zapret2applet</source><translation>zapret2applet</translation></message>
-    <message><source>Статус</source><translation>Status</translation></message>
-    <message><source>Конфигурация</source><translation>Configuration</translation></message>
-    <message><source>Профили</source><translation>Profiles</translation></message>
-    <message><source>Списки</source><translation>Lists</translation></message>
-    <message><source>Мониторинг</source><translation>Monitoring</translation></message>
-    <message><source>Подбор стратегий</source><translation>Strategy scan</translation></message>
-    <message><source>Обновления</source><translation>Updates</translation></message>
-    <message><source>Настройки</source><translation>Settings</translation></message>
-    <message><source>О программе</source><translation>About</translation></message>
-    <message><source>Обновить</source><translation>Refresh</translation></message>
-    <message><source>Состояние zapret2</source><translation>zapret2 state</translation></message>
-    <message><source>Управление системной службой zapret2</source><translation>Manage the zapret2 system service</translation></message>
-    <message><source>Запускать zapret2 при загрузке системы</source><translation>Start zapret2 at system boot</translation></message>
-    <message><source>Запустить</source><translation>Start</translation></message>
-    <message><source>Остановить</source><translation>Stop</translation></message>
-    <message><source>Проверить</source><translation>Check</translation></message>
-    <message><source>Это первый этап миграции на QML и Kirigami. Остальные разделы будут переноситься поэтапно; текущая версия приложения пока сохраняет прежний интерфейс.</source><translation>This is the first stage of the QML and Kirigami migration. Other sections will be migrated incrementally; the current production version still uses the existing interface.</translation></message>
-    <message><source>Этот раздел будет перенесён на QML на следующем этапе миграции.</source><translation>This section will be migrated to QML in a later stage.</translation></message>
-  </context>
+  
   <context>
     <name>SettingsPage</name>
     <message><source>Тема пока следует системным настройкам. Выбор светлой и тёмной темы будет добавлен позже.</source><translation>The application currently follows the system theme. Light and dark theme selection will be added later.</translation></message>
@@ -1418,27 +1132,181 @@ If the service is running, it will be stopped for the duration of the update and
     <message><source>Установка не выполнена (код %1). Подробности — в журнале.</source><translation>Installation failed (exit code %1). See the log for details.</translation></message>
     <message><source>Обновление не выполнено (код %1). Подробности — в журнале.</source><translation>Update failed (exit code %1). See the log for details.</translation></message>
   </context>
+  
+  
+
   <context>
     <name>UpdatePage</name>
+    <message>
+            <location filename="../src/updatepage.cpp" line="42"/>
+            <source>Проверить обновления</source>
+            <translation>Check for updates</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="44"/>
+            <source>Что нового…</source>
+            <translation>What&apos;s new…</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="45"/>
+            <source>Проверять обновления автоматически (раз в сутки, github.com)</source>
+            <translation>Check for updates automatically (once a day, github.com)</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="53"/>
+            <source>Файлы скачиваются с github.com/bol-van/zapret2. Проверяются sha256-суммы бинарников из sha256sum.txt релиза; подписи у апстрима нет, поэтому это защита от повреждения файлов, а не от компрометации репозитория. Конфигурация и ваши списки сохраняются, копия прежней версии остаётся в «zapret2.bak».</source>
+            <translation>Files are downloaded from github.com/bol-van/zapret2. The sha256 sums of the binaries from the release&apos;s sha256sum.txt are verified; upstream does not sign releases, so this protects against corrupted files, not against a compromised repository. Your configuration and lists are kept, and a copy of the previous version stays in &quot;zapret2.bak&quot;.</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="61"/>
+            <source>Установлена:</source>
+            <translation>Installed:</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="63"/>
+            <source>Последняя версия:</source>
+            <translation>Latest version:</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="79"/>
+            <source>Журнал обновления:</source>
+            <translation>Update log:</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="110"/>
+            <source>Не удалось проверить обновления: %1</source>
+            <translation>Could not check for updates: %1</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="115"/>
+            <source>Ошибка</source>
+            <translation>Error</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="149"/>
+            <source>Проверяю обновления…</source>
+            <translation>Checking for updates…</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="161"/>
+            <source>не найдена в %1</source>
+            <translation>not found in %1</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="170"/>
+            <source>zapret2 не установлен: zapret2applet обновляет только существующую установку.</source>
+            <translation>zapret2 is not installed: zapret2applet only updates an existing installation.</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="172"/>
+            <source>Версия на GitHub ещё не проверялась.</source>
+            <translation>The version on GitHub has not been checked yet.</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="174"/>
+            <source>Доступна новая версия: %1.</source>
+            <translation>A new version is available: %1.</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="176"/>
+            <source>Установлена актуальная версия.</source>
+            <translation>The latest version is installed.</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="178"/>
+            <source>Обновить до %1</source>
+            <translation>Update to %1</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="178"/>
+            <source>Обновить</source>
+            <translation>Update</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="189"/>
+            <source>Обновление zapret2</source>
+            <translation>Update zapret2</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="190"/>
+            <source>Обновить zapret2 с v%1 до %2?
+    
+    Если сервис запущен, он будет остановлен на время обновления и запущен снова. Потребуется пароль администратора.</source>
+            <translation>Update zapret2 from v%1 to %2?
+    
+    If the service is running, it will be stopped for the duration of the update and started again. The administrator password is required.</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="198"/>
+            <source>Обновляю до %1…</source>
+            <translation>Updating to %1…</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="211"/>
+            <source>zapret2 обновлён до %1.</source>
+            <translation>zapret2 has been updated to %1.</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="213"/>
+            <source>Обновление отменено: диалог авторизации закрыт.</source>
+            <translation>Update canceled: the authorization dialog was dismissed.</translation>
+        </message>
+    <message>
+            <location filename="../src/updatepage.cpp" line="215"/>
+            <source>Обновление не выполнено (код %1). Подробности — в журнале ниже.</source>
+            <translation>Update failed (code %1). See the log below for details.</translation>
+        </message>
+    <message>
+            <source>Дождитесь завершения подбора стратегий перед обновлением.</source>
+            <translation>Wait for the strategy scan to finish before updating.</translation>
+        </message>
+    <message><source>zapret2 не установлен. Проверьте наличие релиза для установки.</source><translation>zapret2 is not installed. Check for an available release to install.</translation></message>
+    <message><source>zapret2 не установлен. Доступна чистая установка %1.</source><translation>zapret2 is not installed. A clean installation of %1 is available.</translation></message>
+    <message><source>Установить %1</source><translation>Install %1</translation></message>
+    <message><source>Чистая установка zapret2</source><translation>Clean installation of zapret2</translation></message>
+    <message><source>Установить zapret2 %1 в /opt/zapret2?
+    
+    Будет проверена структура архива и SHA-256 бинарных компонентов, создана конфигурация по умолчанию с NFQWS2_ENABLE=0 и установлен systemd unit.
+    
+    Служба не будет запущена или добавлена в автозагрузку. Сетевой трафик не будет перенаправляться. Потребуется пароль администратора.</source><translation>Install zapret2 %1 to /opt/zapret2?
+    
+    The archive structure and binary-component SHA-256 checksums will be verified, a default configuration with NFQWS2_ENABLE=0 will be created, and the systemd unit will be installed.
+    
+    The service will not be started or enabled at boot. Network traffic will not be redirected. Administrator authentication is required.</translation></message>
+    <message><source>Дождитесь завершения подбора стратегий перед установкой.</source><translation>Wait for the strategy scan to finish before installing.</translation></message>
+    <message><source>Устанавливаю zapret2 %1…</source><translation>Installing zapret2 %1…</translation></message>
+    <message><source>zapret2 установлен: %1.</source><translation>zapret2 has been installed: %1.</translation></message>
+    <message><source>Установка отменена: диалог авторизации закрыт.</source><translation>Installation canceled: the authorization dialog was dismissed.</translation></message>
+    <message><source>Установка не выполнена (код %1). Подробности — в журнале ниже.</source><translation>Installation failed (code %1). See the log below for details.</translation></message>
     <message><source>Обновления</source><translation>Updates</translation></message>
-    <message><source>Чистая установка zapret2</source><translation>Clean install of zapret2</translation></message>
-    <message><source>Обновление zapret2</source><translation>Update zapret2</translation></message>
     <message><source>Установить zapret2 %1 в /opt/zapret2? Будет проверена структура архива и SHA-256 бинарных компонентов, создана конфигурация по умолчанию с NFQWS2_ENABLE=0 и установлен systemd unit. Служба не будет запущена или добавлена в автозагрузку. Потребуется пароль администратора.</source><translation>Install zapret2 %1 to /opt/zapret2? The archive layout and SHA-256 checksums of binary components will be verified, a default configuration with NFQWS2_ENABLE=0 will be created, and the systemd unit will be installed. The service will not be started or enabled. Administrator authentication is required.</translation></message>
     <message><source>Обновить zapret2 с %1 до %2? Если служба запущена, она будет остановлена на время обновления и запущена снова. Потребуется пароль администратора.</source><translation>Update zapret2 from %1 to %2? If the service is running, it will be stopped during the update and started again afterwards. Administrator authentication is required.</translation></message>
     <message><source>Версия zapret2</source><translation>zapret2 version</translation></message>
-    <message><source>Установлена:</source><translation>Installed:</translation></message>
-    <message><source>Последняя версия:</source><translation>Latest version:</translation></message>
-    <message><source>Проверить обновления</source><translation>Check for updates</translation></message>
-    <message><source>Установить %1</source><translation>Install %1</translation></message>
-    <message><source>Обновить до %1</source><translation>Update to %1</translation></message>
-    <message><source>Что нового…</source><translation>Release notes…</translation></message>
     <message><source>Загрузка, проверка контрольных сумм, резервное копирование и откат выполняются привилегированным помощником. Подписи upstream-релиза отсутствуют: SHA-256 защищает от повреждения файлов, но не от компрометации репозитория.</source><translation>Downloads, checksum verification, backups, and rollback are handled by the privileged helper. Upstream releases are not signed: SHA-256 protects against file corruption, not repository compromise.</translation></message>
     <message><source>Журнал обновления</source><translation>Update log</translation></message>
     <message><source>Очистить</source><translation>Clear</translation></message>
   </context>
   <context>
     <name>Main</name>
+    <message><source>zapret2applet</source><translation>zapret2applet</translation></message>
+    <message><source>Статус</source><translation>Status</translation></message>
+    <message><source>Конфигурация</source><translation>Configuration</translation></message>
+    <message><source>Профили</source><translation>Profiles</translation></message>
+    <message><source>Списки</source><translation>Lists</translation></message>
+    <message><source>Мониторинг</source><translation>Monitoring</translation></message>
+    <message><source>Подбор стратегий</source><translation>Strategy scan</translation></message>
+    <message><source>Обновления</source><translation>Updates</translation></message>
+    <message><source>Настройки</source><translation>Settings</translation></message>
+    <message><source>О программе</source><translation>About</translation></message>
+    <message><source>Обновить</source><translation>Refresh</translation></message>
+    <message><source>Состояние zapret2</source><translation>zapret2 state</translation></message>
+    <message><source>Управление системной службой zapret2</source><translation>Manage the zapret2 system service</translation></message>
+    <message><source>Запускать zapret2 при загрузке системы</source><translation>Start zapret2 at system boot</translation></message>
+    <message><source>Запустить</source><translation>Start</translation></message>
+    <message><source>Остановить</source><translation>Stop</translation></message>
+    <message><source>Проверить</source><translation>Check</translation></message>
+    <message><source>Это первый этап миграции на QML и Kirigami. Остальные разделы будут переноситься поэтапно; текущая версия приложения пока сохраняет прежний интерфейс.</source><translation>This is the first stage of the QML and Kirigami migration. Other sections will be migrated incrementally; the current production version still uses the existing interface.</translation></message>
+    <message><source>Этот раздел будет перенесён на QML на следующем этапе миграции.</source><translation>This section will be migrated to QML in a later stage.</translation></message>
     <message><source>Предварительный интерфейс на QML и Kirigami. Он проходит поэтапную проверку; основная версия приложения пока использует стабильный интерфейс.</source><translation>Preview interface built with QML and Kirigami. It is being validated incrementally; the stable interface remains the production application.</translation></message>
   </context>
-
 </TS>
