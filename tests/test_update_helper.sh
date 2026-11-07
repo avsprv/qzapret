@@ -120,8 +120,13 @@ out=$(QZAPRET_TEST_BASE=$W/nonexistent QZAPRET_TEST_RUNDIR=$W/run QZAPRET_TEST_N
 
 
 prepare_install() {
-    rm -rf "$W/opt" "$W/systemd" "$W/run"
-    mkdir -p "$W/opt" "$W/systemd" "$W/run"
+    rm -rf "$W/opt" "$W/systemd" "$W/run" "$W/bin" "$W/systemctl.log"
+    mkdir -p "$W/opt" "$W/systemd" "$W/run" "$W/bin"
+    cat > "$W/bin/systemctl" <<'EOS'
+#!/bin/sh
+printf '%s\\n' "$*" >> "$SYSTEMCTL_LOG"
+EOS
+    chmod +x "$W/bin/systemctl"
 }
 
 run_install() {
@@ -143,6 +148,8 @@ grep -q 'NFQWS2_ENABLE=0' "$W/opt/zapret2/config" && ok "fresh config disables N
     && ok "compatible binaries linked" || bad "binary links missing"
 [ -f "$W/systemd/zapret2.service" ] && ok "systemd unit installed" || bad "systemd unit missing"
 [ ! -e "$W/run/install.lock" ] && ok "install lock released" || bad "install lock left behind"
+[ "$(cat "$W/systemctl.log")" = "daemon-reload" ] \\
+    && ok "systemd reloaded without starting or enabling service" || bad "unexpected systemctl calls: $(cat "$W/systemctl.log")"
 
 # --- 9. существующая установка никогда не перезаписывается
 prepare_install; mkdir -p "$W/opt/zapret2"; echo keep > "$W/opt/zapret2/marker"; make_release v9.9.9
