@@ -4,7 +4,6 @@
 #include <QDir>
 #include <QFile>
 #include <QProcess>
-#include <unistd.h>
 #include <QString>
 #include <QStringList>
 
@@ -27,7 +26,7 @@ inline QString path()
 // хелпер запускается напрямую, то есть с МЕНЬШИМИ правами, чем через pkexec.
 inline void start(QProcess *proc, const QStringList &args)
 {
-    if (qEnvironmentVariableIsSet("QZAPRET_NO_PKEXEC") || geteuid() == 0)
+    if (qEnvironmentVariableIsSet("QZAPRET_NO_PKEXEC"))
         proc->start(path(), args);
     else
         proc->start(QStringLiteral("pkexec"), QStringList{path()} + args);

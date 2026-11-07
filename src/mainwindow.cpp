@@ -155,10 +155,10 @@ void MainWindow::onStateChanged(ZapretBackend::State state)
     case ZapretBackend::State::Failed:   text = tr("ошибка юнита"); break;
     default:                             text = tr("неизвестно (zapret2 не установлен?)"); break;
     }
-    m_status->setText(tr("Статус: %1").arg(text));
     const bool available = m_backend->isAvailable();
     if (!available)
         text = tr("служба или upstream init-скрипт не обнаружены");
+    m_status->setText(tr("Статус: %1").arg(text));
     const bool active = state == ZapretBackend::State::Active;
     m_startBtn->setEnabled(available && !active);
     m_stopBtn->setEnabled(available && active);

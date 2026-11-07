@@ -5,7 +5,6 @@
 #include <QProcess>
 #include <QStandardPaths>
 #include <QStringList>
-#include <unistd.h>
 
 #include "helperpath.h"
 
@@ -32,7 +31,7 @@ QString InitScriptBackend::displayName() const
 
 bool InitScriptBackend::isAvailable() const
 {
-    if (geteuid() != 0 && QStandardPaths::findExecutable(QStringLiteral("pkexec")).isEmpty())
+    if (QStandardPaths::findExecutable(QStringLiteral("pkexec")).isEmpty())
         return false;
 
     const QString servicePath = QStringLiteral("/etc/init.d/zapret2");
