@@ -30,6 +30,7 @@ void BlockcheckRunner::start(const Options &o)
         return;
 
     m_buf.clear();
+    m_discardingOversizedLine = false;
     m_seenResults.clear();
     m_errorCount = 0;
     m_cancelRequested = false;
@@ -39,9 +40,10 @@ void BlockcheckRunner::start(const Options &o)
     connect(m_proc, &QProcess::readyRead, this, &BlockcheckRunner::onReadyRead);
     connect(m_proc, &QProcess::finished, this, [this](int code, QProcess::ExitStatus st) {
         onReadyRead();
-        if (!m_buf.isEmpty())
-            handleLine(QString::fromUtf8(m_buf));
+        if (!m_discardingOversizedLine && !m_buf.isEmpty())
+            handleLine(QString::fromUtf8(m_buf.left(64 * 1024)));
         m_buf.clear();
+        m_discardingOversizedLine = false;
         const bool canceled = m_cancelRequested || Helper::isAuthDismissed(code);
         if (!canceled && (st == QProcess::CrashExit || code != 0) && m_errorCount == 0)
             ++m_errorCount;
@@ -87,22 +89,44 @@ void BlockcheckRunner::onReadyRead()
 {
     if (!m_proc)
         return;
-    m_buf += m_proc->readAll();
-    qsizetype nl;
-    while ((nl = m_buf.indexOf('\n')) >= 0) {
-        handleLine(QString::fromUtf8(m_buf.left(nl)));
-        m_buf.remove(0, nl + 1);
-    }
-
-    // A malformed or hostile process output without newline separators must not
-    // grow the pending line buffer without bounds. Strategy records are much
-    // shorter than this limit; oversized diagnostic lines are truncated.
     constexpr qsizetype maxPendingLineBytes = 64 * 1024;
-    if (m_buf.size() > maxPendingLineBytes) {
-        QByteArray bounded = m_buf.left(maxPendingLineBytes);
-        bounded += QByteArrayLiteral("… [строка журнала сокращена]");
-        handleLine(QString::fromUtf8(bounded));
-        m_buf.clear();
+    static const QByteArray truncationMarker = QByteArrayLiteral("… [строка журнала сокращена]");
+    m_buf += m_proc->readAll();
+
+    while (true) {
+        const qsizetype newline = m_buf.indexOf('\n');
+
+        if (m_discardingOversizedLine) {
+            if (newline < 0) {
+                m_buf.clear();
+                return;
+            }
+            m_buf.remove(0, newline + 1);
+            m_discardingOversizedLine = false;
+            continue;
+        }
+
+        const qsizetype lineLength = newline >= 0 ? newline : m_buf.size();
+        if (lineLength > maxPendingLineBytes) {
+            QByteArray bounded = m_buf.left(maxPendingLineBytes);
+            bounded += truncationMarker;
+            handleLine(QString::fromUtf8(bounded));
+
+            if (newline >= 0) {
+                m_buf.remove(0, newline + 1);
+                continue;
+            }
+
+            m_buf.clear();
+            m_discardingOversizedLine = true;
+            return;
+        }
+
+        if (newline < 0)
+            return;
+
+        handleLine(QString::fromUtf8(m_buf.left(newline)));
+        m_buf.remove(0, newline + 1);
     }
 }
 
