@@ -103,16 +103,14 @@ jobs:
         run: |
           set -eu
           package=""
-          for candidate in dist/*.rpm; do
+          for candidate in dist/zapret2applet-[0-9]*.x86_64.rpm; do
             [ -f "$candidate" ] || continue
-            name="$(rpm -qp --qf '%{NAME}' "$candidate")"
-            arch="$(rpm -qp --qf '%{ARCH}' "$candidate")"
-            if [ "$name" = "zapret2applet" ] && [ "$arch" = "x86_64" ]; then
-              package="$candidate"
-              break
-            fi
+            package="$candidate"
+            break
           done
           test -n "$package"
+          test "$(rpm -qp --qf '%{NAME}' "$package")" = "zapret2applet"
+          test "$(rpm -qp --qf '%{ARCH}' "$package")" = "x86_64"
           dnf install -y "$package"
           rpm -q zapret2applet
           test -x /usr/bin/zapret2applet
