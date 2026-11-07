@@ -1,6 +1,10 @@
 #include "appsettings.h"
 
+#include <QApplication>
+#include <QColor>
+#include <QPalette>
 #include <QSettings>
+#include <QStyle>
 
 namespace {
 constexpr auto kThemeKey = "appearance/theme";
@@ -28,6 +32,34 @@ void AppSettings::setTheme(Theme value)
     case Theme::System: break;
     }
     QSettings().setValue(QLatin1String(kThemeKey), QLatin1String(stored));
+}
+
+void AppSettings::applyTheme(QApplication &app)
+{
+    if (theme() != Theme::Dark) {
+        // Для System возвращаем палитру текущего Qt style; Light использует ту же
+        // системную светлую палитру без навязывания стороннего оформления.
+        app.setPalette(app.style()->standardPalette());
+        return;
+    }
+
+    QPalette palette = app.style()->standardPalette();
+    palette.setColor(QPalette::Window, QColor(35, 38, 41));
+    palette.setColor(QPalette::WindowText, QColor(235, 235, 235));
+    palette.setColor(QPalette::Base, QColor(27, 30, 33));
+    palette.setColor(QPalette::AlternateBase, QColor(43, 46, 49));
+    palette.setColor(QPalette::ToolTipBase, QColor(45, 48, 51));
+    palette.setColor(QPalette::ToolTipText, QColor(245, 245, 245));
+    palette.setColor(QPalette::Text, QColor(235, 235, 235));
+    palette.setColor(QPalette::Button, QColor(45, 48, 51));
+    palette.setColor(QPalette::ButtonText, QColor(235, 235, 235));
+    palette.setColor(QPalette::BrightText, QColor(255, 85, 85));
+    palette.setColor(QPalette::Highlight, QColor(55, 125, 185));
+    palette.setColor(QPalette::HighlightedText, QColor(255, 255, 255));
+    palette.setColor(QPalette::Disabled, QPalette::WindowText, QColor(125, 125, 125));
+    palette.setColor(QPalette::Disabled, QPalette::Text, QColor(125, 125, 125));
+    palette.setColor(QPalette::Disabled, QPalette::ButtonText, QColor(125, 125, 125));
+    app.setPalette(palette);
 }
 
 AppSettings::Language AppSettings::language()
