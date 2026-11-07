@@ -8,8 +8,8 @@
 #include "backend/systemdbackend.h"
 
 BlockcheckController::BlockcheckController(QObject *parent)
-    : QObject(parent), m_backend(new SystemdBackend(this)), m_runner(new BlockcheckRunner(this)),
-      m_lifecycleTimeout(new QTimer(this))
+    : QObject(parent), m_lifecycleTimeout(new QTimer(this)),
+      m_backend(new SystemdBackend(this)), m_runner(new BlockcheckRunner(this))
 {
     m_lifecycleTimeout->setSingleShot(true);
     m_lifecycleTimeout->setInterval(30000);
