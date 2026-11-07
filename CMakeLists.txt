@@ -26,6 +26,10 @@ set(QZAPRET_SOURCES
     src/blockcheckpage.h
     src/configpage.cpp
     src/configpage.h
+    src/profileanalyzer.cpp
+    src/profileanalyzer.h
+    src/profilepage.cpp
+    src/profilepage.h
     src/mainwindow.cpp
     src/mainwindow.h
     src/updatepage.cpp
@@ -102,4 +106,9 @@ if(BUILD_TESTING)
     add_test(NAME config_helper
              COMMAND sh ${CMAKE_SOURCE_DIR}/tests/test_config_helper.sh
                      ${CMAKE_SOURCE_DIR}/packaging/helper/zapret2applet-helper)
+
+    qt_add_executable(test_profileanalyzer tests/test_profileanalyzer.cpp
+        src/profileanalyzer.cpp src/profileanalyzer.h)
+    target_link_libraries(test_profileanalyzer PRIVATE Qt6::Test Qt6::Core)
+    add_test(NAME profile_analyzer COMMAND test_profileanalyzer)
 endif()

@@ -510,4 +510,28 @@ If the service is running, it will be stopped for the duration of the update and
     <message><source>Восстанавливаю резервную копию…</source><translation>Restoring backup…</translation></message>
     <message><source>Не удалось выполнить откат: %1</source><translation>Could not restore backup: %1</translation></message>
 </context>
+<context>
+    <name>ProfilePage</name>
+    <message><source>Обновить список</source><translation>Refresh list</translation></message>
+    <message><source>Список профилей ещё не загружен.</source><translation>Profile list has not been loaded yet.</translation></message>
+    <message><source>Читаю конфигурацию для анализа профилей…</source><translation>Reading configuration for profile analysis…</translation></message>
+    <message><source>Найдено профилей: %1. Статический анализ; конфигурация не исполнялась.</source><translation>Found %1 profiles. Static analysis; the configuration was not executed.</translation></message>
+    <message><source>Анализ невозможен: %1</source><translation>Analysis is not possible: %1</translation></message>
+    <message><source>Профиль %1 — %2 параметров</source><translation>Profile %1 — %2 arguments</translation></message>
+    <message><source>Фильтры: %1; Payload: %2; Lua desync: %3</source><translation>Filters: %1; Payload: %2; Lua desync: %3</translation></message>
+    <message><source>Фильтры</source><translation>Filters</translation></message>
+    <message><source>Payload</source><translation>Payload</translation></message>
+    <message><source>Lua desync</source><translation>Lua desync</translation></message>
+    <message><source>Другие параметры</source><translation>Other arguments</translation></message>
+    <message><source>Параметр</source><translation>Option</translation></message>
+    <message><source>Значение</source><translation>Value</translation></message>
+    <message><source>Профили извлекаются из NFQWS2_OPT по разделителям --new. Анализатор принимает только статическую строку и никогда не исполняет config, shell-подстановки или Lua-код.</source><translation>Profiles are extracted from NFQWS2_OPT using --new separators. The analyzer accepts only a static string and never executes config, shell expansions, or Lua code.</translation></message>
+    <message><source>NFQWS2_OPT не найден или задан несколько раз.</source><translation>NFQWS2_OPT is missing or assigned more than once.</translation></message>
+    <message><source>NFQWS2_OPT должен быть статической строкой в двойных кавычках.</source><translation>NFQWS2_OPT must be a static double-quoted string.</translation></message>
+    <message><source>NFQWS2_OPT содержит shell-подстановку или escape-последовательность; безопасный статический анализ невозможен.</source><translation>NFQWS2_OPT contains shell expansion or an escape sequence; safe static analysis is not possible.</translation></message>
+    <message><source>После закрывающей кавычки NFQWS2_OPT обнаружено неподдерживаемое выражение.</source><translation>Unsupported expression found after the closing NFQWS2_OPT quote.</translation></message>
+    <message><source>NFQWS2_OPT не содержит параметров.</source><translation>NFQWS2_OPT contains no arguments.</translation></message>
+    <message><source>Обнаружен пустой профиль рядом с --new.</source><translation>An empty profile was found next to --new.</translation></message>
+    <message><source>Слишком много профилей или параметров.</source><translation>Too many profiles or arguments.</translation></message>
+</context>
 </TS>

@@ -18,6 +18,7 @@
 #include "backend/systemdbackend.h"
 #include "blockcheckpage.h"
 #include "configpage.h"
+#include "profilepage.h"
 #include "updatepage.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -31,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     auto *tabs = new QTabWidget(this);
     tabs->addTab(buildStatusPage(), tr("Статус"));
     tabs->addTab(new ConfigPage(this), tr("Конфигурация"));
+    tabs->addTab(new ProfilePage(this), tr("Профили"));
     m_blockcheck = new BlockcheckPage(m_backend, this);
     tabs->addTab(m_blockcheck, tr("Подбор стратегий"));
     m_update = new UpdatePage(m_backend, this);
