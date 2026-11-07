@@ -63,7 +63,7 @@ private slots:
         QVERIFY(f.open(QIODevice::WriteOnly));
         f.write("#!/bin/sh\n"
                 "echo '* checking privileges'\n"
-                "printf '!!!!! curl_test_https_tls12: working strategy found for ipv4 a.org : nfqws2 --one !!!!!\\r\\n'\n"
+                "printf '!!!!! curl_test_https_tls12: working strategy found for ipv4 a.org : nfqws2 --one !!!!!\\r\n'\n"
                 "echo '!!!!! curl_test_https_tls12: working strategy found for ipv4 a.org : nfqws2 --one !!!!!'\n"
                 "echo '!!!!! curl_test_http: working strategy found for ipv4 a.org : nfqws2 --two --three !!!!!'\n"
                 "printf 'tail-without-newline'\n"
@@ -100,10 +100,10 @@ private slots:
         const QString script = dir.filePath(QStringLiteral("fake-helper"));
         QFile f(script);
         QVERIFY(f.open(QIODevice::WriteOnly));
-        f.write("#!/bin/sh\\n"
-                "echo '* checking privileges'\\n"
-                "echo 'diagnostic: no working strategy found'\\n"
-                "exit 0\\n");
+        f.write("#!/bin/sh\n"
+                "echo '* checking privileges'\n"
+                "echo 'diagnostic: no working strategy found'\n"
+                "exit 0\n");
         f.close();
         f.setPermissions(f.permissions() | QFileDevice::ExeUser);
 
