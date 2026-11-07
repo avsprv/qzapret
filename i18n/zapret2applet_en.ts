@@ -422,6 +422,10 @@
         <source>Дождитесь завершения обновления zapret2 перед выходом.</source>
         <translation>Wait for the zapret2 update to finish before quitting.</translation>
     </message>
+    <message>
+        <source>Дождитесь завершения подбора стратегий перед управлением сервисом.</source>
+        <translation>Wait for the strategy scan to finish before managing the service.</translation>
+    </message>
 </context>
 <context>
     <name>SystemdBackend</name>
