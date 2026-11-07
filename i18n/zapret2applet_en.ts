@@ -1088,26 +1088,7 @@
     <message><source>Копировать стратегию: %1</source><translation>Copy strategy: %1</translation></message>
 </context>
 
-  <context>
-    <name>UpdateController</name>
-    <message><source>Доступна чистая установка %1.</source><translation>Clean installation of %1 is available.</translation></message>
-    <message><source>Доступна новая версия: %1.</source><translation>New version available: %1.</translation></message>
-    <message><source>Установлена актуальная версия.</source><translation>The latest version is installed.</translation></message>
-    <message><source>Не удалось проверить обновления: %1</source><translation>Could not check for updates: %1</translation></message>
-    <message><source>zapret2 не установлен. Проверьте наличие релиза для установки.</source><translation>zapret2 is not installed. Check for a release to install.</translation></message>
-    <message><source>Версия zapret2 определена.</source><translation>Installed zapret2 version detected.</translation></message>
-    <message><source>не установлена</source><translation>not installed</translation></message>
-    <message><source>… [строка журнала сокращена]</source><translation>… [log line truncated]</translation></message>
-    <message><source>Проверяю обновления…</source><translation>Checking for updates…</translation></message>
-    <message><source>Устанавливаю zapret2 %1…</source><translation>Installing zapret2 %1…</translation></message>
-    <message><source>Обновляю zapret2 до %1…</source><translation>Updating zapret2 to %1…</translation></message>
-    <message><source>zapret2 установлен: %1.</source><translation>zapret2 %1 installed.</translation></message>
-    <message><source>zapret2 обновлён до %1.</source><translation>zapret2 updated to %1.</translation></message>
-    <message><source>Установка отменена: диалог авторизации закрыт.</source><translation>Installation canceled: the authorization dialog was closed.</translation></message>
-    <message><source>Обновление отменено: диалог авторизации закрыт.</source><translation>Update canceled: the authorization dialog was closed.</translation></message>
-    <message><source>Установка не выполнена (код %1). Подробности — в журнале.</source><translation>Installation failed (exit code %1). See the log for details.</translation></message>
-    <message><source>Обновление не выполнено (код %1). Подробности — в журнале.</source><translation>Update failed (exit code %1). See the log for details.</translation></message>
-  </context>
+  
   
   
 
@@ -1300,8 +1281,26 @@
         </message>
     <message><source>… [строка журнала сокращена]</source><translation>… [log line truncated]</translation></message>
   </context>
+  
   <context>
     <name>UpdateController</name>
+    <message><source>Доступна чистая установка %1.</source><translation>Clean installation of %1 is available.</translation></message>
+    <message><source>Доступна новая версия: %1.</source><translation>New version available: %1.</translation></message>
+    <message><source>Установлена актуальная версия.</source><translation>The latest version is installed.</translation></message>
+    <message><source>Не удалось проверить обновления: %1</source><translation>Could not check for updates: %1</translation></message>
+    <message><source>zapret2 не установлен. Проверьте наличие релиза для установки.</source><translation>zapret2 is not installed. Check for a release to install.</translation></message>
+    <message><source>Версия zapret2 определена.</source><translation>Installed zapret2 version detected.</translation></message>
+    <message><source>не установлена</source><translation>not installed</translation></message>
+    <message><source>… [строка журнала сокращена]</source><translation>… [log line truncated]</translation></message>
+    <message><source>Проверяю обновления…</source><translation>Checking for updates…</translation></message>
+    <message><source>Устанавливаю zapret2 %1…</source><translation>Installing zapret2 %1…</translation></message>
+    <message><source>Обновляю zapret2 до %1…</source><translation>Updating zapret2 to %1…</translation></message>
+    <message><source>zapret2 установлен: %1.</source><translation>zapret2 %1 installed.</translation></message>
+    <message><source>zapret2 обновлён до %1.</source><translation>zapret2 updated to %1.</translation></message>
+    <message><source>Установка отменена: диалог авторизации закрыт.</source><translation>Installation canceled: the authorization dialog was closed.</translation></message>
+    <message><source>Обновление отменено: диалог авторизации закрыт.</source><translation>Update canceled: the authorization dialog was closed.</translation></message>
+    <message><source>Установка не выполнена (код %1). Подробности — в журнале.</source><translation>Installation failed (exit code %1). See the log for details.</translation></message>
+    <message><source>Обновление не выполнено (код %1). Подробности — в журнале.</source><translation>Update failed (exit code %1). See the log for details.</translation></message>
     <message><source>Установленная версия новее последнего релиза GitHub.</source><translation>The installed version is newer than the latest GitHub release.</translation></message>
   </context>
 </TS>
