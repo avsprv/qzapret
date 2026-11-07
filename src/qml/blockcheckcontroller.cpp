@@ -64,10 +64,18 @@ BlockcheckRunner::Options BlockcheckController::collectOptions() const {
 void BlockcheckController::start() {
     if (m_busy || m_updateBusy) { setStatus(tr("Подбор недоступен во время другой операции.")); return; }
     const auto o=collectOptions();
-    static const QRegularExpression domainRe(QStringLiteral(R"(^[A-Za-z0-9](?:[A-Za-z0-9.-]{0,251}[A-Za-z0-9])?\.?$)"));
+    static const QRegularExpression labelRe(QStringLiteral("^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$"));
     if (o.domains.isEmpty() || o.domains.size()>10) { setStatus(tr("Укажите от 1 до 10 доменов.")); return; }
-    for (const auto &d:o.domains) if (!domainRe.match(d).hasMatch() || d.contains(QStringLiteral(".."))) {
-        setStatus(tr("Некорректный домен: %1").arg(d)); return;
+    for (const auto &input : o.domains) {
+        QString domain = input;
+        if (domain.endsWith(QLatin1Char('.'))) domain.chop(1);
+        if (domain.isEmpty() || domain.size()>253) {
+            setStatus(tr("Некорректный домен: %1").arg(input)); return;
+        }
+        bool valid = true;
+        for (const auto &label : domain.split(QLatin1Char('.')))
+            valid = valid && label.size()<=63 && labelRe.match(label).hasMatch();
+        if (!valid) { setStatus(tr("Некорректный домен: %1").arg(input)); return; }
     }
     if (o.ipvs!=QLatin1String("4") && o.ipvs!=QLatin1String("6") && o.ipvs!=QLatin1String("46")) { setStatus(tr("Недопустимый протокол IP.")); return; }
     if (!o.http && !o.tls12 && !o.tls13 && !o.http3) { setStatus(tr("Выберите хотя бы один тип проверки.")); return; }
