@@ -53,6 +53,7 @@ Kirigami.ScrollablePage {
                         switchDialog.open()
                     } else {
                         page.selectedIndex = index
+                        listSelector.currentIndex = index
                         listsController.readList(page.listEntries[index].file)
                     }
                 }
@@ -62,7 +63,14 @@ Kirigami.ScrollablePage {
                 text: qsTr("Прочитать")
                 icon.name: "view-refresh"
                 enabled: !listsController.busy
-                onClicked: listsController.readList(page.listEntries[page.selectedIndex].file)
+                onClicked: {
+                    if (listsController.dirty) {
+                        page.pendingIndex = page.selectedIndex
+                        switchDialog.open()
+                    } else {
+                        listsController.readList(page.listEntries[page.selectedIndex].file)
+                    }
+                }
             }
         }
 
@@ -123,10 +131,13 @@ Kirigami.ScrollablePage {
         Controls.Label {
             width: parent.width
             wrapMode: Text.WordWrap
-            text: qsTr("Текущий хостлист изменён. Отбросить изменения и переключиться на другой список?")
+            text: page.pendingIndex === page.selectedIndex
+                  ? qsTr("Текущий хостлист изменён. Отбросить изменения и перечитать его?")
+                  : qsTr("Текущий хостлист изменён. Отбросить изменения и переключиться на другой список?")
         }
         onAccepted: {
             page.selectedIndex = page.pendingIndex
+            listSelector.currentIndex = page.pendingIndex
             page.pendingIndex = -1
             listsController.readList(page.listEntries[page.selectedIndex].file)
         }
