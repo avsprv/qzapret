@@ -11,8 +11,7 @@ class UpdateChecker;
 class ZapretUpdater;
 class ZapretBackend;
 
-// Вкладка «Обновления»: версия установленного zapret2, проверка новой версии на GitHub и
-// обновление через привилегированный хелпер.
+// Вкладка «Обновления»: версия установленного zapret2, чистая установка и обновление через привилегированный хелпер.
 class UpdatePage : public QWidget
 {
     Q_OBJECT
