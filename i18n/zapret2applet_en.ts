@@ -42,6 +42,30 @@
         <translation>Copy strategy</translation>
     </message>
     <message>
+        <source>Сохранить журнал…</source>
+        <translation>Save log…</translation>
+    </message>
+    <message>
+        <source>Сохранить журнал</source>
+        <translation>Save log</translation>
+    </message>
+    <message>
+        <source>Текстовые файлы (*.txt);;Все файлы (*)</source>
+        <translation>Text files (*.txt);;All files (*)</translation>
+    </message>
+    <message>
+        <source>Ошибка сохранения</source>
+        <translation>Save error</translation>
+    </message>
+    <message>
+        <source>Не удалось открыть файл для записи: %1</source>
+        <translation>Could not open file for writing: %1</translation>
+    </message>
+    <message>
+        <source>Не удалось сохранить журнал: %1</source>
+        <translation>Could not save log: %1</translation>
+    </message>
+    <message>
         <location filename="../src/blockcheckpage.cpp" line="39"/>
         <source>домены через пробел (до 10)</source>
         <translation>space-separated domains (up to 10)</translation>
