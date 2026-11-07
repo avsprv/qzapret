@@ -40,4 +40,5 @@ private:
     QString m_unit;
     QQueue<PendingUnitAction> m_pendingActions;
     bool m_actionInProgress = false;
+    quint64 m_stateQueryGeneration = 0;
 };
