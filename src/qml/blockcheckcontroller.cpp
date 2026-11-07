@@ -4,11 +4,20 @@
 #include <QGuiApplication>
 #include <QClipboard>
 #include <QTimer>
+#include <QTimer>
 #include "backend/systemdbackend.h"
 
 BlockcheckController::BlockcheckController(QObject *parent)
-    : QObject(parent), m_backend(new SystemdBackend(this)), m_runner(new BlockcheckRunner(this))
+    : QObject(parent), m_backend(new SystemdBackend(this)), m_runner(new BlockcheckRunner(this)),
+      m_lifecycleTimeout(new QTimer(this))
 {
+    m_lifecycleTimeout->setSingleShot(true);
+    m_lifecycleTimeout->setInterval(30000);
+    connect(m_lifecycleTimeout, &QTimer::timeout, this, [this] {
+        if (m_phase == Phase::Checking) finish(tr("Не удалось получить подтверждённое состояние службы. Диагностика не запущена."));
+        else if (m_phase == Phase::WaitingForStop) restoreService(tr("Не получено подтверждение остановки службы за отведённое время."));
+        else if (m_phase == Phase::WaitingForStart) { m_resumeService=false; finish(tr("Не удалось подтвердить восстановление службы. Проверьте systemd.")); }
+    });
     connect(m_backend, &ZapretBackend::stateVerified, this, &BlockcheckController::handleVerifiedState);
     connect(m_backend, &ZapretBackend::unitActionFinished, this, &BlockcheckController::handleUnitAction);
     connect(m_backend, &ZapretBackend::errorOccurred, this, &BlockcheckController::appendLog);
@@ -65,10 +74,11 @@ void BlockcheckController::start() {
     if (o.scanLevel!=QLatin1String("veryquick") && o.scanLevel!=QLatin1String("quick") && o.scanLevel!=QLatin1String("standard") && o.scanLevel!=QLatin1String("force")) { setStatus(tr("Недопустимый уровень сканирования.")); return; }
     m_lastOptions=o; m_found=0; m_results.clear(); emit resultsChanged(); m_logText.clear(); emit logTextChanged();
     m_resumeService=false; m_cancelRequested=false; m_phase=Phase::Checking; setBusy(true);
-    setStatus(tr("Проверка состояния службы zapret2…")); m_backend->verifyState();
+    setStatus(tr("Проверка состояния службы zapret2…")); m_lifecycleTimeout->start(); m_backend->verifyState();
 }
 void BlockcheckController::handleVerifiedState(ZapretBackend::State state) {
     if (m_phase!=Phase::Checking) return;
+    m_lifecycleTimeout->stop();
     if (state==ZapretBackend::State::Inactive) { beginScan(); return; }
     if (state==ZapretBackend::State::Active) {
         m_phase=Phase::AwaitingConfirmation;
@@ -81,7 +91,7 @@ void BlockcheckController::handleVerifiedState(ZapretBackend::State state) {
 void BlockcheckController::confirmStop(bool accepted) {
     if (m_phase!=Phase::AwaitingConfirmation) return;
     if (!accepted) { finish(tr("Подбор отменён. Служба не изменена.")); return; }
-    m_resumeService=true; m_phase=Phase::WaitingForStop; setStatus(tr("Остановка службы zapret2…")); m_backend->stop();
+    m_resumeService=true; m_phase=Phase::WaitingForStop; setStatus(tr("Остановка службы zapret2…")); m_lifecycleTimeout->start(); m_backend->stop();
 }
 void BlockcheckController::beginScan() { m_phase=Phase::Scanning; setStatus(tr("Выполняется диагностика blockcheck2…")); appendLog(tr("Запуск blockcheck2…")); m_runner->start(m_lastOptions); }
 void BlockcheckController::copyStrategy(int index) {
@@ -96,12 +106,14 @@ void BlockcheckController::cancel() {
 }
 void BlockcheckController::handleUnitAction(const QString &action, ZapretBackend::State state, bool success) {
     if (m_phase==Phase::WaitingForStop && action==QLatin1String("stop")) {
+        m_lifecycleTimeout->stop();
         if (success && state==ZapretBackend::State::Inactive) {
             if (m_cancelRequested) restoreService(tr("Диагностика отменена до запуска."));
             else beginScan();
         } else if (state==ZapretBackend::State::Active) { m_resumeService=false; finish(tr("Остановка не подтверждена. Диагностика не запущена.")); }
         else restoreService(tr("Не удалось подтвердить остановку службы."));
     } else if (m_phase==Phase::WaitingForStart && action==QLatin1String("start")) {
+        m_lifecycleTimeout->stop();
         m_resumeService=false;
         finish(state==ZapretBackend::State::Active ? tr("Служба zapret2 снова активна.") : tr("Не удалось восстановить службу. Проверьте состояние systemd."));
     }
@@ -109,7 +121,7 @@ void BlockcheckController::handleUnitAction(const QString &action, ZapretBackend
 void BlockcheckController::restoreService(const QString &reason) {
     if (!reason.isEmpty()) appendLog(reason);
     if (!m_resumeService) { finish(); return; }
-    m_phase=Phase::WaitingForStart; setStatus(tr("Восстановление службы zapret2…")); m_backend->start();
+    m_phase=Phase::WaitingForStart; setStatus(tr("Восстановление службы zapret2…")); m_lifecycleTimeout->start(); m_backend->start();
 }
 void BlockcheckController::handleFinished(int exitCode, bool canceled) {
     m_cancelRequested=canceled;
@@ -119,6 +131,7 @@ void BlockcheckController::handleFinished(int exitCode, bool canceled) {
     else finish();
 }
 void BlockcheckController::finish(const QString &message) {
+    m_lifecycleTimeout->stop();
     m_phase=Phase::Idle; m_resumeService=false;
     if (!message.isEmpty()) appendLog(message);
     setStatus(message.isEmpty() ? tr("Готово.") : message);
