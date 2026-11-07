@@ -12,7 +12,7 @@
 #include "appsettings.h"
 #include "autostart.h"
 
-SettingsDialog::SettingsDialog(QWidget *parent)
+SettingsDialog::SettingsDialog(bool trayAvailable, QWidget *parent)
     : QDialog(parent)
 {
     setWindowTitle(tr("Настройки"));
@@ -38,7 +38,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 
     m_closeToTray = new QCheckBox(tr("Сворачивать в системный трей при закрытии окна"), this);
     m_closeToTray->setChecked(AppSettings::closeToTray());
-    m_closeToTray->setEnabled(parent != nullptr);
+    m_closeToTray->setEnabled(trayAvailable);
 
     auto *form = new QFormLayout;
     form->addRow(tr("Язык интерфейса:"), m_language);
@@ -56,22 +56,22 @@ SettingsDialog::SettingsDialog(QWidget *parent)
                                          this);
     layout->addWidget(buttons);
     connect(buttons, &QDialogButtonBox::accepted, this, [this] {
-        applySettings();
-        accept();
+        if (applySettings())
+            accept();
     });
     connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
     connect(buttons->button(QDialogButtonBox::Apply), &QPushButton::clicked,
-            this, &SettingsDialog::applySettings);
+            this, [this] { applySettings(); });
 }
 
-void SettingsDialog::applySettings()
+bool SettingsDialog::applySettings()
 {
     if (Autostart::isEnabled() != m_guiAutostart->isChecked()
         && !Autostart::setEnabled(m_guiAutostart->isChecked())) {
         QMessageBox::warning(this, tr("Ошибка"),
                              tr("Не удалось изменить автозапуск zapret2applet."));
         m_guiAutostart->setChecked(Autostart::isEnabled());
-        return;
+        return false;
     }
 
     const auto oldLanguage = AppSettings::language();
@@ -86,4 +86,5 @@ void SettingsDialog::applySettings()
 
     if (oldLanguage != newLanguage)
         emit languageRestartRequired();
+    return true;
 }
