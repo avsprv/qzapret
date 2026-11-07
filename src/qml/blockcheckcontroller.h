@@ -33,6 +33,8 @@ public:
     Q_ENUM(StatusType)
 
     explicit BlockcheckController(QObject *parent = nullptr);
+    BlockcheckController(ZapretBackend *backend, BlockcheckRunner *runner,
+                         int lifecycleTimeoutMs, QObject *parent = nullptr);
     QString domains() const; void setDomains(const QString &value);
     QString ipVersion() const; void setIpVersion(const QString &value);
     bool http() const; void setHttp(bool value);
@@ -73,14 +75,14 @@ private:
     void setBusy(bool value);
     void finish(const QString &message = {}, StatusType type = StatusType::Success);
     void beginScan();
-    void restoreService(const QString &reason);
+    void restoreService(const QString &reason, const QString &finalMessage = {},\n                        StatusType finalType = StatusType::Success);
     void handleVerifiedState(ZapretBackend::State state);
     void handleUnitAction(const QString &action, ZapretBackend::State state, bool success);
     void handleFinished(int exitCode, bool canceled);
     BlockcheckRunner::Options collectOptions() const;
 
     QTimer *m_lifecycleTimeout = nullptr;
-    SystemdBackend *m_backend = nullptr;
+    ZapretBackend *m_backend = nullptr;
     BlockcheckRunner *m_runner = nullptr;
     Phase m_phase = Phase::Idle;
     QString m_domains = QStringLiteral("rutracker.org");
@@ -94,5 +96,5 @@ private:
     bool m_busy = false, m_updateBusy = false;
     bool m_resumeService = false, m_cancelRequested = false, m_stopTimedOut = false;
     int m_found = 0;
-    BlockcheckRunner::Options m_lastOptions;
+    BlockcheckRunner::Options m_lastOptions;\n    QString m_pendingFinalMessage;\n    StatusType m_pendingFinalType = StatusType::Success;
 };
