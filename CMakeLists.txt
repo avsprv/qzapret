@@ -78,6 +78,7 @@ qt_add_translations(zapret2applet_i18n
         src/i18n.cpp
         src/qml/logscontroller.cpp
         src/qml/listscontroller.cpp
+        src/qml/blockcheckcontroller.cpp
         src/qml/Main.qml
         src/qml/pages/SettingsPage.qml
         src/qml/pages/ConfigPage.qml
@@ -85,6 +86,7 @@ qt_add_translations(zapret2applet_i18n
         src/qml/pages/AboutPage.qml
         src/qml/pages/LogsPage.qml
         src/qml/pages/ListsPage.qml
+        src/qml/pages/BlockcheckPage.qml
     INCLUDE_DIRECTORIES src
 )
 
@@ -114,6 +116,12 @@ qt_add_executable(zapret2applet-qml-preview
     src/qml/logscontroller.h
     src/qml/listscontroller.cpp
     src/qml/listscontroller.h
+    src/qml/blockcheckcontroller.cpp
+    src/qml/blockcheckcontroller.h
+    src/backend/blockcheckrunner.cpp
+    src/backend/blockcheckrunner.h
+    src/backend/systemdbackend.cpp
+    src/backend/systemdbackend.h
     src/profileanalyzer.cpp
     src/profileanalyzer.h
     src/backend/systemdbackend.cpp
@@ -132,6 +140,7 @@ qt_add_qml_module(zapret2applet-qml-preview
         src/qml/pages/AboutPage.qml
         src/qml/pages/LogsPage.qml
         src/qml/pages/ListsPage.qml
+        src/qml/pages/BlockcheckPage.qml
 )
 target_include_directories(zapret2applet-qml-preview PRIVATE src src/qml)
 target_link_libraries(zapret2applet-qml-preview PRIVATE
