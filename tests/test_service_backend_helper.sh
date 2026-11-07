@@ -7,12 +7,14 @@ mkdir -p "$tmp/base/init.d/openrc" "$tmp/base/init.d/openwrt" "$tmp/etc/init.d" 
 export QZAPRET_TEST_BASE="$tmp/base"
 export QZAPRET_TEST_SERVICE_DIR="$tmp/etc/init.d"
 export QZAPRET_TEST_SERVICE_ARGS="$tmp/service.args"
+export QZAPRET_TEST_RC_SERVICE_ARGS="$tmp/rc-service.args"
+export QZAPRET_TEST_RC_UPDATE_ARGS="$tmp/rc-update.args"
 PATH="$tmp/bin:$PATH"
 export PATH
 
 cat > "$tmp/bin/rc-service" <<'EOF'
 #!/bin/sh
-printf '%s\n' "$@" > "$QZAPRET_TEST_SERVICE_ARGS"
+printf '%s\n' "$@" > "$QZAPRET_TEST_RC_SERVICE_ARGS"
 [ "$1" = zapret2 ] || exit 9
 case "$2" in
     status) [ "${QZAPRET_TEST_RUNNING:-1}" = 1 ] ;;
@@ -22,7 +24,7 @@ esac
 EOF
 cat > "$tmp/bin/rc-update" <<'EOF'
 #!/bin/sh
-printf '%s\n' "$@" > "$QZAPRET_TEST_SERVICE_ARGS"
+printf '%s\n' "$@" > "$QZAPRET_TEST_RC_UPDATE_ARGS"
 case "$1" in
     show) [ "${QZAPRET_TEST_ENABLED:-1}" = 1 ] && echo 'zapret2 | default'; exit 0 ;;
     add|del) [ "$2" = zapret2 ] && [ "$3" = default ] && exit 0 ;;
@@ -45,15 +47,17 @@ chmod 755 "$tmp/etc/init.d/zapret2"
 state=$("$H" service openrc state)
 [ "$(printf '%s\n' "$state" | sed -n '1p')" = active ]
 [ "$(printf '%s\n' "$state" | sed -n '2p')" = enabled ]
-grep -qx zapret2 "$tmp/service.args"
-grep -qx default "$tmp/service.args"
+grep -qx zapret2 "$tmp/rc-service.args"
+grep -qx status "$tmp/rc-service.args"
+grep -qx show "$tmp/rc-update.args"
+grep -qx default "$tmp/rc-update.args"
 echo "ok: OpenRC status and runlevel are queried through fixed service identifiers"
 
 QZAPRET_TEST_RUNNING=0 "$H" service openrc status | grep -qx inactive
 QZAPRET_TEST_ENABLED=0 "$H" service openrc enabled | grep -qx disabled
 "$H" service openrc start >/dev/null
-grep -qx zapret2 "$tmp/service.args"
-grep -qx start "$tmp/service.args"
+grep -qx zapret2 "$tmp/rc-service.args"
+grep -qx start "$tmp/rc-service.args"
 "$H" service openrc stop >/dev/null
 "$H" service openrc enable >/dev/null
 "$H" service openrc disable >/dev/null
