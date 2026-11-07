@@ -18,10 +18,10 @@ Kirigami.ScrollablePage {
             text: qsTr("zapret2applet")
         }
 
-        Controls.Label {
+        Kirigami.UrlButton {
             Layout.fillWidth: true
-            wrapMode: Text.WordWrap
-            text: qsTr("Независимый графический интерфейс на Qt 6 для управления zapret2 в Linux.")
+            text: qsTr("Репозиторий zapret2applet")
+            url: "https://github.com/avsprv/zapret2applet"
         }
 
         Kirigami.Heading {
@@ -30,28 +30,28 @@ Kirigami.ScrollablePage {
             text: qsTr("Версия и компоненты")
         }
 
-        Controls.Label {
+        Kirigami.UrlButton {
             Layout.fillWidth: true
-            wrapMode: Text.WordWrap
-            text: qsTr("Версия приложения: %1").arg(Qt.application.version)
+            text: qsTr("Документация приложения")
+            url: "https://github.com/avsprv/zapret2applet/blob/main/README.md"
         }
 
-        Controls.Label {
+        Kirigami.UrlButton {
             Layout.fillWidth: true
-            wrapMode: Text.WordWrap
-            text: qsTr("Qt %1 — графическая платформа приложения.").arg(Qt.version)
+            text: qsTr("Релизы приложения")
+            url: "https://github.com/avsprv/zapret2applet/releases"
         }
 
-        Controls.Label {
+        Kirigami.UrlButton {
             Layout.fillWidth: true
-            wrapMode: Text.WordWrap
-            text: qsTr("zapret2 — отдельный upstream-компонент; он не входит в состав приложения.")
+            text: qsTr("Сообщить об ошибке")
+            url: "https://github.com/avsprv/zapret2applet/issues"
         }
 
-        Controls.Label {
+        Kirigami.UrlButton {
             Layout.fillWidth: true
-            wrapMode: Text.WordWrap
-            text: qsTr("systemd и Polkit используются для системной интеграции и авторизации операций.")
+            text: qsTr("Уведомления о сторонних компонентах")
+            url: "https://github.com/avsprv/zapret2applet/blob/main/NOTICE.md"
         }
 
         Kirigami.Heading {
@@ -60,10 +60,10 @@ Kirigami.ScrollablePage {
             text: qsTr("Лицензии")
         }
 
-        Controls.Label {
+        Kirigami.UrlButton {
             Layout.fillWidth: true
-            wrapMode: Text.WordWrap
-            text: qsTr("Код zapret2applet распространяется по лицензии MIT. Лицензии сторонних компонентов сохраняют собственную область действия. Подробности приведены в NOTICE и в документации upstream.")
+            text: qsTr("Upstream-проект zapret2")
+            url: "https://github.com/bol-van/zapret2"
         }
 
         Kirigami.Heading {
