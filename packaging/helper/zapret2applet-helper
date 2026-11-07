@@ -451,9 +451,12 @@ install)
     fi
     [ ! -e "$BASE" ] && [ ! -L "$BASE" ] || die "zapret2 already exists at $BASE; clean installation will not overwrite it"
     [ -d "$UNIT_DIR" ] && [ ! -L "$UNIT_DIR" ] || die "systemd unit directory is missing or unsafe"
-    for existing_unit in /etc/systemd/system/zapret2.service /usr/lib/systemd/system/zapret2.service /lib/systemd/system/zapret2.service; do
-        [ ! -e "$existing_unit" ] && [ ! -L "$existing_unit" ] || die "zapret2 systemd unit already exists: $existing_unit"
-    done
+    if [ "$TEST_MODE" != 1 ]; then
+        secure_root_dir "$UNIT_DIR" || die "systemd unit directory must be root-owned and not writable by group or other users"
+        for existing_unit in /etc/systemd/system/zapret2.service /usr/lib/systemd/system/zapret2.service /lib/systemd/system/zapret2.service; do
+            [ ! -e "$existing_unit" ] && [ ! -L "$existing_unit" ] || die "zapret2 systemd unit already exists: $existing_unit"
+        done
+    fi
     [ ! -e "$UNIT_DIR/zapret2.service" ] && [ ! -L "$UNIT_DIR/zapret2.service" ] || die "zapret2 systemd unit already exists in $UNIT_DIR"
 
     umask 077
