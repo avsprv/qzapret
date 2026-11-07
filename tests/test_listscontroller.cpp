@@ -69,6 +69,7 @@ private slots:
         QTemporaryDir directory;
         QVERIFY(directory.isValid());
         const QString helper = createHelper(directory,
+            "if [ \"$1\" = lists-read ]; then [ \"$2\" = zapret-hosts-user.txt ] || exit 9; printf 'initial.example\\n'; exit 0; fi\n"
             "[ \"$1\" = lists-write ] || exit 8\n"
             "[ \"$2\" = zapret-hosts-user.txt ] || exit 9\n"
             "cat > \"$QZAPRET_CAPTURE\"\n"
