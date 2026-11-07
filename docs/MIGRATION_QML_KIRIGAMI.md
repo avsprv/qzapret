@@ -45,3 +45,22 @@ explicit placeholders, not implemented functionality.
 The preview target is intentionally not installed or packaged as the application executable.
 It is compiled in CI to validate the QML module and C++ bridge. Production packaging continues
 to ship the proven Widgets executable until the migration is complete.
+
+## Quality baseline
+
+The migration follows the repository-wide [quality and engineering standards](QUALITY_STANDARDS.md),
+which use the official KDE Kirigami documentation and KDE Human Interface Guidelines as their
+implementation baseline.
+
+In particular, each migrated page must have:
+- a C++ controller/model with a typed, testable API;
+- native Kirigami interaction patterns and platform theme integration;
+- complete Russian and English localization;
+- accessible keyboard and focus behavior;
+- loading, empty, success, cancellation, and failure states where applicable;
+- isolated regression tests for the controller and critical workflows;
+- documentation and CI coverage.
+
+The QML preview is not considered production-ready while navigation placeholders remain, settings
+do not affect runtime behavior, or the About/localization/desktop integration work is incomplete.
+The final replacement gate is defined in QUALITY_STANDARDS.md.
