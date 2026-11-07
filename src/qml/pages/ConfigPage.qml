@@ -51,6 +51,8 @@ Kirigami.ScrollablePage {
             Layout.minimumHeight: 360
             enabled: configController.loaded && !configController.busy
             text: configController.configText
+            Accessible.name: qsTr("Содержимое файла конфигурации")
+            Accessible.description: qsTr("Редактор shell-конфигурации zapret2. Проверка не исполняет файл.")
             onTextChanged: if (text !== configController.configText) configController.configText = text
             wrapMode: TextEdit.NoWrap
             font.family: "monospace"
