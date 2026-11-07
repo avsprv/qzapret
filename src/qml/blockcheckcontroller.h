@@ -77,8 +77,8 @@ private:
     void beginScan();
     void restoreService(const QString &reason, const QString &finalMessage = {},
                         StatusType finalType = StatusType::Success);
-    void handleVerifiedState(ZapretBackend::State state);
-    void handleUnitAction(const QString &action, ZapretBackend::State state, bool success);
+    void handleVerifiedState(quint64 requestId, ZapretBackend::State state);
+    void handleUnitAction(quint64 requestId, const QString &action, ZapretBackend::State state, bool success);
     void handleFinished(int exitCode, bool canceled);
     BlockcheckRunner::Options collectOptions() const;
 
