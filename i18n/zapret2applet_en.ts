@@ -287,6 +287,14 @@
         <source>Не удалось восстановить сервис zapret2. Проверьте состояние systemd.</source>
         <translation>Could not restore the zapret2 service. Check the systemd state.</translation>
     </message>
+    <message>
+        <source>Дождитесь завершения обновления перед запуском диагностики.</source>
+        <translation>Wait for the update to finish before starting diagnostics.</translation>
+    </message>
+    <message>
+        <source>Дождитесь завершения подбора стратегий перед обновлением.</source>
+        <translation>Wait for the strategy scan to finish before updating.</translation>
+    </message>
 </context>
 <context>
     <name>BlockcheckRunner</name>
