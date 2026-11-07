@@ -32,6 +32,8 @@ set(QZAPRET_SOURCES
     src/profilepage.h
     src/listsmanagerpage.cpp
     src/listsmanagerpage.h
+    src/logmonitorpage.cpp
+    src/logmonitorpage.h
     src/mainwindow.cpp
     src/mainwindow.h
     src/updatepage.cpp
@@ -129,6 +131,10 @@ if(BUILD_TESTING)
 
     add_test(NAME lists_helper
              COMMAND sh ${CMAKE_SOURCE_DIR}/tests/test_lists_helper.sh
+                     ${CMAKE_SOURCE_DIR}/packaging/helper/zapret2applet-helper)
+
+    add_test(NAME logs_helper
+             COMMAND sh ${CMAKE_SOURCE_DIR}/tests/test_logs_helper.sh
                      ${CMAKE_SOURCE_DIR}/packaging/helper/zapret2applet-helper)
 
     qt_add_executable(test_profileanalyzer tests/test_profileanalyzer.cpp
