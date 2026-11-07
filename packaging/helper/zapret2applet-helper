@@ -544,6 +544,7 @@ install)
     stage="$tmp/x/$name"
     [ -d "$stage" ] || die "unexpected archive layout"
     chmod -R ug-s "$stage"
+    chmod -R go-w "$stage"
 
     echo "Verifying checksums of binaries (sha256sum.txt from the release) ..."
     [ -s "$tmp/sums.txt" ] || die "empty sha256sum.txt"
