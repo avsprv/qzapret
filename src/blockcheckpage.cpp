@@ -133,7 +133,6 @@ BlockcheckPage::BlockcheckPage(ZapretBackend *backend, QWidget *parent)
     connect(m_results, &QListWidget::currentItemChanged, this, [this] {
         m_copyBtn->setEnabled(m_results->currentItem() != nullptr);
     });
-    connect(m_backend, &ZapretBackend::stateChanged, this, &BlockcheckPage::onBackendState);
     connect(m_backend, &ZapretBackend::stateVerified, this, &BlockcheckPage::onVerifiedState);
     connect(m_backend, &ZapretBackend::unitActionFinished, this, &BlockcheckPage::onUnitActionFinished);
     connect(m_backend, &ZapretBackend::errorOccurred, this, [this](const QString &message) {
@@ -196,11 +195,6 @@ void BlockcheckPage::onStartClicked()
     m_log->appendPlainText(tr("Проверяю состояние сервиса zapret2…"));
     m_stopTimeout->start();
     m_backend->verifyState();
-}
-
-void BlockcheckPage::onBackendState(ZapretBackend::State state)
-{
-    m_state = state;
 }
 
 void BlockcheckPage::onVerifiedState(ZapretBackend::State state)
