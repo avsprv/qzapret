@@ -1236,7 +1236,7 @@ If the service is running, it will be stopped for the duration of the update and
     <message><source>Автоматически проверять обновления</source><translation>Check for updates automatically</translation></message>
     <message><source>Поведение</source><translation>Behavior</translation></message>
     <message><source>Сворачивать приложение в системный трей при закрытии окна</source><translation>Minimize to the system tray when closing the window</translation></message>
-    <message><source>Параметры уже сохраняются в прежние ключи QSettings. Системная тема Kirigami применяется автоматически; принудительные светлая и тёмная схемы и переключение языка будут подключены на следующем этапе.</source><translation>Settings are stored using the existing QSettings keys. Kirigami follows the system theme automatically. Forced light and dark themes and language switching will be available in a later migration stage.</translation></message>
+    <message><source>Параметры уже сохраняются в прежние ключи QSettings. Системная тема Kirigami применяется автоматически; принудительные светлая и тёмная схемы и переключение языка будут подключены на следующем этапе.</source><translation>Settings are stored using the existing QSettings keys. Language changes are applied immediately. Forced light and dark themes will be connected in a later migration stage.</translation></message>
   </context>
   <context>
     <name>ProfilesPage</name>
