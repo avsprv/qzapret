@@ -133,6 +133,7 @@ run_install() {
     PATH="$W/bin:$PATH" SYSTEMCTL_LOG="$W/systemctl.log" \
     QZAPRET_TEST_BASE=$W/opt/zapret2 QZAPRET_TEST_RUNDIR=$W/run \
     QZAPRET_TEST_UNIT_DIR=$W/systemd QZAPRET_TEST_URLBASE="file://$W/rel" "$H" install "$1" 2>&1
+}
 
 expect_no_install() {
     [ ! -e "$W/opt/zapret2" ] && [ ! -e "$W/systemd/zapret2.service" ] \
