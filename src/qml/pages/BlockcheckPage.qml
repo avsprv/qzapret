@@ -47,7 +47,14 @@ Kirigami.ScrollablePage {
             Layout.fillWidth: true
             visible: blockcheckController.status.length > 0
             text: blockcheckController.status
-            type: blockcheckController.busy ? Kirigami.MessageType.Information : Kirigami.MessageType.Positive
+            type: {
+                switch (blockcheckController.statusType) {
+                case BlockcheckController.Error: return Kirigami.MessageType.Error
+                case BlockcheckController.Warning: return Kirigami.MessageType.Warning
+                case BlockcheckController.Success: return Kirigami.MessageType.Positive
+                default: return Kirigami.MessageType.Information
+                }
+            }
         }
 
         Controls.GroupBox {
