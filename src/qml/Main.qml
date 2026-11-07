@@ -28,7 +28,7 @@ Kirigami.ApplicationWindow {
             Kirigami.Action {
                 text: qsTr("Конфигурация")
                 icon.name: "document-edit"
-                onTriggered: root.pageStack.push(placeholderPage, { pageTitle: text })
+                onTriggered: root.pageStack.push(configPageComponent)
             },
             Kirigami.Action {
                 text: qsTr("Профили")
@@ -174,8 +174,7 @@ Kirigami.ApplicationWindow {
         }
     }
 
-    Component {
-        id: settingsPageComponent
+    Component {\n        id: configPageComponent\n        ConfigPage {}\n    }\n\n    Component {\n        id: settingsPageComponent
         SettingsPage {}
     }
 
