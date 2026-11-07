@@ -40,7 +40,7 @@ UpdateController::UpdateController(SettingsManager *settings, QObject *parent)
         QSettings().setValue(QStringLiteral("update/lastCheck"), QDateTime::currentSecsSinceEpoch());
 
         const bool newer = !m_installed.isEmpty() && ZapretVersion::compare(m_installed, tag) < 0;
-        if (m_automaticCheck && newer) {
+        if (m_automaticCheck && m_settings->autoCheckUpdates() && newer) {
             QSettings settings;
             if (settings.value(QStringLiteral("update/notifiedTag")).toString() != tag) {
                 settings.setValue(QStringLiteral("update/notifiedTag"), tag);
@@ -52,6 +52,8 @@ UpdateController::UpdateController(SettingsManager *settings, QObject *parent)
             setStatus(tr("Доступна чистая установка %1.").arg(tag));
         else if (newer)
             setStatus(tr("Доступна новая версия: %1.").arg(tag));
+        else if (ZapretVersion::compare(m_installed, tag) > 0)
+            setStatus(tr("Установленная версия новее последнего релиза GitHub."));
         else
             setStatus(tr("Установлена актуальная версия."));
         emit stateChanged();
