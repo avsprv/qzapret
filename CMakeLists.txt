@@ -94,7 +94,7 @@ if(BUILD_TESTING)
         src/backend/zapretbackend.h src/backend/helperpath.h)
     target_include_directories(test_blockcheck_lifecycle PRIVATE src)
     target_link_libraries(test_blockcheck_lifecycle PRIVATE Qt6::Test Qt6::Widgets)
-    target_compile_definitions(test_blockcheck_lifecycle PRIVATE QZAPRET_HELPER_PATH="/nonexistent")
+    target_compile_definitions(test_blockcheck_lifecycle PRIVATE QZAPRET_HELPER_PATH="/nonexistent" QZAPRET_TEST_SKIP_COMPATIBILITY=1)
     add_test(NAME blockcheck_lifecycle COMMAND test_blockcheck_lifecycle)
     set_tests_properties(blockcheck_lifecycle PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
 
