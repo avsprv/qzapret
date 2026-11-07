@@ -20,7 +20,7 @@ class BlockcheckPage : public QWidget
     Q_OBJECT
 public:
     explicit BlockcheckPage(ZapretBackend *backend, QWidget *parent = nullptr);
-    bool isRunning() const { return m_runner->isRunning() || m_waitingStop; }
+    bool isRunning() const { return m_phase != LifecyclePhase::Idle || m_runner->isRunning(); }
 
 signals:
     void scanFinished(int found, bool canceled);
