@@ -1,7 +1,6 @@
 #include "aboutpage.h"
 
 #include <QLabel>
-#include <QLibraryInfo>
 #include <QTextBrowser>
 #include <QVBoxLayout>
 #include <QtGlobal>
@@ -54,7 +53,7 @@ AboutPage::AboutPage(QWidget *parent)
         "<p><i>zapret2applet — независимый проект, не связанный с автором "
         "или сопровождающими upstream zapret2.</i></p>")
         .arg(QString::fromLatin1(QZAPRET_VERSION).toHtmlEscaped(),
-             QString::fromLatin1(qVersion()).toHtmlEscaped()), this);
+             QString::fromLatin1(qVersion()).toHtmlEscaped()));
     details->setOpenExternalLinks(true);
     layout->addWidget(details, 1);
 }
