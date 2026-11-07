@@ -52,10 +52,10 @@ bool ProfileController::validArguments(const QStringList &args, QString *error) 
     }
     return true;
 }
-void ProfileController::read()
+void ProfileController::read(bool discardChanges)
 {
     if (m_busy) return;
-    if (m_dirty) { setStatus(tr("Сначала сохраните изменения или отмените их повторной загрузкой после подтверждения.")); return; }
+    if (m_dirty && !discardChanges) { setStatus(tr("Есть несохранённые изменения. Сохраните их или подтвердите отмену.")); return; }
     setBusy(true); setStatus(tr("Чтение конфигурации…"));
     auto *p = new QProcess(this); m_process = p;
     connect(p, &QProcess::finished, this, [this,p](int code, QProcess::ExitStatus state) {
