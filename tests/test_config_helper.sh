@@ -74,7 +74,7 @@ printf 'SAFE=1\n' > "$tmp/base/config"
 rm -rf "$tmp/backups"
 ln -s "$tmp" "$tmp/backups"
 current_hash=$(sha256sum "$tmp/base/config" | awk '{print $1}')
-if printf 'NFQWS2_ENABLE=1\\n' | "$H" config-write "$current_hash" >/dev/null 2>&1; then
+if printf 'NFQWS2_ENABLE=1\n' | "$H" config-write "$current_hash" >/dev/null 2>&1; then
     echo "FAIL: symlink backup root was accepted"; exit 1
 fi
 echo "ok: rejects symlink backup root"
