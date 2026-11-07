@@ -89,7 +89,7 @@ void SystemdBackend::runUnitAction(const QString &action, quint64 requestId)
     auto *proc = new QProcess(this);
     auto completed = std::make_shared<bool>(false);
     const auto reportResult = [this, action, requestId](bool success) {
-        query(QStringLiteral("is-active"), [this, action, success](const QString &out) {
+        query(QStringLiteral("is-active"), [this, action, success, requestId](const QString &out) {
             const State state = parseUnitState(out);
             emit stateChanged(state);
             if (requestId == 0)
