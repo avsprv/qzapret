@@ -46,6 +46,7 @@ installed separately.
 export QT_QPA_PLATFORM=offscreen
 %ctest
 desktop-file-validate %{buildroot}%{_datadir}/applications/zapret2applet.desktop
+%{_datadir}/icons/hicolor/scalable/apps/zapret2applet.svg
 
 %files
 %license LICENSE NOTICE.md
