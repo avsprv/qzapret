@@ -41,6 +41,87 @@ bc_pid() {
 need_arg() { [ "$1" -ge 2 ] || die "missing value for $2"; }
 
 case "${1:-}" in
+lists-write)
+    [ "$#" -eq 2 ] || die "usage: lists-write NAME"
+    case "$2" in
+        zapret-hosts-user.txt|zapret-hosts-user-exclude.txt|zapret-hosts-user-ipban.txt) ;;
+        *) die "only source user hostlists are writable" ;;
+    esac
+    [ -d "$BASE" ] && [ ! -L "$BASE" ] || die "zapret2 not found in $BASE"
+    ipset_dir="$BASE/ipset"
+    [ -d "$ipset_dir" ] && [ ! -L "$ipset_dir" ] || die "ipset directory is missing or unsafe"
+    list="$ipset_dir/$2"
+    [ ! -L "$list" ] || die "list file must not be a symlink"
+    if [ -e "$list" ] && [ ! -f "$list" ]; then die "list is not a regular file"; fi
+
+    tmp=$(mktemp "$ipset_dir/.list.zapret2applet.XXXXXX") || die "cannot create temporary list"
+    trap 'rm -f "$tmp"' EXIT HUP INT TERM
+    head -c 1048577 > "$tmp"
+    size=$(wc -c < "$tmp" | tr -d '[:space:]')
+    case "$size" in ''|*[!0-9]*) die "cannot determine staged list size" ;; esac
+    [ "$size" -le 1048576 ] || die "list exceeds the 1 MiB write limit"
+    LC_ALL=C awk '
+        NR > 50000 { exit 1 }
+        length($0) > 4095 { exit 1 }
+        /[[:cntrl:]]/ { exit 1 }
+        /[[:space:]]/ { exit 1 }
+        /[^A-Za-z0-9.\/: -]/ { exit 1 }
+    ' "$tmp" || die "invalid hostlist text; use one plain entry per line"
+
+    if [ -e "$list" ]; then
+        [ -f "$list" ] && [ ! -L "$list" ] || die "list changed to an unsafe file"
+        chmod --reference="$list" "$tmp" || die "cannot preserve list permissions"
+        chown --reference="$list" "$tmp" || die "cannot preserve list ownership"
+    else
+        chmod 644 "$tmp" || die "cannot set new list permissions"
+        chown --reference="$ipset_dir" "$tmp" || die "cannot set new list ownership"
+    fi
+
+    if [ -e "$BACKUP_ROOT" ] && { [ ! -d "$BACKUP_ROOT" ] || [ -L "$BACKUP_ROOT" ]; }; then
+        die "backup directory is unsafe"
+    fi
+    [ -d "$BACKUP_ROOT" ] || { mkdir -p "$BACKUP_ROOT" && chmod 700 "$BACKUP_ROOT"; } || die "cannot create backup directory"
+    list_backup_root="$BACKUP_ROOT/lists"
+    if [ -e "$list_backup_root" ] && { [ ! -d "$list_backup_root" ] || [ -L "$list_backup_root" ]; }; then
+        die "list backup directory is unsafe"
+    fi
+    [ -d "$list_backup_root" ] || { mkdir "$list_backup_root" && chmod 700 "$list_backup_root"; } || die "cannot create list backup directory"
+    chmod 700 "$list_backup_root" || die "cannot secure list backup directory"
+
+    backup=""
+    if [ -e "$list" ]; then
+        backup=$(mktemp -d "$list_backup_root/$2-$(date +%Y%m%d-%H%M%S)-XXXXXX") || die "cannot create list backup"
+        cp -p "$list" "$backup/list" || { rm -rf "$backup"; die "cannot back up current list"; }
+        chmod 600 "$backup/list" || { rm -rf "$backup"; die "cannot secure list backup"; }
+    fi
+
+    sync -f "$tmp" || { [ -z "$backup" ] || rm -rf "$backup"; die "cannot sync staged list"; }
+    mv -f -- "$tmp" "$list" || { [ -z "$backup" ] || rm -rf "$backup"; die "atomic list replacement failed"; }
+    sync -f "$ipset_dir" || true
+    trap - EXIT HUP INT TERM
+    if [ -n "$backup" ]; then
+        echo "OK: list updated; backup: $backup"
+    else
+        echo "OK: list created; no previous file existed"
+    fi
+    ;;
+lists-read)
+    [ "$#" -eq 2 ] || die "usage: lists-read NAME"
+    case "$2" in
+        zapret-hosts-user.txt|zapret-hosts-user-exclude.txt|zapret-hosts-user-ipban.txt|zapret-ip-user.txt|zapret-ip-user6.txt|zapret-ip-exclude.txt|zapret-ip-exclude6.txt|zapret-ip-user-ipban.txt|zapret-ip-user-ipban6.txt) ;;
+        *) die "list name is not allowlisted" ;;
+    esac
+    [ -d "$BASE" ] && [ ! -L "$BASE" ] || die "zapret2 not found in $BASE"
+    ipset_dir="$BASE/ipset"
+    [ -d "$ipset_dir" ] && [ ! -L "$ipset_dir" ] || die "ipset directory is missing or unsafe"
+    list="$ipset_dir/$2"
+    [ -e "$list" ] || { echo "zapret2applet-helper: list file does not exist" >&2; exit 3; }
+    [ -f "$list" ] && [ ! -L "$list" ] || die "list is not a regular file"
+    size=$(wc -c < "$list" | tr -d '[:space:]')
+    case "$size" in ''|*[!0-9]*) die "cannot determine list size" ;; esac
+    [ "$size" -le 1048576 ] || die "list exceeds the 1 MiB read limit"
+    cat "$list"
+    ;;
 config-read)
     [ "$#" -eq 1 ] || die "usage: config-read"
     [ -d "$BASE" ] && [ ! -L "$BASE" ] || die "zapret2 not found in $BASE"
@@ -254,6 +335,6 @@ update)
     echo "OK: zapret2 updated to $tag (previous version kept in $bak)"
     ;;
 *)
-    die "usage: zapret2applet-helper unit {start|stop|enable|disable} | blockcheck [opts] | blockcheck-cancel | update vX.Y.Z"
+    die "usage: zapret2applet-helper lists-read NAME | lists-write NAME | config-read | config-write | config-rollback | unit {start|stop|enable|disable} | blockcheck [opts] | blockcheck-cancel | update vX.Y.Z"
     ;;
 esac
