@@ -33,8 +33,14 @@ MainWindow::MainWindow(QWidget *parent)
     tabs->addTab(m_blockcheck, tr("Подбор стратегий"));
     m_update = new UpdatePage(m_backend, this);
     tabs->addTab(m_update, tr("Обновления"));
-    connect(m_blockcheck, &BlockcheckPage::busyChanged, m_update, &UpdatePage::setServiceBusy);
-    connect(m_update, &UpdatePage::busyChanged, m_blockcheck, &BlockcheckPage::setUpdateBusy);
+    connect(m_blockcheck, &BlockcheckPage::busyChanged, this, [this](bool busy) {
+        m_update->setServiceBusy(busy);
+        m_backend->refresh();
+    });
+    connect(m_update, &UpdatePage::busyChanged, this, [this](bool busy) {
+        m_blockcheck->setUpdateBusy(busy);
+        m_backend->refresh();
+    });
     setCentralWidget(tabs);
 
     connect(m_backend, &ZapretBackend::stateChanged, this, &MainWindow::onStateChanged);
@@ -166,14 +172,15 @@ void MainWindow::onStateChanged(ZapretBackend::State state)
     }
     m_status->setText(tr("Статус: %1").arg(text));
     const bool active = state == ZapretBackend::State::Active;
-    m_startBtn->setEnabled(!active);
-    m_stopBtn->setEnabled(active);
+    const bool locked = m_blockcheck->isRunning() || m_update->isBusy();
+    m_startBtn->setEnabled(!active && !locked);
+    m_stopBtn->setEnabled(active && !locked);
 
     if (m_tray) {
         m_tray->setIcon(QIcon::fromTheme(iconName, style()->standardIcon(QStyle::SP_ComputerIcon)));
         m_tray->setToolTip(tr("zapret2applet: %1").arg(text));
-        m_trayStart->setEnabled(!active);
-        m_trayStop->setEnabled(active);
+        m_trayStart->setEnabled(!active && !locked);
+        m_trayStop->setEnabled(active && !locked);
     }
 }
 
