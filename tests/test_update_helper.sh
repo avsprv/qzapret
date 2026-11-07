@@ -147,7 +147,8 @@ grep -q 'NFQWS2_ENABLE=0' "$W/opt/zapret2/config" && ok "fresh config disables N
 [ -x "$W/opt/zapret2/nfq2/nfqws2" ] && [ -x "$W/opt/zapret2/ip2net/ip2net" ] \
     && ok "compatible binaries linked" || bad "binary links missing"
 [ -f "$W/systemd/zapret2.service" ] && ok "systemd unit installed" || bad "systemd unit missing"
-[ -r "$W/opt/zapret2/docs/changes.txt" ] && ok "installed version metadata remains readable" || bad "installed metadata is not readable"
+[ "$(stat -c %a "$W/opt/zapret2/docs/changes.txt")" = 644 ] && ok "installed version metadata is world-readable" || bad "installed metadata permissions are too restrictive"
+[ "$(stat -c %a "$W/opt/zapret2/config")" = 600 ] && ok "initial config is private" || bad "initial config permissions are unsafe"
 [ ! -e "$W/run/install.lock" ] && ok "install lock released" || bad "install lock left behind"
 [ "$(cat "$W/systemctl.log")" = "daemon-reload" ] \
     && ok "systemd reloaded without starting or enabling service" || bad "unexpected systemctl calls: $(cat "$W/systemctl.log")"
