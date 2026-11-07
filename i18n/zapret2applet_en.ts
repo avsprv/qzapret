@@ -1300,4 +1300,8 @@
         </message>
     <message><source>… [строка журнала сокращена]</source><translation>… [log line truncated]</translation></message>
   </context>
+  <context>
+    <name>UpdateController</name>
+    <message><source>Установленная версия новее последнего релиза GitHub.</source><translation>The installed version is newer than the latest GitHub release.</translation></message>
+  </context>
 </TS>
