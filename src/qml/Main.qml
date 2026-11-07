@@ -1,0 +1,184 @@
+import QtQuick
+import QtQuick.Controls as Controls
+import org.kde.kirigami as Kirigami
+
+Kirigami.ApplicationWindow {
+    id: root
+
+    title: qsTr("zapret2applet")
+    width: 980
+    height: 680
+    minimumWidth: 640
+    minimumHeight: 480
+    pageStack.initialPage: dashboardPage
+
+    globalDrawer: Kirigami.GlobalDrawer {
+        title: qsTr("zapret2applet")
+        titleIcon: "zapret2applet"
+        isMenu: true
+
+        actions: [
+            Kirigami.Action {
+                text: qsTr("Статус")
+                icon.name: "network-connect"
+                onTriggered: root.pageStack.replace(dashboardPage)
+            },
+            Kirigami.Action {
+                text: qsTr("Конфигурация")
+                icon.name: "document-edit"
+                onTriggered: root.pageStack.push(placeholderPage, { pageTitle: text })
+            },
+            Kirigami.Action {
+                text: qsTr("Профили")
+                icon.name: "view-list-details"
+                onTriggered: root.pageStack.push(placeholderPage, { pageTitle: text })
+            },
+            Kirigami.Action {
+                text: qsTr("Списки")
+                icon.name: "view-list-text"
+                onTriggered: root.pageStack.push(placeholderPage, { pageTitle: text })
+            },
+            Kirigami.Action {
+                text: qsTr("Мониторинг")
+                icon.name: "utilities-system-monitor"
+                onTriggered: root.pageStack.push(placeholderPage, { pageTitle: text })
+            },
+            Kirigami.Action {
+                text: qsTr("Подбор стратегий")
+                icon.name: "search"
+                onTriggered: root.pageStack.push(placeholderPage, { pageTitle: text })
+            },
+            Kirigami.Action {
+                text: qsTr("Обновления")
+                icon.name: "system-software-update"
+                onTriggered: root.pageStack.push(placeholderPage, { pageTitle: text })
+            },
+            Kirigami.Action {
+                text: qsTr("Настройки")
+                icon.name: "settings-configure"
+                onTriggered: root.pageStack.push(placeholderPage, { pageTitle: text })
+            },
+            Kirigami.Action {
+                text: qsTr("О программе")
+                icon.name: "help-about"
+                onTriggered: root.pageStack.push(placeholderPage, { pageTitle: text })
+            }
+        ]
+    }
+
+    Component {
+        id: dashboardPage
+
+        Kirigami.ScrollablePage {
+            title: qsTr("Статус")
+            actions: [
+                Kirigami.Action {
+                    text: qsTr("Обновить")
+                    icon.name: "view-refresh"
+                    onTriggered: appController.refresh()
+                }
+            ]
+
+            ColumnLayout {
+                width: parent.width
+                spacing: Kirigami.Units.largeSpacing
+
+                Kirigami.Heading {
+                    level: 1
+                    text: qsTr("Состояние zapret2")
+                }
+
+                Controls.Frame {
+                    Layout.fillWidth: true
+
+                    ColumnLayout {
+                        anchors.fill: parent
+                        spacing: Kirigami.Units.mediumSpacing
+
+                        RowLayout {
+                            Layout.fillWidth: true
+
+                            Kirigami.Heading {
+                                level: 2
+                                text: appController.serviceState
+                            }
+
+                            Item { Layout.fillWidth: true }
+
+                            Rectangle {
+                                width: 12
+                                height: 12
+                                radius: width / 2
+                                color: appController.serviceActive ? Kirigami.Theme.positiveTextColor
+                                                                   : Kirigami.Theme.neutralTextColor
+                            }
+                        }
+
+                        Controls.Label {
+                            Layout.fillWidth: true
+                            text: qsTr("Управление системной службой zapret2")
+                            opacity: 0.75
+                            wrapMode: Text.WordWrap
+                        }
+
+                        RowLayout {
+                            Controls.Button {
+                                text: qsTr("Запустить")
+                                icon.name: "media-playback-start"
+                                enabled: !appController.serviceActive
+                                onClicked: appController.startService()
+                            }
+
+                            Controls.Button {
+                                text: qsTr("Остановить")
+                                icon.name: "media-playback-stop"
+                                enabled: appController.serviceActive
+                                onClicked: appController.stopService()
+                            }
+
+                            Item { Layout.fillWidth: true }
+
+                            Controls.Button {
+                                text: qsTr("Проверить")
+                                icon.name: "view-refresh"
+                                onClicked: appController.refresh()
+                            }
+                        }
+                    }
+                }
+
+                Kirigami.InlineMessage {
+                    Layout.fillWidth: true
+                    visible: appController.errorMessage.length > 0
+                    type: Kirigami.MessageType.Error
+                    text: appController.errorMessage
+                }
+
+                Kirigami.InlineMessage {
+                    Layout.fillWidth: true
+                    visible: true
+                    type: Kirigami.MessageType.Information
+                    text: qsTr("Это первый этап миграции на QML и Kirigami. Остальные разделы будут переноситься поэтапно; текущая версия приложения пока сохраняет прежний интерфейс.")
+                }
+            }
+        }
+    }
+
+    Component {
+        id: placeholderPage
+
+        Kirigami.Page {
+            property string pageTitle: ""
+
+            title: pageTitle
+
+            Controls.Label {
+                anchors.centerIn: parent
+                width: Math.min(parent.width - Kirigami.Units.largeSpacing * 2, 520)
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.WordWrap
+                text: qsTr("Этот раздел будет перенесён на QML на следующем этапе миграции.")
+            }
+        }
+    }
+}
