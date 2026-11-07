@@ -45,6 +45,7 @@ public:
     Q_INVOKABLE void start();
     Q_INVOKABLE void confirmStop(bool accepted);
     Q_INVOKABLE void cancel();
+    Q_INVOKABLE void copyStrategy(int index);
 
 signals:
     void optionsChanged();
