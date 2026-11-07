@@ -98,24 +98,28 @@ BlockcheckPage::BlockcheckPage(ZapretBackend *backend, QWidget *parent)
     layout->addWidget(note);
 
     m_stopTimeout->setSingleShot(true);
-    m_stopTimeout->setInterval(60000);
-    connect(m_stopTimeout, &QTimer::timeout, this, [this] {
-        m_waitingStop = false;
-        m_resumeService = false;
-        setBusy(false);
-        m_log->appendPlainText(tr("Не удалось остановить сервис zapret2, подбор не начат."));
-    });
+    m_stopTimeout->setInterval(30000);
+    connect(m_stopTimeout, &QTimer::timeout, this, &BlockcheckPage::onLifecycleTimeout);
 
     connect(m_startBtn, &QPushButton::clicked, this, &BlockcheckPage::onStartClicked);
     connect(m_cancelBtn, &QPushButton::clicked, this, [this] {
         m_cancelBtn->setEnabled(false);
-        if (m_waitingStop) {
+        switch (m_phase) {
+        case LifecyclePhase::Checking:
             m_stopTimeout->stop();
-            m_waitingStop = false;
-            m_resumeService = false;
-            setBusy(false);
-        } else {
+            finishLifecycle(tr("Проверка состояния отменена. Диагностика не запускалась."));
+            break;
+        case LifecyclePhase::WaitingForStop:
+            // Остановка могла уже выполниться. Дожидаемся подтверждения и восстанавливаем сервис.
+            m_cancelRequested = true;
+            m_log->appendPlainText(tr("Отмена запрошена. Дожидаюсь результата остановки сервиса…"));
+            break;
+        case LifecyclePhase::Scanning:
             m_runner->cancel();
+            break;
+        case LifecyclePhase::Idle:
+        case LifecyclePhase::WaitingForStart:
+            break;
         }
     });
     connect(m_saveLogBtn, &QPushButton::clicked, this, &BlockcheckPage::saveLog);
@@ -130,6 +134,9 @@ BlockcheckPage::BlockcheckPage(ZapretBackend *backend, QWidget *parent)
         m_copyBtn->setEnabled(m_results->currentItem() != nullptr);
     });
     connect(m_backend, &ZapretBackend::stateChanged, this, &BlockcheckPage::onBackendState);
+    connect(m_backend, &ZapretBackend::errorOccurred, this, [this](const QString &message) {
+        m_log->appendPlainText(tr("Ошибка управления сервисом: %1").arg(message));
+    });
     connect(m_runner, &BlockcheckRunner::logLine, m_log, &QPlainTextEdit::appendPlainText);
     connect(m_runner, &BlockcheckRunner::strategyFound, this, [this](const BlockcheckRunner::Result &r) {
         ++m_found;
@@ -178,41 +185,107 @@ void BlockcheckPage::onStartClicked()
     m_found = 0;
     m_results->clear();
     m_log->clear();
-
-    if (m_state == ZapretBackend::State::Active) {
-        const auto answer = QMessageBox::question(
-            this, tr("Сервис zapret2 запущен"),
-            tr("Подбор не работает при запущенном zapret2. Остановить сервис на время подбора "
-               "и запустить снова после завершения?"));
-        if (answer != QMessageBox::Yes)
-            return;
-        m_resumeService = true;
-        m_waitingStop = true;
-        setBusy(true);
-        m_log->appendPlainText(tr("Останавливаю zapret2…"));
-        m_stopTimeout->start();
-        m_backend->stop();
-        return;
-    }
-    beginScan();
+    m_lastOptions = o;
+    m_resumeService = false;
+    m_cancelRequested = false;
+    m_phase = LifecyclePhase::Checking;
+    setBusy(true);
+    m_log->appendPlainText(tr("Проверяю состояние сервиса zapret2…"));
+    m_stopTimeout->start();
+    m_backend->refresh();
 }
 
 void BlockcheckPage::onBackendState(ZapretBackend::State state)
 {
     m_state = state;
-    if (m_waitingStop && state != ZapretBackend::State::Active) {
-        m_stopTimeout->stop();
-        m_waitingStop = false;
-        beginScan();
+    switch (m_phase) {
+    case LifecyclePhase::Checking:
+        if (state == ZapretBackend::State::Active) {
+            m_stopTimeout->stop();
+            const auto answer = QMessageBox::question(
+                this, tr("Сервис zapret2 запущен"),
+                tr("Подбор не работает при запущенном zapret2. Остановить сервис на время подбора "
+                   "и запустить снова после завершения?"));
+            if (answer != QMessageBox::Yes) {
+                finishLifecycle(tr("Подбор отменён. Сервис не изменён."));
+                return;
+            }
+            m_resumeService = true;
+            m_phase = LifecyclePhase::WaitingForStop;
+            m_log->appendPlainText(tr("Останавливаю zapret2 и проверяю результат…"));
+            m_stopTimeout->start();
+            m_backend->stop();
+        } else if (state == ZapretBackend::State::Inactive) {
+            m_stopTimeout->stop();
+            beginScan();
+        } else if (state == ZapretBackend::State::Failed || state == ZapretBackend::State::Unknown) {
+            m_stopTimeout->stop();
+            finishLifecycle(tr("Не удалось достоверно определить состояние сервиса. Диагностика не запущена."));
+        }
+        break;
+
+    case LifecyclePhase::WaitingForStop:
+        if (state == ZapretBackend::State::Inactive) {
+            m_stopTimeout->stop();
+            if (m_cancelRequested)
+                restoreService(tr("Диагностика отменена до запуска."));
+            else
+                beginScan();
+        } else if (state == ZapretBackend::State::Failed || state == ZapretBackend::State::Unknown) {
+            m_stopTimeout->stop();
+            restoreService(tr("Не удалось подтвердить остановку сервиса. Диагностика не запущена."));
+        }
+        break;
+
+    case LifecyclePhase::WaitingForStart:
+        if (state == ZapretBackend::State::Active) {
+            m_stopTimeout->stop();
+            m_resumeService = false;
+            finishLifecycle(tr("Сервис zapret2 снова активен."));
+        } else if (state == ZapretBackend::State::Failed) {
+            m_stopTimeout->stop();
+            m_resumeService = false;
+            finishLifecycle(tr("Не удалось восстановить сервис zapret2. Проверьте состояние systemd."));
+        }
+        break;
+
+    case LifecyclePhase::Idle:
+    case LifecyclePhase::Scanning:
+        break;
     }
 }
 
 void BlockcheckPage::beginScan()
 {
+    m_phase = LifecyclePhase::Scanning;
     setBusy(true);
-    m_log->appendPlainText(tr("Запускаю blockcheck2…"));
-    m_lastOptions = collectOptions();
+    m_log->appendPlainText(tr("Сервис остановлен. Запускаю blockcheck2…"));
     m_runner->start(m_lastOptions);
+}
+
+void BlockcheckPage::restoreService(const QString &reason)
+{
+    if (!reason.isEmpty())
+        m_log->appendPlainText(reason);
+    if (!m_resumeService) {
+        finishLifecycle();
+        return;
+    }
+    m_phase = LifecyclePhase::WaitingForStart;
+    m_log->appendPlainText(tr("Запускаю zapret2 и проверяю восстановление…"));
+    m_stopTimeout->start();
+    m_backend->start();
+}
+
+void BlockcheckPage::finishLifecycle(const QString &message)
+{
+    m_stopTimeout->stop();
+    m_phase = LifecyclePhase::Idle;
+    m_resumeService = false;
+    m_cancelRequested = false;
+    setBusy(false);
+    if (!message.isEmpty())
+        m_log->appendPlainText(message);
 }
 
 void BlockcheckPage::saveLog()
@@ -242,9 +315,22 @@ void BlockcheckPage::saveLog()
     }
 }
 
+void BlockcheckPage::onLifecycleTimeout()
+{
+    if (m_phase == LifecyclePhase::Checking) {
+        finishLifecycle(tr("Не удалось получить подтверждённое состояние сервиса. Диагностика не запущена."));
+    } else if (m_phase == LifecyclePhase::WaitingForStop) {
+        // Остановка могла завершиться без своевременного обновления статуса.
+        // Повторный start безопаснее, чем оставить ранее активный сервис остановленным.
+        restoreService(tr("Не получено подтверждение остановки сервиса за отведённое время."));
+    } else if (m_phase == LifecyclePhase::WaitingForStart) {
+        m_resumeService = false;
+        finishLifecycle(tr("Не удалось подтвердить запуск zapret2. Проверьте systemctl status zapret2.service."));
+    }
+}
+
 void BlockcheckPage::onFinished(int exitCode, bool canceled)
 {
-    setBusy(false);
     if (canceled)
         m_log->appendPlainText(tr("Подбор отменён."));
     else if (exitCode != 0)
@@ -269,9 +355,10 @@ void BlockcheckPage::onFinished(int exitCode, bool canceled)
     m_log->appendPlainText(tr("Код завершения: %1").arg(exitCode));
     m_log->appendPlainText(tr("Статус: %1").arg(status));
     if (m_resumeService) {
-        m_resumeService = false;
-        m_log->appendPlainText(tr("Запускаю zapret2 обратно…"));
-        m_backend->start();
+        m_cancelRequested = canceled;
+        restoreService(tr("Диагностика завершена."));
+    } else {
+        finishLifecycle();
+        emit scanFinished(m_found, canceled);
     }
-    emit scanFinished(m_found, canceled);
 }
