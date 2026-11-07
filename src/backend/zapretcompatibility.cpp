@@ -72,7 +72,7 @@ Report inspect(const QString &baseDir)
                     &report.missingComponents);
 
         static const QRegularExpression scanLevelsRe(
-            QStringLiteral(R"(ask_list\s+SCANLEVEL\s+"([^"]+)")"));
+            QStringLiteral(R"REGEX(ask_list\s+SCANLEVEL\s+"([^"]+)")REGEX"));
         const auto match = scanLevelsRe.match(text);
         const QStringList requiredLevels{
             QStringLiteral("veryquick"), QStringLiteral("quick"),
