@@ -97,6 +97,8 @@ qt_add_executable(zapret2applet-qml-preview
     src/qml/settingsmanager.h
     src/qml/configcontroller.cpp
     src/qml/configcontroller.h
+    src/qml/profilecontroller.cpp
+    src/qml/profilecontroller.h
     src/backend/systemdbackend.cpp
     src/backend/systemdbackend.h
     src/backend/zapretbackend.h
@@ -109,6 +111,7 @@ qt_add_qml_module(zapret2applet-qml-preview
         src/qml/Main.qml
         src/qml/pages/SettingsPage.qml
         src/qml/pages/ConfigPage.qml
+        src/qml/pages/ProfilesPage.qml
 )
 target_include_directories(zapret2applet-qml-preview PRIVATE src src/qml)
 target_link_libraries(zapret2applet-qml-preview PRIVATE
