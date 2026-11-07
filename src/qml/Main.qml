@@ -129,20 +129,21 @@ Kirigami.ApplicationWindow {
                             text: qsTr("Запускать zapret2 при загрузке системы")
                             checked: appController.bootEnabled
                             onToggled: appController.setBootEnabled(checked)
+                            enabled: !appController.operationsBusy
                         }
 
                         RowLayout {
                             Controls.Button {
                                 text: qsTr("Запустить")
                                 icon.name: "media-playback-start"
-                                enabled: !appController.serviceActive
+                                enabled: !appController.serviceActive && !appController.operationsBusy
                                 onClicked: appController.startService()
                             }
 
                             Controls.Button {
                                 text: qsTr("Остановить")
                                 icon.name: "media-playback-stop"
-                                enabled: appController.serviceActive
+                                enabled: appController.serviceActive && !appController.operationsBusy
                                 onClicked: appController.stopService()
                             }
 
@@ -151,6 +152,7 @@ Kirigami.ApplicationWindow {
                             Controls.Button {
                                 text: qsTr("Проверить")
                                 icon.name: "view-refresh"
+                                enabled: !appController.operationsBusy
                                 onClicked: appController.refresh()
                             }
                         }
