@@ -120,8 +120,6 @@ qt_add_executable(zapret2applet-qml-preview
     src/qml/blockcheckcontroller.h
     src/backend/blockcheckrunner.cpp
     src/backend/blockcheckrunner.h
-    src/backend/systemdbackend.cpp
-    src/backend/systemdbackend.h
     src/profileanalyzer.cpp
     src/profileanalyzer.h
     src/backend/systemdbackend.cpp
