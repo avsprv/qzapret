@@ -20,7 +20,7 @@ Kirigami.ScrollablePage {
                   ? qsTr("Установить zapret2 %1 в /opt/zapret2? Будет проверена структура архива и SHA-256 бинарных компонентов, создана конфигурация по умолчанию с NFQWS2_ENABLE=0 и установлен systemd unit. Служба не будет запущена или добавлена в автозагрузку. Потребуется пароль администратора.")
                     .arg(updateController.latestVersion)
                   : qsTr("Обновить zapret2 с %1 до %2? Если служба запущена, она будет остановлена на время обновления и запущена снова. Потребуется пароль администратора.")
-                    .arg(updateController.installedVersion, updateController.latestVersion)
+                    .arg(updateController.installedVersion).arg(updateController.latestVersion)
         }
 
         onAccepted: {
