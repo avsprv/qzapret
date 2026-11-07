@@ -16,7 +16,7 @@ include(CTest)
 find_package(ECM 6.0.0 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 include(ECMFindQmlModule)
-find_package(KF6Kirigami REQUIRED CONFIG)
+find_package(KF6 REQUIRED COMPONENTS Kirigami)
 ecm_find_qmlmodule(org.kde.kirigami REQUIRED)
 
 find_package(Qt6 ${QZAPRET_QT_MIN} REQUIRED COMPONENTS
