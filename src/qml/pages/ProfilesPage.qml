@@ -39,7 +39,7 @@ Kirigami.ScrollablePage {
         Kirigami.InlineMessage {
             Layout.fillWidth: true
             visible: profileController.status.length > 0
-            type: profileController.status.startsWith("Не удалось") || profileController.status.startsWith("Ошибка") ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
+            type: profileController.status.startsWith("Не удалось") || profileController.status.startsWith("Ошибка") || profileController.status.startsWith("config changed") || profileController.status.startsWith("stale config") ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
             text: profileController.status
         }
         Controls.ProgressBar { Layout.fillWidth: true; visible: profileController.busy; indeterminate: true }
