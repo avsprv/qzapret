@@ -295,6 +295,9 @@
         <source>Дождитесь завершения обновления zapret2 перед выходом.</source>
         <translation>Wait for the zapret2 update to finish before quitting.</translation>
     </message>
+    <message><source>Профили</source><translation>Profiles</translation></message>
+    <message><source>Списки</source><translation>Lists</translation></message>
+    <message><source>Мониторинг</source><translation>Monitoring</translation></message>
 </context>
 <context>
     <name>SystemdBackend</name>
