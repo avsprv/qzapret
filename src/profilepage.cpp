@@ -1,5 +1,6 @@
 #include "profilepage.h"
 
+#include <QCryptographicHash>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QHeaderView>
@@ -75,6 +76,11 @@ int ProfilePage::selectedProfile() const
 void ProfilePage::readConfig()
 {
     if (m_process) return;
+    if (m_dirty && QMessageBox::question(
+            this, tr("Несохранённые изменения"),
+            tr("Есть несохранённые изменения профилей. Отбросить их и заново прочитать config?"),
+            QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
+        return;
     m_tree->clear();
     m_configBytes.clear();
     m_loaded = false;
@@ -144,7 +150,8 @@ void ProfilePage::showProfiles()
     }
     setBusy(m_process != nullptr);
 }
-bool ProfilePage::editProfileDialog(ProfileAnalyzer::Profile *profile, const QString &title)
+bool ProfilePage::editProfileDialog(ProfileAnalyzer::Profile *profile, const QString &title,
+                                             int targetIndex, bool insert)
 {
     if (!profile) return false;
     QDialog dialog(this);
@@ -160,50 +167,68 @@ bool ProfilePage::editProfileDialog(ProfileAnalyzer::Profile *profile, const QSt
     layout->addWidget(editor, 1);
     auto *buttons = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel, &dialog);
     layout->addWidget(buttons);
-    connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
     connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
-    if (dialog.exec() != QDialog::Accepted) return false;
-    QStringList args;
-    const QStringList lines = editor->toPlainText().split(QLatin1Char('\n'));
-    for (const QString &line : lines) {
-        const QString arg = line.trimmed();
-        if (!arg.isEmpty()) args.append(arg);
-    }
-    if (args.isEmpty()) {
-        QMessageBox::warning(this, tr("Некорректный профиль"), tr("Профиль должен содержать хотя бы один аргумент."));
-        return false;
-    }
-    if (args.contains(QStringLiteral("--new"))) {
-        QMessageBox::warning(this, tr("Некорректный профиль"), tr("Разделитель --new добавляется автоматически и не может быть аргументом профиля."));
-        return false;
-    }
-    ProfileAnalyzer::Profile candidate;
-    candidate.allArguments = args;
-    for (const QString &arg : args) {
-        if (arg.startsWith(QStringLiteral("--filter-"))) candidate.filters.append(arg);
-        else if (arg.startsWith(QStringLiteral("--payload="))) candidate.payloads.append(arg);
-        else if (arg.startsWith(QStringLiteral("--lua-desync="))) candidate.luaDesync.append(arg);
-        else candidate.other.append(arg);
-    }
-    const auto validation = ProfileAnalyzer::replaceProfiles(m_config, [&] {
-        auto copy = m_profiles;
-        const int index = selectedProfile();
-        if (index >= 0 && index < copy.size()) copy[index] = candidate;
-        else copy.append(candidate);
-        return copy;
-    }());
-    if (!validation.ok()) {
-        QMessageBox::warning(this, tr("Некорректный профиль"), validation.error);
-        return false;
-    }
-    *profile = candidate;
-    return true;
+    connect(buttons->button(QDialogButtonBox::Save), &QPushButton::clicked, &dialog,
+            [this, &dialog, profile, editor, targetIndex, insert] {
+        QStringList args;
+        const QStringList lines = editor->toPlainText().split(QLatin1Char('\n'));
+        for (const QString &line : lines) {
+            const QString arg = line.trimmed();
+            if (!arg.isEmpty()) args.append(arg);
+        }
+        if (args.isEmpty()) {
+            QMessageBox::warning(&dialog, tr("Некорректный профиль"),
+                                 tr("Профиль должен содержать хотя бы один аргумент."));
+            return;
+        }
+        if (args.contains(QStringLiteral("--new"))) {
+            QMessageBox::warning(&dialog, tr("Некорректный профиль"),
+                                 tr("Разделитель --new добавляется автоматически и не может быть аргументом профиля."));
+            return;
+        }
+
+        ProfileAnalyzer::Profile candidate;
+        candidate.allArguments = args;
+        for (const QString &arg : args) {
+            if (arg.startsWith(QStringLiteral("--filter-"))) candidate.filters.append(arg);
+            else if (arg.startsWith(QStringLiteral("--payload="))) candidate.payloads.append(arg);
+            else if (arg.startsWith(QStringLiteral("--lua-desync="))) candidate.luaDesync.append(arg);
+            else candidate.other.append(arg);
+        }
+
+        auto proposed = m_profiles;
+        if (insert) {
+            if (targetIndex < 0 || targetIndex > proposed.size()) {
+                QMessageBox::warning(&dialog, tr("Некорректный профиль"),
+                                     tr("Не удалось определить позицию нового профиля."));
+                return;
+            }
+            proposed.insert(targetIndex, candidate);
+        } else if (targetIndex < 0) {
+            proposed.append(candidate);
+        } else if (targetIndex < proposed.size()) {
+            proposed[targetIndex] = candidate;
+        } else {
+            QMessageBox::warning(&dialog, tr("Некорректный профиль"),
+                                 tr("Не удалось определить профиль для изменения."));
+            return;
+        }
+
+        const auto validation = ProfileAnalyzer::replaceProfiles(m_config, proposed);
+        if (!validation.ok()) {
+            QMessageBox::warning(&dialog, tr("Некорректный профиль"), validation.error);
+            return;
+        }
+        *profile = candidate;
+        dialog.accept();
+    });
+    return dialog.exec() == QDialog::Accepted;
 }
 void ProfilePage::addProfile()
 {
     if (!m_loaded || m_profiles.size() >= 128) return;
     ProfileAnalyzer::Profile profile;
-    if (!editProfileDialog(&profile, tr("Создать профиль"))) return;
+    if (!editProfileDialog(&profile, tr("Создать профиль"), -1, false)) return;
     m_profiles.append(profile);
     m_dirty = true;
     showProfiles();
@@ -216,9 +241,7 @@ void ProfilePage::editProfile()
     const int index = selectedProfile();
     if (index < 0) return;
     auto candidate = m_profiles.at(index);
-    // Validate against a copy with the selected profile replaced.
-    const auto original = m_profiles;
-    if (!editProfileDialog(&candidate, tr("Изменить профиль"))) return;
+    if (!editProfileDialog(&candidate, tr("Изменить профиль"), index, false)) return;
     m_profiles[index] = candidate;
     m_dirty = true;
     showProfiles();
@@ -231,7 +254,7 @@ void ProfilePage::copyProfile()
     const int index = selectedProfile();
     if (index < 0 || m_profiles.size() >= 128) return;
     auto copy = m_profiles.at(index);
-    if (!editProfileDialog(&copy, tr("Копировать профиль"))) return;
+    if (!editProfileDialog(&copy, tr("Копировать профиль"), index + 1, true)) return;
     m_profiles.insert(index + 1, copy);
     m_dirty = true;
     showProfiles();
@@ -298,5 +321,7 @@ void ProfilePage::applyProfiles()
         setBusy(false);
         m_status->setText(tr("Не удалось запустить хелпер: %1").arg(reason));
     });
-    Helper::start(proc, {QStringLiteral("config-write")});
+    const QString expectedHash = QString::fromLatin1(
+        QCryptographicHash::hash(m_configBytes, QCryptographicHash::Sha256).toHex());
+    Helper::start(proc, {QStringLiteral("config-write"), expectedHash});
 }

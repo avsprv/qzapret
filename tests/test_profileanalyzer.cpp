@@ -84,6 +84,31 @@ private slots:
         QVERIFY(!ProfileAnalyzer::replaceProfiles(
             QStringLiteral("NFQWS2_OPT=\"--filter-tcp=80\"\n"), {unsafe}).ok());
     }
+    void rejectsReservedNewDelimiterAsArgument() {
+        ProfileAnalyzer::Profile invalid;
+        invalid.allArguments = {QStringLiteral("--new")};
+        QVERIFY(!ProfileAnalyzer::replaceProfiles(
+            QStringLiteral("NFQWS2_OPT=\"--filter-tcp=80\"\\n"), {invalid}).ok());
+    }
+    void countsProfileSeparatorsTowardTokenLimit() {
+        QVector<ProfileAnalyzer::Profile> profiles;
+        for (int i = 0; i < 128; ++i) {
+            ProfileAnalyzer::Profile profile;
+            for (int j = 0; j < 32; ++j)
+                profile.allArguments.append(QStringLiteral("--option%1=value").arg(j));
+            profiles.append(profile);
+        }
+        const auto result = ProfileAnalyzer::replaceProfiles(
+            QStringLiteral("NFQWS2_OPT=\"--filter-tcp=80\"\\n"), profiles);
+        QVERIFY(!result.ok());
+    }
+    void enforcesCompleteConfigSizeLimit() {
+        const QString config = QStringLiteral("NFQWS2_OPT=\"--filter-tcp=80\"\\n#") +
+                               QString(1024 * 1024, QLatin1Char('x')) + QLatin1Char('\n');
+        const auto result = ProfileAnalyzer::replaceProfiles(
+            config, ProfileAnalyzer::parse(config).profiles);
+        QVERIFY(!result.ok());
+    }
     void rejectsEmptyReplacement() {
         auto parsed = ProfileAnalyzer::parse(
             QStringLiteral("NFQWS2_OPT=\"--filter-tcp=80\"\n"));

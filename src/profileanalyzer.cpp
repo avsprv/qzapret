@@ -62,7 +62,7 @@ bool findAssignment(const QString &config, qsizetype *quoteStart, qsizetype *quo
 }
 bool validArgument(const QString &argument)
 {
-    if (argument.isEmpty())
+    if (argument.isEmpty() || argument == QStringLiteral("--new"))
         return false;
     for (const QChar ch : argument) {
         if (ch.isSpace() || ch.category() == QChar::Other_Control || ch == QLatin1Char('"') ||
@@ -141,11 +141,16 @@ EditResult replaceProfiles(const QString &config, const QVector<Profile> &profil
         return result;
     }
     QStringList serialized;
-    qsizetype argumentCount = 0;
-    for (const Profile &profile : profiles) {
+    qsizetype tokenCount = 0;
+    for (qsizetype profileIndex = 0; profileIndex < profiles.size(); ++profileIndex) {
+        const Profile &profile = profiles.at(profileIndex);
         if (profile.allArguments.isEmpty()) {
             result.error = errorText("Профиль не может быть пустым.");
             return result;
+        }
+        if (profileIndex > 0) {
+            serialized.append(QStringLiteral("--new"));
+            ++tokenCount;
         }
         for (const QString &argument : profile.allArguments) {
             if (!validArgument(argument)) {
@@ -153,25 +158,24 @@ EditResult replaceProfiles(const QString &config, const QVector<Profile> &profil
                 return result;
             }
             serialized.append(argument);
-            ++argumentCount;
-            if (argumentCount > 4096) {
+            ++tokenCount;
+            if (tokenCount > 4096) {
                 result.error = errorText("Слишком много профилей или параметров.");
                 return result;
             }
         }
-        if (&profile != &profiles.last())
-            serialized.append(QStringLiteral("--new"));
     }
     const QString value = serialized.join(QLatin1Char(' '));
-    if (value.toUtf8().size() > 1024 * 1024) {
-        result.error = errorText("Конфигурация превышает ограничение 1 MiB.");
-        return result;
-    }
     qsizetype quoteStart = -1;
     qsizetype quoteEnd = -1;
     if (!findAssignment(config, &quoteStart, &quoteEnd, &result.error))
         return result;
     result.config = config.left(quoteStart + 1) + value + config.mid(quoteEnd);
+    if (result.config.toUtf8().size() > 1024 * 1024) {
+        result.config.clear();
+        result.error = errorText("Конфигурация превышает ограничение 1 MiB.");
+        return result;
+    }
     return result;
 }
 }
