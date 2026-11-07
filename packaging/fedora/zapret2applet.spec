@@ -46,7 +46,6 @@ installed separately.
 export QT_QPA_PLATFORM=offscreen
 %ctest
 desktop-file-validate %{buildroot}%{_datadir}/applications/zapret2applet.desktop
-%{_datadir}/icons/hicolor/scalable/apps/zapret2applet.svg
 
 %files
 %license LICENSE NOTICE.md
@@ -55,6 +54,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/zapret2applet.desktop
 %{_libexecdir}/zapret2applet/zapret2applet-helper
 %{_datadir}/polkit-1/actions/org.zapret2applet.policy
 %{_datadir}/applications/zapret2applet.desktop
+%{_datadir}/icons/hicolor/scalable/apps/zapret2applet.svg
 
 %changelog
 * Sat Nov 07 2026 avsprv <avsprv@users.noreply.github.com> - 0.4.0-1
@@ -70,6 +70,5 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/zapret2applet.desktop
 * Tue Nov 03 2026 avsprv - 0.2.0-1
 - Strategy selection via blockcheck2, tray applet, boot and login autostart
 - Privileged helper with polkit policy
-
 * Tue Nov 03 2026 avsprv - 0.1.0-1
 - Initial skeleton
