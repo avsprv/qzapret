@@ -513,6 +513,7 @@ install)
     config_assignments=$(grep -Ec '^[[:space:]]*NFQWS2_ENABLE[[:space:]]*=' "$stage/config.default" || true)
     [ "$config_assignments" = 1 ] && grep -q '^NFQWS2_ENABLE=0$' "$stage/config.default" \
         || die "upstream default config does not explicitly disable NFQWS2"
+    sh -n "$stage/config.default" || die "upstream default config has invalid shell syntax"
     cp "$stage/config.default" "$stage/config" || die "cannot create initial config"
     chmod 600 "$stage/config" || die "cannot secure initial config"
 
