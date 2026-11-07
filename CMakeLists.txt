@@ -115,7 +115,7 @@ if(BUILD_TESTING)
     qt_add_executable(test_appsettings tests/test_appsettings.cpp
         src/appsettings.cpp src/appsettings.h)
     target_include_directories(test_appsettings PRIVATE src)
-    target_link_libraries(test_appsettings PRIVATE Qt6::Test Qt6::Core)
+    target_link_libraries(test_appsettings PRIVATE Qt6::Test Qt6::Core Qt6::Widgets)
     add_test(NAME appsettings COMMAND test_appsettings)
 
     qt_add_executable(test_i18n tests/test_i18n.cpp)
