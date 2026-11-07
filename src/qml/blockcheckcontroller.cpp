@@ -74,6 +74,7 @@ QString BlockcheckController::statusSeverity() const {
 bool BlockcheckController::busy() const { return m_busy; }
 bool BlockcheckController::updateBusy() const { return m_updateBusy; }
 void BlockcheckController::setUpdateBusy(bool v) { if (m_updateBusy != v) { m_updateBusy=v; emit updateBusyChanged(); } }
+void BlockcheckController::setServiceBusy(bool v) { m_serviceBusy = v; }
 void BlockcheckController::appendLog(const QString &line) {
     constexpr qsizetype maxLogChars = 1024 * 1024;
     QString boundedLine = line;
@@ -99,7 +100,7 @@ BlockcheckRunner::Options BlockcheckController::collectOptions() const {
     o.repeats=m_repeats; o.scanLevel=m_scanLevel; return o;
 }
 void BlockcheckController::start() {
-    if (m_busy || m_updateBusy) { setStatus(tr("Подбор недоступен во время другой операции."), StatusType::Warning); return; }
+    if (m_busy || m_updateBusy || m_serviceBusy) { setStatus(tr("Подбор недоступен во время другой операции."), StatusType::Warning); return; }
     const auto o=collectOptions();
     static const QRegularExpression labelRe(QStringLiteral("^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$"));
     if (o.domains.isEmpty() || o.domains.size()>10) { setStatus(tr("Укажите от 1 до 10 доменов."), StatusType::Error); return; }
