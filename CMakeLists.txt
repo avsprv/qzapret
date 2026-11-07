@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 project(zapret2applet VERSION 0.4.0 LANGUAGES CXX)
 
-# Минимум — Qt 6.8 LTS (поддержка до 2029). API новее 6.8 не используем;
-# при выходе дистрибутивных пакетов Qt 6.12 LTS проверяем сборку и на нём.
+# Minimum supported Qt release. Keep the API compatible with the Qt 6.8 LTS baseline.
 set(QZAPRET_QT_MIN 6.8 CACHE STRING "Minimum supported Qt version (LTS)")
 
 set(CMAKE_CXX_STANDARD 20)
@@ -13,7 +12,17 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include(GNUInstallDirs)
 include(CTest)
 
-find_package(Qt6 ${QZAPRET_QT_MIN} REQUIRED COMPONENTS Widgets Network LinguistTools)
+# KDE Frameworks / Kirigami dependencies for the parallel QML migration target.
+find_package(ECM 6.0.0 REQUIRED NO_MODULE)
+set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
+include(ECMFindQmlModule)
+find_package(KF6Kirigami REQUIRED CONFIG)
+ecm_find_qmlmodule(org.kde.kirigami REQUIRED)
+
+find_package(Qt6 ${QZAPRET_QT_MIN} REQUIRED COMPONENTS
+    Widgets Network LinguistTools
+    Core Gui Qml Quick QuickControls2
+)
 qt_standard_project_setup(REQUIRES ${QZAPRET_QT_MIN})
 
 set(QZAPRET_HELPER "${CMAKE_INSTALL_FULL_LIBEXECDIR}/zapret2applet/zapret2applet-helper")
@@ -68,6 +77,8 @@ qt_add_translations(zapret2applet_i18n
     INCLUDE_DIRECTORIES src
 )
 
+# Current production application. It remains the installed executable until the
+# QML implementation reaches feature parity and passes the full regression suite.
 qt_add_executable(zapret2applet ${QZAPRET_SOURCES})
 target_include_directories(zapret2applet PRIVATE src)
 target_link_libraries(zapret2applet PRIVATE Qt6::Widgets Qt6::Network zapret2applet_i18n)
@@ -75,6 +86,32 @@ target_compile_definitions(zapret2applet PRIVATE
     QZAPRET_VERSION="${PROJECT_VERSION}"
     QZAPRET_HELPER_PATH="${QZAPRET_HELPER}")
 target_compile_options(zapret2applet PRIVATE -Wall -Wextra)
+
+# Parallel Kirigami application shell. This target is deliberately not installed
+# or packaged yet; it is built in CI while features are migrated incrementally.
+qt_add_executable(zapret2applet-qml-preview
+    src/qml/main.cpp
+    src/qml/applicationcontroller.cpp
+    src/qml/applicationcontroller.h
+    src/backend/systemdbackend.cpp
+    src/backend/systemdbackend.h
+    src/backend/zapretbackend.h
+    src/backend/helperpath.h
+)
+qt_add_qml_module(zapret2applet-qml-preview
+    URI org.avsprv.zapret2applet
+    VERSION 1.0
+    QML_FILES
+        src/qml/Main.qml
+)
+target_include_directories(zapret2applet-qml-preview PRIVATE src src/qml)
+target_link_libraries(zapret2applet-qml-preview PRIVATE
+    Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick Qt6::QuickControls2
+)
+target_compile_definitions(zapret2applet-qml-preview PRIVATE
+    QZAPRET_VERSION="${PROJECT_VERSION}"
+    QZAPRET_HELPER_PATH="${QZAPRET_HELPER}")
+target_compile_options(zapret2applet-qml-preview PRIVATE -Wall -Wextra)
 
 configure_file(data/org.zapret2applet.policy.in ${CMAKE_BINARY_DIR}/org.zapret2applet.policy @ONLY)
 
