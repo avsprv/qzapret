@@ -432,9 +432,14 @@ void BlockcheckControllerTest::restoreTimeoutReportsError()
     controller.start();
     controller.confirmStop(true);
     QCOMPARE(backend.startCalls, 1);
-    QTRY_VERIFY_WITH_TIMEOUT(!controller.busy(), 1000);
-    QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Error);
-    QVERIFY(controller.status().contains(QStringLiteral("Не удалось подтвердить восстановление")));
+    QTRY_COMPARE_WITH_TIMEOUT(controller.statusType(), BlockcheckController::StatusType::Warning, 1000);
+    QVERIFY(controller.busy());
+    QCOMPARE(backend.startCalls, 1);
+
+    backend.completeStart(ZapretBackend::State::Active, true);
+    QVERIFY(!controller.busy());
+    QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Warning);
+    QVERIFY(controller.status().contains(QStringLiteral("восстановлена с задержкой")));
 }
 
 
