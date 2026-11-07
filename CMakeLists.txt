@@ -28,6 +28,8 @@ qt_standard_project_setup(REQUIRES ${QZAPRET_QT_MIN})
 set(QZAPRET_HELPER "${CMAKE_INSTALL_FULL_LIBEXECDIR}/zapret2applet/zapret2applet-helper")
 
 set(QZAPRET_SOURCES
+    src/appsettings.cpp
+    src/appsettings.h
     src/main.cpp
     src/settingsdialog.cpp
     src/settingsdialog.h
@@ -93,8 +95,6 @@ qt_add_executable(zapret2applet-qml-preview
     src/qml/applicationcontroller.h
     src/qml/settingsmanager.cpp
     src/qml/settingsmanager.h
-    src/appsettings.cpp
-    src/appsettings.h
     src/backend/systemdbackend.cpp
     src/backend/systemdbackend.h
     src/backend/zapretbackend.h
