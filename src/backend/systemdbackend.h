@@ -13,6 +13,9 @@ class SystemdBackend : public ZapretBackend
 public:
     explicit SystemdBackend(QObject *parent = nullptr);
 
+    QString displayName() const override { return QStringLiteral("systemd"); }
+    bool supportsJournalLogs() const override { return true; }
+
     void refresh() override;
     void start() override;
     void stop() override;

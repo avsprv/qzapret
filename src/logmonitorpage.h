@@ -16,6 +16,7 @@ class LogMonitorPage : public QWidget
     Q_OBJECT
 public:
     explicit LogMonitorPage(QWidget *parent = nullptr);
+    void setSupported(bool supported);
 protected:
     void showEvent(QShowEvent *event) override;
     void hideEvent(QHideEvent *event) override;
@@ -30,4 +31,5 @@ private:
     QProcess *m_process = nullptr;
     QTimer *m_timer = nullptr;
     QByteArray m_output;
+    bool m_supported = true;
 };

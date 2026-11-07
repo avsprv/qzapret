@@ -38,6 +38,10 @@ set(QZAPRET_SOURCES
     src/mainwindow.h
     src/updatepage.cpp
     src/updatepage.h
+    src/backend/backendfactory.cpp
+    src/backend/backendfactory.h
+    src/backend/initbackends.cpp
+    src/backend/initbackends.h
     src/backend/blockcheckrunner.cpp
     src/backend/blockcheckrunner.h
     src/backend/helperpath.h
@@ -115,6 +119,10 @@ if(BUILD_TESTING)
 
     add_test(NAME logs_helper
              COMMAND sh ${CMAKE_SOURCE_DIR}/tests/test_logs_helper.sh
+                     ${CMAKE_SOURCE_DIR}/packaging/helper/zapret2applet-helper)
+
+    add_test(NAME service_backend_helper
+             COMMAND sh ${CMAKE_SOURCE_DIR}/tests/test_service_backend_helper.sh
                      ${CMAKE_SOURCE_DIR}/packaging/helper/zapret2applet-helper)
 
     qt_add_executable(test_profileanalyzer tests/test_profileanalyzer.cpp

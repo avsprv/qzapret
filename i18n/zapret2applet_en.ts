@@ -298,6 +298,8 @@
     <message><source>Профили</source><translation>Profiles</translation></message>
     <message><source>Списки</source><translation>Lists</translation></message>
     <message><source>Мониторинг</source><translation>Monitoring</translation></message>
+    <message><source>Система управления службами: %1</source><translation>Service manager: %1</translation></message>
+    <message><source>служба или upstream init-скрипт не обнаружены</source><translation>service or upstream init script was not found</translation></message>
 </context>
 <context>
     <name>SystemdBackend</name>
@@ -607,5 +609,18 @@ If the service is running, it will be stopped for the duration of the update and
     <message><source>Журнал обновлён: %1; получено %2 байт.</source><translation>Journal refreshed at %1; received %2 bytes.</translation></message>
     <message><source>Не удалось прочитать журнал: %1</source><translation>Could not read journal: %1</translation></message>
     <message><source>Не удалось запустить хелпер: %1</source><translation>Could not start helper: %1</translation></message>
+      <message><source>Журнал zapret2.service через journald доступен при использовании systemd backend. Для OpenRC и OpenWrt этот просмотр пока отключён. Чтение выполняется через отдельное read-only действие Polkit; произвольные имена служб и параметры journalctl не передаются. Автообновление выключено по умолчанию. Данные не записываются и не изменяют состояние службы.</source><translation>The zapret2.service journald view is available with the systemd backend. This view is currently disabled for OpenRC and OpenWrt. Reading uses a dedicated read-only Polkit action; arbitrary unit names and journalctl arguments are not accepted. Auto-refresh is off by default. No data is written and the service state is not changed.</translation></message>
+    <message><source>Просмотр журнала доступен только при использовании systemd.</source><translation>Journal viewing is only available with the systemd backend.</translation></message>
+    <message><source>Для выбранной init-системы просмотр журнала пока не реализован.</source><translation>Journal viewing is not yet implemented for the selected init system.</translation></message>
+</context>
+  <context>
+    <name>InitScriptBackend</name>
+    <message><source>Не найден корректный upstream init-скрипт zapret2 для %1.</source><translation>A valid upstream zapret2 init script for %1 was not found.</translation></message>
+    <message><source>Операция init-системы не выполнена (код %1): %2</source><translation>Init system operation failed (code %1): %2</translation></message>
+    <message><source>Не удалось запустить pkexec/хелпер: %1</source><translation>Could not start pkexec/helper: %1</translation></message>
+  </context>
+  <context>
+    <name>ZapretBackend</name>
+    <message><source>Не обнаружена поддерживаемая init-система для zapret2.</source><translation>No supported init system for zapret2 was detected.</translation></message>
   </context>
 </TS>

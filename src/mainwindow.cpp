@@ -15,7 +15,7 @@
 #include <QVBoxLayout>
 
 #include "autostart.h"
-#include "backend/systemdbackend.h"
+#include "backend/backendfactory.h"
 #include "blockcheckpage.h"
 #include "configpage.h"
 #include "listsmanagerpage.h"
@@ -25,7 +25,7 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , m_backend(new SystemdBackend(this))
+    , m_backend(BackendFactory::create(this))
     , m_poll(new QTimer(this))
 {
     setWindowTitle(QStringLiteral("zapret2applet"));
@@ -36,7 +36,9 @@ MainWindow::MainWindow(QWidget *parent)
     tabs->addTab(new ConfigPage(this), tr("Конфигурация"));
     tabs->addTab(new ProfilePage(this), tr("Профили"));
     tabs->addTab(new ListsManagerPage(this), tr("Списки"));
-    tabs->addTab(new LogMonitorPage(this), tr("Мониторинг"));
+    auto *logMonitor = new LogMonitorPage(this);
+    logMonitor->setSupported(m_backend->supportsJournalLogs());
+    tabs->addTab(logMonitor, tr("Мониторинг"));
     m_blockcheck = new BlockcheckPage(m_backend, this);
     tabs->addTab(m_blockcheck, tr("Подбор стратегий"));
     m_update = new UpdatePage(m_backend, this);
@@ -64,7 +66,7 @@ MainWindow::MainWindow(QWidget *parent)
             m_tray->showMessage(QStringLiteral("zapret2applet"), tr("Доступна новая версия zapret2: %1").arg(tag));
     });
 
-    m_poll->setInterval(3000);
+    m_poll->setInterval(m_backend->refreshIntervalMs());
     connect(m_poll, &QTimer::timeout, m_backend, &ZapretBackend::refresh);
     m_poll->start();
     m_backend->refresh();
@@ -72,6 +74,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 QWidget *MainWindow::buildStatusPage()
 {
+    m_backendInfo = new QLabel(tr("Система управления службами: %1").arg(m_backend->displayName()));
     m_status = new QLabel(tr("Статус: …"));
     m_startBtn = new QPushButton(tr("Запустить"));
     m_stopBtn = new QPushButton(tr("Остановить"));
@@ -93,6 +96,7 @@ QWidget *MainWindow::buildStatusPage()
 
     auto *page = new QWidget;
     auto *layout = new QVBoxLayout(page);
+    layout->addWidget(m_backendInfo);
     layout->addWidget(m_status);
     auto *row = new QHBoxLayout;
     row->addWidget(m_startBtn);
@@ -100,6 +104,7 @@ QWidget *MainWindow::buildStatusPage()
     row->addStretch();
     layout->addLayout(row);
     layout->addSpacing(12);
+    m_bootCheck->setEnabled(m_backend->isAvailable());
     layout->addWidget(m_bootCheck);
     layout->addWidget(m_guiCheck);
     layout->addStretch();
@@ -151,15 +156,19 @@ void MainWindow::onStateChanged(ZapretBackend::State state)
     default:                             text = tr("неизвестно (zapret2 не установлен?)"); break;
     }
     m_status->setText(tr("Статус: %1").arg(text));
+    const bool available = m_backend->isAvailable();
+    if (!available)
+        text = tr("служба или upstream init-скрипт не обнаружены");
     const bool active = state == ZapretBackend::State::Active;
-    m_startBtn->setEnabled(!active);
-    m_stopBtn->setEnabled(active);
+    m_startBtn->setEnabled(available && !active);
+    m_stopBtn->setEnabled(available && active);
+    m_bootCheck->setEnabled(available);
 
     if (m_tray) {
         m_tray->setIcon(QIcon::fromTheme(iconName, style()->standardIcon(QStyle::SP_ComputerIcon)));
         m_tray->setToolTip(tr("zapret2applet: %1").arg(text));
-        m_trayStart->setEnabled(!active);
-        m_trayStop->setEnabled(active);
+        m_trayStart->setEnabled(available && !active);
+        m_trayStop->setEnabled(available && active);
     }
 }
 

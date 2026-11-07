@@ -45,7 +45,7 @@ LogMonitorPage::LogMonitorPage(QWidget *parent) : QWidget(parent)
     controls->addStretch();
 
     auto *note = new QLabel(
-        tr("Отображается только журнал фиксированной службы zapret2.service. Чтение выполняется через отдельное read-only действие Polkit; произвольные имена служб и параметры journalctl не передаются. Автообновление выключено по умолчанию. Данные не записываются и не изменяют состояние службы."),
+        tr("Журнал zapret2.service через journald доступен при использовании systemd backend. Для OpenRC и OpenWrt этот просмотр пока отключён. Чтение выполняется через отдельное read-only действие Polkit; произвольные имена служб и параметры journalctl не передаются. Автообновление выключено по умолчанию. Данные не записываются и не изменяют состояние службы."),
         this);
     note->setWordWrap(true);
 
@@ -60,7 +60,7 @@ LogMonitorPage::LogMonitorPage(QWidget *parent) : QWidget(parent)
     connect(m_refreshButton, &QPushButton::clicked, this, &LogMonitorPage::readLogs);
     connect(m_timer, &QTimer::timeout, this, &LogMonitorPage::readLogs);
     connect(m_autoRefresh, &QCheckBox::toggled, this, [this](bool enabled) {
-        if (enabled && isVisible()) {
+        if (enabled && m_supported && isVisible()) {
             m_timer->start();
             readLogs();
         } else {
@@ -70,15 +70,28 @@ LogMonitorPage::LogMonitorPage(QWidget *parent) : QWidget(parent)
     setBusy(false);
 }
 
+void LogMonitorPage::setSupported(bool supported)
+{
+    m_supported = supported;
+    if (!supported) {
+        m_timer->stop();
+        m_editor->clear();
+        m_editor->setPlaceholderText(tr("Просмотр журнала доступен только при использовании systemd."));
+        m_status->setText(tr("Для выбранной init-системы просмотр журнала пока не реализован."));
+    }
+    setBusy(false);
+}
+
 void LogMonitorPage::setBusy(bool busy)
 {
-    m_lineCount->setEnabled(!busy);
-    m_refreshButton->setEnabled(!busy);
+    m_lineCount->setEnabled(m_supported && !busy);
+    m_refreshButton->setEnabled(m_supported && !busy);
+    m_autoRefresh->setEnabled(m_supported);
 }
 
 void LogMonitorPage::readLogs()
 {
-    if (m_process)
+    if (!m_supported || m_process)
         return;
 
     m_output.clear();
@@ -131,8 +144,9 @@ void LogMonitorPage::readLogs()
 void LogMonitorPage::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
-    readLogs();
-    if (m_autoRefresh->isChecked())
+    if (m_supported)
+        readLogs();
+    if (m_supported && m_autoRefresh->isChecked())
         m_timer->start();
 }
 
