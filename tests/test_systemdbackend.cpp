@@ -11,6 +11,8 @@ public:
     using SystemdBackend::SystemdBackend;
 
     QStringList actions;
+    int activePrivilegedProcesses = 0;
+    int maxConcurrentPrivilegedProcesses = 0;
     bool failNextActionToStart = false;
     bool failNextActionToExecute = false;
     bool failNextStateQueryToStart = false;
@@ -19,9 +21,19 @@ protected:
     void startProcess(QProcess *process, const QString &program,
                       const QStringList &arguments, bool privileged) override
     {
+        Q_UNUSED(program);
         if (privileged) {
             const QString action = arguments.value(1);
             actions.append(action);
+            ++activePrivilegedProcesses;
+            maxConcurrentPrivilegedProcesses = qMax(maxConcurrentPrivilegedProcesses,
+                                                       activePrivilegedProcesses);
+            connect(process, &QProcess::finished, this, [this] { --activePrivilegedProcesses; });
+            connect(process, &QProcess::errorOccurred, this,
+                    [this](QProcess::ProcessError error) {
+                if (error == QProcess::FailedToStart)
+                    --activePrivilegedProcesses;
+            });
             if (failNextActionToStart) {
                 failNextActionToStart = false;
                 process->start(QStringLiteral("/path/that/does/not/exist"));
@@ -77,6 +89,7 @@ void SystemdBackendTest::serializesUnitActionsInFifoOrder()
     QCOMPARE(backend.actions,
              QStringList({QStringLiteral("stop"), QStringLiteral("start"),
                           QStringLiteral("disable"), QStringLiteral("enable")}));
+    QCOMPARE(backend.maxConcurrentPrivilegedProcesses, 1);
 }
 
 void SystemdBackendTest::continuesAfterFailedToStart()
