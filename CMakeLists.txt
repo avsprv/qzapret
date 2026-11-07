@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(zapret2applet VERSION 0.3.0 LANGUAGES CXX)
+project(zapret2applet VERSION 0.4.0 LANGUAGES CXX)
 
 # Минимум — Qt 6.8 LTS (поддержка до 2029). API новее 6.8 не используем;
 # при выходе дистрибутивных пакетов Qt 6.12 LTS проверяем сборку и на нём.

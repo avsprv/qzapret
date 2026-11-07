@@ -1,5 +1,5 @@
 Name:           zapret2applet
-Version:        0.3.0
+Version:        0.4.0
 Release:        1%{?dist}
 Summary:        Unofficial Qt6 GUI for zapret2
 License:        MIT
@@ -26,8 +26,9 @@ Requires:       systemd
 Recommends:     qt6-qttranslations
 
 %description
-Qt6 graphical front-end for zapret2: service control and strategy selection
-(blockcheck2), system tray applet, and automatic startup. Privileged operations
+Qt6 graphical front-end for zapret2: service and configuration management,
+profile and user host list editing, journal monitoring, strategy selection via
+blockcheck2, system tray applet, and automatic startup. Privileged operations
 use a small Polkit-protected helper. zapret2 is not bundled and must be
 installed separately.
 
@@ -55,6 +56,12 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/zapret2applet.desktop
 %{_datadir}/applications/zapret2applet.desktop
 
 %changelog
+* Sat Nov 07 2026 avsprv <avsprv@users.noreply.github.com> - 0.4.0-1
+- Add safe configuration and profile management with validation and backups
+- Add user hostlist editing and read-only access to generated IP lists
+- Add a read-only systemd journal monitor for zapret2.service
+- Expand helper validation and regression test coverage
+
 * Fri Nov 06 2026 avsprv <avsprv@users.noreply.github.com> - 0.3.0-1
 - Project renamed to zapret2applet (binary, polkit actions, helper, translations)
 - Install and update zapret2 from the latest GitHub release (sha256 verified)

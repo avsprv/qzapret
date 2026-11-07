@@ -34,6 +34,10 @@ The application provides a graphical interface for managing an existing zapret2 
 ## Features
 
 - **Service management:** view the status, start, and stop the zapret2 systemd service.
+- **Configuration:** view and edit `/opt/zapret2/config`, validate shell syntax, create backups, save atomically, and roll back.
+- **Profiles:** statically analyze `NFQWS2_OPT` profiles; create, edit, copy, delete, and safely apply profile changes.
+- **Lists:** view user hostlists and generated IP lists; edit the three source user hostlists with input validation and backups.
+- **Journal monitor:** read recent entries from the fixed `zapret2.service` journal through a read-only Polkit action.
 - **Network diagnostics:** run the upstream `blockcheck2` script to test connectivity to user-specified domains over HTTP, TLS 1.2/1.3, and HTTP/3 (QUIC), with IPv4 and IPv6 support.
 - **Results:** view and copy detected strategies.
 - **System tray:** the application keeps running in the notification area after the main window is closed.
@@ -80,6 +84,22 @@ If a prebuilt package is unavailable, follow the [build from source](#building-f
 ### Service management
 
 The **Status** tab displays the zapret2 service state. You can start or stop the service and configure its autostart. Application autostart at user login is configured separately.
+
+### Configuration
+
+The **Configuration** tab can read and edit `/opt/zapret2/config`, validate shell syntax without executing the file, save with a backup, and roll back the latest saved copy. Before writing, the helper validates syntax and atomically replaces the file. The service is not restarted automatically.
+
+### Profiles
+
+The **Profiles** tab statically analyzes profiles separated by `--new` in `NFQWS2_OPT`. You can create, edit, copy, and delete profiles. The editor does not execute config, shell code, or Lua. Before applying changes, the helper validates shell syntax, creates a backup, and atomically writes the updated configuration. The service is not restarted automatically.
+
+### Lists
+
+The **Lists** tab can display source user hostlists and generated IP lists. Only the three source user hostlists can be edited; entries are validated as domain names, IP addresses, or CIDR ranges. Generated IP files are read-only because zapret2 recreates them. A backup is created before saving.
+
+### Journal monitor
+
+The **Journal** tab displays the latest 50, 100, 200, or 500 entries from the fixed `zapret2.service` unit. Reading uses a separate read-only Polkit action. Optional 10-second auto-refresh is disabled by default.
 
 ### Strategy testing
 
@@ -146,7 +166,7 @@ GitHub Actions builds packages for Debian 13 and Fedora on pushes to main and pu
 
 ## Development and testing
 
-The project uses C++20, Qt 6, CMake, and CTest. Tests cover strategy-testing logic, localization, update versions, and helper validation.
+The project uses C++20, Qt 6, CMake, and CTest. Tests cover strategy testing, profile analysis, localization, update versions, list and journal operations, and helper validation.
 
 ```bash
 ctest --test-dir build --output-on-failure

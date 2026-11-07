@@ -11,13 +11,13 @@ Fedora 41+, Debian 13 (trixie)+, Ubuntu 25.04+. На Ubuntu 24.04 LTS и Debian 
 ```bash
 sudo dnf install rpm-build rpmdevtools mock
 rpmdev-setuptree
-packaging/make-dist.sh                      # нужен тег v<версия>: git tag -a v0.3.0 -m v0.3.0
-cp zapret2applet-0.3.0.tar.gz ~/rpmbuild/SOURCES/
+packaging/make-dist.sh                      # нужен тег v<версия>: git tag -a v0.4.0 -m v0.4.0
+cp zapret2applet-0.4.0.tar.gz ~/rpmbuild/SOURCES/
 cp packaging/fedora/zapret2applet.spec ~/rpmbuild/SPECS/
 rpmbuild -ba ~/rpmbuild/SPECS/zapret2applet.spec
 
 # чистая сборка в chroot (как в COPR)
-mock -r fedora-$(rpm -E %fedora)-x86_64 ~/rpmbuild/SRPMS/zapret2applet-0.3.0-1.*.src.rpm
+mock -r fedora-$(rpm -E %fedora)-x86_64 ~/rpmbuild/SRPMS/zapret2applet-0.4.0-1.*.src.rpm
 ```
 Если тег уже на GitHub, архив можно скачать вместо `make-dist.sh`: `spectool -g -R packaging/fedora/zapret2applet.spec`.
 
@@ -42,7 +42,7 @@ ln -sfn packaging/debian debian
 sudo mk-build-deps -ir debian/control
 dpkg-buildpackage -us -uc -b                # .deb окажется на уровень выше
 ```
-Смена версии: `packaging/debian/changelog` (`dch -v 0.3.1 "..."`), `project(VERSION)` в `CMakeLists.txt`, `Version:` в spec.
+Смена версии: обновить `project(VERSION)` в `CMakeLists.txt`, добавить запись в `packaging/debian/changelog` и изменить `Version:` в RPM spec. RPM workflow получает номер версии непосредственно из `CMakeLists.txt`.
 Если понадобится PPA или Debian-архив — перевести на `3.0 (quilt)` с отдельным `.orig.tar.gz`.
 
 ## Проверка готовых пакетов
