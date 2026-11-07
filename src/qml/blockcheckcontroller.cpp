@@ -55,6 +55,15 @@ QString BlockcheckController::logText() const { return m_logText; }
 QVariantList BlockcheckController::results() const { return m_results; }
 QString BlockcheckController::status() const { return m_status; }
 BlockcheckController::StatusType BlockcheckController::statusType() const { return m_statusType; }
+QString BlockcheckController::statusSeverity() const {
+    switch (m_statusType) {
+    case StatusType::Success: return QStringLiteral("Success");
+    case StatusType::Warning: return QStringLiteral("Warning");
+    case StatusType::Error: return QStringLiteral("Error");
+    case StatusType::Information: return QStringLiteral("Information");
+    }
+    return QStringLiteral("Information");
+}
 bool BlockcheckController::busy() const { return m_busy; }
 bool BlockcheckController::updateBusy() const { return m_updateBusy; }
 void BlockcheckController::setUpdateBusy(bool v) { if (m_updateBusy != v) { m_updateBusy=v; emit updateBusyChanged(); } }
@@ -96,7 +105,7 @@ void BlockcheckController::start() {
         bool valid = true;
         for (const auto &label : domain.split(QLatin1Char('.')))
             valid = valid && label.size()<=63 && labelRe.match(label).hasMatch();
-        if (!valid) { setStatus(tr("Некорректный домен: %1").arg(input)); return; }
+        if (!valid) { setStatus(tr("Некорректный домен: %1").arg(input), StatusType::Error); return; }
     }
     if (o.ipvs!=QLatin1String("4") && o.ipvs!=QLatin1String("6") && o.ipvs!=QLatin1String("46")) { setStatus(tr("Недопустимый протокол IP."), StatusType::Error); return; }
     if (!o.http && !o.tls12 && !o.tls13 && !o.http3) { setStatus(tr("Выберите хотя бы один тип проверки."), StatusType::Error); return; }
