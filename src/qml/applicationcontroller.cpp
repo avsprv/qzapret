@@ -8,7 +8,13 @@ ApplicationController::ApplicationController(QObject *parent)
 {
     connect(m_backend, &ZapretBackend::stateChanged,
             this, &ApplicationController::setState);
-    connect(m_backend, &ZapretBackend::bootEnabledChanged, this, [this](bool enabled) {\n        if (m_bootEnabled == enabled)\n            return;\n        m_bootEnabled = enabled;\n        emit bootEnabledChanged();\n    });\n    connect(m_backend, &ZapretBackend::errorOccurred, this, [this](const QString &message) {
+    connect(m_backend, &ZapretBackend::bootEnabledChanged, this, [this](bool enabled) {
+        if (m_bootEnabled == enabled)
+            return;
+        m_bootEnabled = enabled;
+        emit bootEnabledChanged();
+    });
+    connect(m_backend, &ZapretBackend::errorOccurred, this, [this](const QString &message) {
         if (m_errorMessage == message)
             return;
         m_errorMessage = message;
@@ -65,7 +71,12 @@ void ApplicationController::stopService()
     m_backend->stop();
 }
 
-void ApplicationController::setBootEnabled(bool enabled)\n{\n    m_backend->setBootEnabled(enabled);\n}\n\nvoid ApplicationController::setState(ZapretBackend::State state)
+void ApplicationController::setBootEnabled(bool enabled)
+{
+    m_backend->setBootEnabled(enabled);
+}
+
+void ApplicationController::setState(ZapretBackend::State state)
 {
     if (m_state == state)
         return;
