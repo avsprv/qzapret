@@ -5,6 +5,15 @@
 
 #include "helperpath.h"
 
+void SystemdBackend::startProcess(QProcess *process, const QString &program,
+                                   const QStringList &arguments, bool privileged)
+{
+    if (privileged)
+        Helper::start(process, arguments);
+    else
+        process->start(program, arguments);
+}
+
 SystemdBackend::SystemdBackend(QObject *parent)
     : ZapretBackend(parent)
     , m_unit(QStringLiteral("zapret2.service"))
@@ -30,7 +39,7 @@ void SystemdBackend::query(const QString &verb, const std::function<void(const Q
         onResult(QString());
         proc->deleteLater();
     });
-    proc->start(QStringLiteral("systemctl"), {verb, m_unit});
+    startProcess(proc, QStringLiteral("systemctl"), {verb, m_unit}, false);
 }
 
 namespace {
@@ -140,5 +149,5 @@ void SystemdBackend::startNextUnitAction()
             reportResult(false);
         }
     });
-    Helper::start(proc, {QStringLiteral("unit"), action});
+    startProcess(proc, QString(), {QStringLiteral("unit"), action}, true);
 }
