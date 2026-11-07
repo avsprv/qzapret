@@ -93,6 +93,17 @@ void BlockcheckRunner::onReadyRead()
         handleLine(QString::fromUtf8(m_buf.left(nl)));
         m_buf.remove(0, nl + 1);
     }
+
+    // A malformed or hostile process output without newline separators must not
+    // grow the pending line buffer without bounds. Strategy records are much
+    // shorter than this limit; oversized diagnostic lines are truncated.
+    constexpr qsizetype maxPendingLineBytes = 64 * 1024;
+    if (m_buf.size() > maxPendingLineBytes) {
+        QByteArray bounded = m_buf.left(maxPendingLineBytes);
+        bounded += QByteArrayLiteral("… [строка журнала сокращена]");
+        handleLine(QString::fromUtf8(bounded));
+        m_buf.clear();
+    }
 }
 
 void BlockcheckRunner::handleLine(const QString &rawLine)
