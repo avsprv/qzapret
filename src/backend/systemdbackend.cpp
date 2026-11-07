@@ -80,6 +80,8 @@ void SystemdBackend::verifyState()
 
 void SystemdBackend::verifyState(quint64 requestId)
 {
+    // Invalidate older refresh results while keeping this lifecycle result private.
+    ++m_stateQueryGeneration;
     // Lifecycle verification is private to its requesting operation. Publishing
     // it as stateChanged would let a late response overwrite the application UI.
     query(QStringLiteral("is-active"), [this, requestId](const QString &out) {
