@@ -369,7 +369,8 @@ config-rollback)
     echo "OK: config restored from $restore; previous config backed up to $backup"
     ;;
 unit)
-    case "${2:-}" in
+    [ "$#" -eq 2 ] || die "usage: unit {start|stop|enable|disable}"
+    case "$2" in
         start|stop|enable|disable) exec systemctl "$2" "$UNIT" ;;
         *) die "bad unit action" ;;
     esac
@@ -423,6 +424,7 @@ blockcheck)
         sh "$BASE/blockcheck2.sh"
     ;;
 blockcheck-cancel)
+    [ "$#" -eq 1 ] || die "usage: blockcheck-cancel"
     pid=$(bc_pid) || { echo "zapret2applet-helper: blockcheck is not running" >&2; exit 0; }
     # SIGINT: обработчик blockcheck2.sh печатает "terminating..." и чистит правила/процессы.
     # Если процесс стартовал с игнорируемым SIGINT, через ~3 с шлём SIGTERM (обработчик
@@ -556,7 +558,8 @@ update)
     # update vX.Y.Z — скачать релиз zapret2 с github.com/bol-van/zapret2 и обновить $BASE.
     # Файлы пользователя (config, ipset/zapret-hosts-user*.txt, init.d/*/custom.d) в архиве
     # отсутствуют, поэтому наложение файлов поверх их не затрагивает.
-    tag=${2:-}
+    [ "$#" -eq 2 ] || die "usage: update vX.Y.Z"
+    tag=$2
     case "$tag" in v[0-9]*) ;; *) die "bad tag" ;; esac
     case "$tag" in *[!0-9.v]*|*..*|*.|v*v*) die "bad tag" ;; esac
     [ ${#tag} -le 24 ] || die "bad tag"
