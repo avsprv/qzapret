@@ -24,10 +24,14 @@ class BlockcheckController final : public QObject
     Q_PROPERTY(QString logText READ logText NOTIFY logTextChanged)
     Q_PROPERTY(QVariantList results READ results NOTIFY resultsChanged)
     Q_PROPERTY(QString status READ status NOTIFY statusChanged)
+    Q_PROPERTY(StatusType statusType READ statusType NOTIFY statusChanged)
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
     Q_PROPERTY(bool updateBusy READ updateBusy WRITE setUpdateBusy NOTIFY updateBusyChanged)
 
 public:
+    enum class StatusType { Information, Success, Warning, Error };
+    Q_ENUM(StatusType)
+
     explicit BlockcheckController(QObject *parent = nullptr);
     QString domains() const; void setDomains(const QString &value);
     QString ipVersion() const; void setIpVersion(const QString &value);
@@ -40,6 +44,7 @@ public:
     QString logText() const;
     QVariantList results() const;
     QString status() const;
+    StatusType statusType() const;
     bool busy() const;
     bool updateBusy() const;
     void setUpdateBusy(bool value);
@@ -63,7 +68,7 @@ signals:
 private:
     enum class Phase { Idle, Checking, AwaitingConfirmation, WaitingForStop, Scanning, WaitingForStart };
     void appendLog(const QString &line);
-    void setStatus(const QString &value);
+    void setStatus(const QString &value, StatusType type = StatusType::Information);
     void setBusy(bool value);
     void finish(const QString &message = {});
     void beginScan();
@@ -83,6 +88,7 @@ private:
     int m_repeats = 1;
     QString m_scanLevel = QStringLiteral("standard");
     QString m_logText, m_status;
+    StatusType m_statusType = StatusType::Information;
     QVariantList m_results;
     bool m_busy = false, m_updateBusy = false;
     bool m_resumeService = false, m_cancelRequested = false, m_stopTimedOut = false;
