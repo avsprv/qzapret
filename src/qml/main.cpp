@@ -6,6 +6,7 @@
 
 #include "applicationcontroller.h"
 #include "configcontroller.h"
+#include "profilecontroller.h"
 #include "settingsmanager.h"
 
 int main(int argc, char *argv[])
@@ -18,6 +19,7 @@ int main(int argc, char *argv[])
     ApplicationController controller;
     SettingsManager settingsManager;
     ConfigController configController;
+    ProfileController profileController;
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty(QStringLiteral("appController"), &controller);
     engine.rootContext()->setContextProperty(QStringLiteral("settingsManager"), &settingsManager);
