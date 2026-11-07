@@ -65,23 +65,37 @@ void SystemdBackend::verifyState()
     });
 }
 
+void SystemdBackend::verifyState(quint64 requestId)
+{
+    query(QStringLiteral("is-active"), [this, requestId](const QString &out) {
+        const State state = parseUnitState(out);
+        emit stateChanged(state);
+        emit stateVerifiedForRequest(requestId, state);
+    });
+}
+
 void SystemdBackend::start() { runUnitAction(QStringLiteral("start")); }
+void SystemdBackend::start(quint64 requestId) { runUnitAction(QStringLiteral("start"), requestId); }
 void SystemdBackend::stop() { runUnitAction(QStringLiteral("stop")); }
+void SystemdBackend::stop(quint64 requestId) { runUnitAction(QStringLiteral("stop"), requestId); }
 
 void SystemdBackend::setBootEnabled(bool enabled)
 {
     runUnitAction(enabled ? QStringLiteral("enable") : QStringLiteral("disable"));
 }
 
-void SystemdBackend::runUnitAction(const QString &action)
+void SystemdBackend::runUnitAction(const QString &action, quint64 requestId)
 {
     auto *proc = new QProcess(this);
     auto completed = std::make_shared<bool>(false);
-    const auto reportResult = [this, action](bool success) {
+    const auto reportResult = [this, action, requestId](bool success) {
         query(QStringLiteral("is-active"), [this, action, success](const QString &out) {
             const State state = parseUnitState(out);
             emit stateChanged(state);
-            emit unitActionFinished(action, state, success);
+            if (requestId == 0)
+                emit unitActionFinished(action, state, success);
+            else
+                emit unitActionFinishedForRequest(requestId, action, state, success);
         });
         query(QStringLiteral("is-enabled"), [this](const QString &out) {
             emit bootEnabledChanged(out == QLatin1String("enabled"));
