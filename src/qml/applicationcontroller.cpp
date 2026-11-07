@@ -83,11 +83,15 @@ QString ApplicationController::errorMessage() const
 
 void ApplicationController::refresh()
 {
+    if (m_operationsBusy)
+        return;
     m_backend->refresh();
 }
 
 void ApplicationController::startService()
 {
+    if (m_operationsBusy)
+        return;
     m_errorMessage.clear();
     emit errorMessageChanged();
     m_backend->start();
@@ -95,6 +99,8 @@ void ApplicationController::startService()
 
 void ApplicationController::stopService()
 {
+    if (m_operationsBusy)
+        return;
     m_errorMessage.clear();
     emit errorMessageChanged();
     m_backend->stop();
@@ -102,6 +108,8 @@ void ApplicationController::stopService()
 
 void ApplicationController::setBootEnabled(bool enabled)
 {
+    if (m_operationsBusy)
+        return;
     m_backend->setBootEnabled(enabled);
 }
 
