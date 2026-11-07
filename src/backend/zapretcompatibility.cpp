@@ -31,8 +31,13 @@ Report inspect(const QString &baseDir)
         QStringLiteral("config.default"),
         QStringLiteral("common/base.sh"),
         QStringLiteral("common/dialog.sh"),
+        QStringLiteral("common/elevate.sh"),
+        QStringLiteral("common/fwtype.sh"),
+        QStringLiteral("common/virt.sh"),
         QStringLiteral("blockcheck2.d/standard/10-http-basic.sh"),
+        QStringLiteral("blockcheck2.d/standard/def.inc"),
         QStringLiteral("nfq2/nfqws2"),
+        QStringLiteral("mdig/mdig"),
         QStringLiteral("docs/changes.txt")
     };
 
