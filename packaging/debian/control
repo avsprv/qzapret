@@ -20,6 +20,7 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends},
          pkexec | policykit-1,
          curl,
+         python3,
          systemd
 Recommends: qt6-translations-l10n
 Description: unofficial Qt6 GUI for zapret2
