@@ -80,6 +80,7 @@ qt_add_translations(zapret2applet_i18n
         src/qml/pages/SettingsPage.qml
         src/qml/pages/ConfigPage.qml
         src/qml/pages/ProfilesPage.qml
+        src/qml/pages/AboutPage.qml
     INCLUDE_DIRECTORIES src
 )
 
@@ -120,6 +121,7 @@ qt_add_qml_module(zapret2applet-qml-preview
         src/qml/pages/SettingsPage.qml
         src/qml/pages/ConfigPage.qml
         src/qml/pages/ProfilesPage.qml
+        src/qml/pages/AboutPage.qml
 )
 target_include_directories(zapret2applet-qml-preview PRIVATE src src/qml)
 target_link_libraries(zapret2applet-qml-preview PRIVATE
