@@ -10,24 +10,39 @@ printf 'NFQWS2_ENABLE=1\n# original\n' > "$tmp/base/config"
 out=$("$H" config-read)
 [ "$out" = "$(cat "$tmp/base/config")" ] || { echo "FAIL: config-read changed content"; exit 1; }
 echo "ok: reads regular config"
-printf 'NFQWS2_ENABLE=0\n# changed\n' | "$H" config-write > "$tmp/write.out"
+
+initial_hash=$(sha256sum "$tmp/base/config" | awk '{print $1}')
+printf 'NFQWS2_ENABLE=0\n# changed\n' | "$H" config-write "$initial_hash" > "$tmp/write.out"
 grep -q 'backup:' "$tmp/write.out"
 grep -q 'NFQWS2_ENABLE=0' "$tmp/base/config"
-echo "ok: validates, backs up and writes config"
-if printf 'if then\n' | "$H" config-write >/dev/null 2>&1; then
+echo "ok: validates, backs up and writes config with expected SHA-256"
+
+if printf 'NFQWS2_ENABLE=9\n' | "$H" config-write "$initial_hash" >/dev/null 2>&1; then
+    echo "FAIL: stale config hash was accepted"; exit 1
+fi
+grep -q 'NFQWS2_ENABLE=0' "$tmp/base/config"
+echo "ok: rejects stale writes without changing current config"
+
+current_hash=$(sha256sum "$tmp/base/config" | awk '{print $1}')
+if printf 'if then\n' | "$H" config-write "$current_hash" >/dev/null 2>&1; then
     echo "FAIL: invalid shell syntax was accepted"; exit 1
 fi
 grep -q 'NFQWS2_ENABLE=0' "$tmp/base/config"
 echo "ok: rejects invalid syntax without changing config"
-if dd if=/dev/zero bs=1048577 count=1 2>/dev/null | "$H" config-write >/dev/null 2>&1; then
+
+current_hash=$(sha256sum "$tmp/base/config" | awk '{print $1}')
+if dd if=/dev/zero bs=1048577 count=1 2>/dev/null | "$H" config-write "$current_hash" >/dev/null 2>&1; then
     echo "FAIL: oversized config was accepted"; exit 1
 fi
 grep -q 'NFQWS2_ENABLE=0' "$tmp/base/config"
 echo "ok: rejects config larger than 1 MiB"
-printf 'NFQWS2_ENABLE=1\n# newer\n' | "$H" config-write >/dev/null
+
+current_hash=$(sha256sum "$tmp/base/config" | awk '{print $1}')
+printf 'NFQWS2_ENABLE=1\n# newer\n' | "$H" config-write "$current_hash" >/dev/null
 "$H" config-rollback >/dev/null
 grep -q 'NFQWS2_ENABLE=0' "$tmp/base/config"
 echo "ok: restores latest backup and preserves pre-rollback config"
+
 rm "$tmp/base/config"
 ln -s /etc/passwd "$tmp/base/config"
 if "$H" config-read >/dev/null 2>&1; then
