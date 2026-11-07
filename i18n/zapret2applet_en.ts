@@ -523,19 +523,7 @@
     </message>
 </context>
 
-<context>
-    <name>ZapretUpdater</name>
-    <message>
-        <location filename="../src/backend/zapretupdater.cpp" line="19"/>
-        <source>Некорректная версия: %1</source>
-        <translation>Invalid version: %1</translation>
-    </message>
-    <message>
-        <location filename="../src/backend/zapretupdater.cpp" line="41"/>
-        <source>Не удалось запустить pkexec/хелпер: %1</source>
-        <translation>Could not start pkexec/helper: %1</translation>
-    </message>
-</context>
+
 <context>
     <name>main</name>
     <message>
@@ -804,19 +792,7 @@
     </message>
 </context>
 
-<context>
-    <name>ZapretUpdater</name>
-    <message>
-        <location filename="../src/backend/zapretupdater.cpp" line="19"/>
-        <source>Некорректная версия: %1</source>
-        <translation>Invalid version: %1</translation>
-    </message>
-    <message>
-        <location filename="../src/backend/zapretupdater.cpp" line="41"/>
-        <source>Не удалось запустить pkexec/хелпер: %1</source>
-        <translation>Could not start pkexec/helper: %1</translation>
-    </message>
-</context>
+
 <context>
     <name>main</name>
     <message>
@@ -1309,8 +1285,19 @@
     <message><source>Этот раздел будет перенесён на QML на следующем этапе миграции.</source><translation>This section will be migrated to QML in a later stage.</translation></message>
     <message><source>Предварительный интерфейс на QML и Kirigami. Он проходит поэтапную проверку; основная версия приложения пока использует стабильный интерфейс.</source><translation>Preview interface built with QML and Kirigami. It is being validated incrementally; the stable interface remains the production application.</translation></message>
   </context>
+  
   <context>
     <name>ZapretUpdater</name>
+    <message>
+            <location filename="../src/backend/zapretupdater.cpp" line="19"/>
+            <source>Некорректная версия: %1</source>
+            <translation>Invalid version: %1</translation>
+        </message>
+    <message>
+            <location filename="../src/backend/zapretupdater.cpp" line="41"/>
+            <source>Не удалось запустить pkexec/хелпер: %1</source>
+            <translation>Could not start pkexec/helper: %1</translation>
+        </message>
     <message><source>… [строка журнала сокращена]</source><translation>… [log line truncated]</translation></message>
   </context>
 </TS>
