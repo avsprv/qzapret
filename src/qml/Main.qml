@@ -33,7 +33,7 @@ Kirigami.ApplicationWindow {
             Kirigami.Action {
                 text: qsTr("Профили")
                 icon.name: "view-list-details"
-                onTriggered: root.pageStack.push(placeholderPage, { pageTitle: text })
+                onTriggered: root.pageStack.push(profilesPageComponent)
             },
             Kirigami.Action {
                 text: qsTr("Списки")
@@ -111,10 +111,10 @@ Kirigami.ApplicationWindow {
                                 width: 12
                                 height: 12
                                 radius: width / 2
-                                color: appController.serviceStateCode === "active" ? Kirigami.Theme.positiveTextColor
-                                     : appController.serviceStateCode === "inactive" ? Kirigami.Theme.neutralTextColor
+                                color: appController.serviceStateCode === "inactive" ? Kirigami.Theme.neutralTextColor
                                      : appController.serviceStateCode === "failed" ? Kirigami.Theme.negativeTextColor
-                                     : Kirigami.Theme.neutralTextColor
+                                     : Kirigami.Theme.textColor
+                                Accessible.ignored: true
                             }
                         }
 
@@ -177,6 +177,11 @@ Kirigami.ApplicationWindow {
     Component {
         id: configPageComponent
         ConfigPage {}
+    }
+
+    Component {
+        id: profilesPageComponent
+        ProfilesPage {}
     }
 
     Component {
