@@ -77,12 +77,14 @@ qt_add_translations(zapret2applet_i18n
         ${QZAPRET_SOURCES}
         src/i18n.cpp
         src/qml/logscontroller.cpp
+        src/qml/listscontroller.cpp
         src/qml/Main.qml
         src/qml/pages/SettingsPage.qml
         src/qml/pages/ConfigPage.qml
         src/qml/pages/ProfilesPage.qml
         src/qml/pages/AboutPage.qml
         src/qml/pages/LogsPage.qml
+        src/qml/pages/ListsPage.qml
     INCLUDE_DIRECTORIES src
 )
 
@@ -110,6 +112,8 @@ qt_add_executable(zapret2applet-qml-preview
     src/qml/profilecontroller.h
     src/qml/logscontroller.cpp
     src/qml/logscontroller.h
+    src/qml/listscontroller.cpp
+    src/qml/listscontroller.h
     src/profileanalyzer.cpp
     src/profileanalyzer.h
     src/backend/systemdbackend.cpp
@@ -127,6 +131,7 @@ qt_add_qml_module(zapret2applet-qml-preview
         src/qml/pages/ProfilesPage.qml
         src/qml/pages/AboutPage.qml
         src/qml/pages/LogsPage.qml
+        src/qml/pages/ListsPage.qml
 )
 target_include_directories(zapret2applet-qml-preview PRIVATE src src/qml)
 target_link_libraries(zapret2applet-qml-preview PRIVATE
@@ -201,6 +206,13 @@ if(BUILD_TESTING)
     target_link_libraries(test_logscontroller PRIVATE Qt6::Test Qt6::Core)
     target_compile_definitions(test_logscontroller PRIVATE QZAPRET_HELPER_PATH="/nonexistent")
     add_test(NAME logs_controller COMMAND test_logscontroller)
+
+    qt_add_executable(test_listscontroller tests/test_listscontroller.cpp
+        src/qml/listscontroller.cpp src/qml/listscontroller.h)
+    target_include_directories(test_listscontroller PRIVATE src src/qml)
+    target_link_libraries(test_listscontroller PRIVATE Qt6::Test Qt6::Core)
+    target_compile_definitions(test_listscontroller PRIVATE QZAPRET_HELPER_PATH="/nonexistent")
+    add_test(NAME lists_controller COMMAND test_listscontroller)
 
     qt_add_executable(test_aboutpage tests/test_aboutpage.cpp
         src/aboutpage.cpp src/aboutpage.h)
