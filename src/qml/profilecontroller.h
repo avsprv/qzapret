@@ -25,7 +25,7 @@ public:
     bool busy() const;
     bool loaded() const;
     bool dirty() const;
-    Q_INVOKABLE void read();
+    Q_INVOKABLE void read(bool discardChanges = false);
     Q_INVOKABLE void add(const QStringList &arguments);
     Q_INVOKABLE void edit(int index, const QStringList &arguments);
     Q_INVOKABLE void copy(int index);
