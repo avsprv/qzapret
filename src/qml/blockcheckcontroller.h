@@ -51,6 +51,7 @@ public:
     bool busy() const;
     bool updateBusy() const;
     void setUpdateBusy(bool value);
+    void setServiceBusy(bool value);
 
     Q_INVOKABLE void start();
     Q_INVOKABLE void confirmStop(bool accepted);
@@ -94,7 +95,7 @@ private:
     QString m_logText, m_status;
     StatusType m_statusType = StatusType::Information;
     QVariantList m_results;
-    bool m_busy = false, m_updateBusy = false;
+    bool m_busy = false, m_updateBusy = false, m_serviceBusy = false;
     bool m_resumeService = false, m_cancelRequested = false, m_stopTimedOut = false;
     int m_found = 0;
     quint64 m_operationId = 0;
