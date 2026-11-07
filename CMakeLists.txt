@@ -78,6 +78,16 @@ if(BUILD_TESTING)
     target_compile_definitions(test_blockcheck PRIVATE QZAPRET_HELPER_PATH="/nonexistent")
     add_test(NAME blockcheck COMMAND test_blockcheck)
 
+    qt_add_executable(test_blockcheck_lifecycle tests/test_blockcheck_lifecycle.cpp
+        src/blockcheckpage.cpp src/blockcheckpage.h
+        src/backend/blockcheckrunner.cpp src/backend/blockcheckrunner.h
+        src/backend/zapretbackend.h src/backend/helperpath.h)
+    target_include_directories(test_blockcheck_lifecycle PRIVATE src)
+    target_link_libraries(test_blockcheck_lifecycle PRIVATE Qt6::Test Qt6::Widgets)
+    target_compile_definitions(test_blockcheck_lifecycle PRIVATE QZAPRET_HELPER_PATH="/nonexistent")
+    add_test(NAME blockcheck_lifecycle COMMAND test_blockcheck_lifecycle)
+    set_tests_properties(blockcheck_lifecycle PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+
     qt_add_executable(test_i18n tests/test_i18n.cpp)
     target_link_libraries(test_i18n PRIVATE Qt6::Test zapret2applet_i18n)
     target_compile_definitions(test_i18n PRIVATE QZAPRET_I18N_DIR="${CMAKE_SOURCE_DIR}/i18n")
