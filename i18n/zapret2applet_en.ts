@@ -158,6 +158,7 @@
 </context>
 <context>
     <name>MainWindow</name>
+    <message><source>Конфигурация</source><translation>Configuration</translation></message>
     <message>
         <location filename="../src/mainwindow.cpp" line="31"/>
         <source>Статус</source>
@@ -474,5 +475,20 @@ If the service is running, it will be stopped for the duration of the update and
         <source>Запустить скрытым в системном трее</source>
         <translation>Start hidden in the system tray</translation>
     </message>
+</context>
+<context>
+    <name>ConfigPage</name>
+    <message><source>Прочитать config</source><translation>Read config</translation></message>
+    <message><source>Экспортировать копию…</source><translation>Export a copy…</translation></message>
+    <message><source>Конфигурация ещё не загружена.</source><translation>Configuration has not been loaded yet.</translation></message>
+    <message><source>Читаю /opt/zapret2/config…</source><translation>Reading /opt/zapret2/config…</translation></message>
+    <message><source>Конфигурация загружена. Режим просмотра: файл не изменяется.</source><translation>Configuration loaded. View-only mode: the file is not modified.</translation></message>
+    <message><source>Не удалось прочитать config: %1</source><translation>Could not read config: %1</translation></message>
+    <message><source>Не удалось запустить хелпер: %1</source><translation>Could not start the helper: %1</translation></message>
+    <message><source>Не удалось сохранить копию: %1</source><translation>Could not save the copy: %1</translation></message>
+    <message><source>Копия конфигурации сохранена: %1</source><translation>Configuration copy saved: %1</translation></message>
+    <message><source>Конфигурация zapret2 (*.conf);;Все файлы (*)</source><translation>zapret2 configuration (*.conf);;All files (*)</translation></message>
+    <message><source>Экспорт доступен после чтения конфигурации.</source><translation>Export is available after reading the configuration.</translation></message>
+    <message><source>Файл читается через привилегированный read-only helper. Содержимое не исполняется и не интерпретируется приложением.</source><translation>The file is read through a privileged read-only helper. Its contents are not executed or interpreted by the application.</translation></message>
 </context>
 </TS>
