@@ -41,6 +41,7 @@ public:
     static std::optional<Result> parseLine(const QString &line);
 
     bool isRunning() const;
+    int errorCount() const { return m_errorCount; }
     void start(const Options &opt);
     void cancel();
 
@@ -57,5 +58,6 @@ private:
     QProcess *m_proc = nullptr;
     QByteArray m_buf;
     QSet<QString> m_seenResults;
+    int m_errorCount = 0;
     bool m_cancelRequested = false;
 };
