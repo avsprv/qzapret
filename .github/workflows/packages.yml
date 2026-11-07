@@ -105,7 +105,9 @@ jobs:
           package=""
           for candidate in dist/*.rpm; do
             [ -f "$candidate" ] || continue
-            if [ "$(rpm -qp --qf '%{NAME}' "$candidate")" = "zapret2applet" ]; then
+            name="$(rpm -qp --qf '%{NAME}' "$candidate")"
+            arch="$(rpm -qp --qf '%{ARCH}' "$candidate")"
+            if [ "$name" = "zapret2applet" ] && [ "$arch" = "x86_64" ]; then
               package="$candidate"
               break
             fi
