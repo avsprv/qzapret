@@ -35,8 +35,9 @@ int main(int argc, char *argv[])
     ConfigController configController;
     ProfileController profileController;
 
-    QLocale::setDefault(localeForLanguage(settingsManager.language()));
-    QList<QTranslator *> translators = I18n::install(app, QLocale());
+    const QLocale initialLocale = localeForLanguage(settingsManager.language());
+    QLocale::setDefault(initialLocale);
+    QList<QTranslator *> translators = I18n::install(app, initialLocale);
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty(QStringLiteral("appController"), &controller);
     engine.rootContext()->setContextProperty(QStringLiteral("settingsManager"), &settingsManager);
@@ -50,8 +51,9 @@ int main(int argc, char *argv[])
     QObject::connect(&settingsManager, &SettingsManager::languageChanged, &app, [&]() {
         for (QTranslator *translator : translators)
             delete translator;
-        translators = I18n::install(app, localeForLanguage(settingsManager.language()));
-        QLocale::setDefault(localeForLanguage(settingsManager.language()));
+        const QLocale locale = localeForLanguage(settingsManager.language());
+        QLocale::setDefault(locale);
+        translators = I18n::install(app, locale);
         engine.retranslate();
     });
 
