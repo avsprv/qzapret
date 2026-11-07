@@ -6,6 +6,7 @@ trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 mkdir -p "$tmp/base/ipset"
 export QZAPRET_TEST_BASE="$tmp/base"
 export QZAPRET_TEST_BACKUP_DIR="$tmp/backups"
+export QZAPRET_TEST_ENFORCE_SECURITY=1
 printf 'example.org\n192.0.2.0/24\n' > "$tmp/base/ipset/zapret-hosts-user.txt"
 
 out=$("$H" lists-read zapret-hosts-user.txt)
@@ -13,6 +14,24 @@ out=$("$H" lists-read zapret-hosts-user.txt)
     echo "FAIL: user list was not read exactly"; exit 1;
 }
 echo "ok: reads allowlisted user list"
+
+chmod 777 "$tmp/base/ipset"
+if "$H" lists-read zapret-hosts-user.txt >/dev/null 2>&1; then
+    echo "FAIL: writable list directory was accepted"; exit 1
+fi
+if printf 'changed.example\n' | "$H" lists-write zapret-hosts-user.txt >/dev/null 2>&1; then
+    echo "FAIL: writable list directory was accepted for writing"; exit 1
+fi
+chmod 755 "$tmp/base/ipset"
+chmod 666 "$tmp/base/ipset/zapret-hosts-user.txt"
+if "$H" lists-read zapret-hosts-user.txt >/dev/null 2>&1; then
+    echo "FAIL: group/world-writable list file was accepted"; exit 1
+fi
+if printf 'changed.example\n' | "$H" lists-write zapret-hosts-user.txt >/dev/null 2>&1; then
+    echo "FAIL: group/world-writable list file was accepted for writing"; exit 1
+fi
+chmod 644 "$tmp/base/ipset/zapret-hosts-user.txt"
+echo "ok: rejects unsafe list directory and file permissions"
 
 if "$H" lists-read ../config >/dev/null 2>&1; then
     echo "FAIL: path traversal was accepted"; exit 1

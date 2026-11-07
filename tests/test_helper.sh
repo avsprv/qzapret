@@ -21,6 +21,11 @@ expect_reject blockcheck --domains 'a.org;id'
 expect_reject blockcheck --domains '$(id)'
 expect_reject blockcheck --domains '-rf'
 expect_reject blockcheck --domains '.hidden'
+expect_reject blockcheck --domains 'example..org'
+expect_reject blockcheck --domains '-bad.example'
+expect_reject blockcheck --domains 'bad-.example'
+expect_reject blockcheck --domains '*'
+expect_reject blockcheck --domains 'label-that-is-far-too-long-and-exceeds-the-sixty-three-character-dns-label-limit-which-must-be-rejected.example'
 expect_reject blockcheck --domains 'a b c d e f g h i j k'
 expect_reject blockcheck --ipvs 5
 expect_reject blockcheck --http 2

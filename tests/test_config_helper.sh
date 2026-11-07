@@ -6,10 +6,23 @@ trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 mkdir -p "$tmp/base"
 export QZAPRET_TEST_BASE="$tmp/base"
 export QZAPRET_TEST_BACKUP_DIR="$tmp/backups"
+export QZAPRET_TEST_ENFORCE_SECURITY=1
 printf 'NFQWS2_ENABLE=1\n# original\n' > "$tmp/base/config"
 out=$("$H" config-read)
 [ "$out" = "$(cat "$tmp/base/config")" ] || { echo "FAIL: config-read changed content"; exit 1; }
 echo "ok: reads regular config"
+
+chmod 777 "$tmp/base"
+if "$H" config-read >/dev/null 2>&1; then
+    echo "FAIL: writable config directory was accepted"; exit 1
+fi
+chmod 755 "$tmp/base"
+chmod 666 "$tmp/base/config"
+if "$H" config-read >/dev/null 2>&1; then
+    echo "FAIL: group/world-writable config file was accepted"; exit 1
+fi
+chmod 644 "$tmp/base/config"
+echo "ok: rejects unsafe config directory and file permissions"
 
 initial_hash=$(sha256sum "$tmp/base/config" | awk '{print $1}')
 printf 'NFQWS2_ENABLE=0\n# changed\n' | "$H" config-write "$initial_hash" > "$tmp/write.out"
@@ -52,3 +65,16 @@ if printf 'BAD=1\n' | "$H" config-write >/dev/null 2>&1; then
     echo "FAIL: symlink config was writable"; exit 1
 fi
 echo "ok: rejects symlink config"
+
+# Restore a regular config before testing backup-root validation.
+rm -f "$tmp/base/config"
+printf 'SAFE=1\n' > "$tmp/base/config"
+
+# The backup root must not be redirected through a symlink.
+rm -rf "$tmp/backups"
+ln -s "$tmp" "$tmp/backups"
+current_hash=$(sha256sum "$tmp/base/config" | awk '{print $1}')
+if printf 'NFQWS2_ENABLE=1\n' | "$H" config-write "$current_hash" >/dev/null 2>&1; then
+    echo "FAIL: symlink backup root was accepted"; exit 1
+fi
+echo "ok: rejects symlink backup root"
