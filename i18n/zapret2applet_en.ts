@@ -952,7 +952,7 @@
   
   <context>
     <name>SettingsPage</name>
-    <message><source>Тема пока следует системным настройкам. Выбор светлой и тёмной темы будет добавлен позже.</source><translation>The application currently follows the system theme. Light and dark theme selection will be added later.</translation></message>
+    
     <message><source>Настройки</source><translation>Settings</translation></message>
     <message><source>Внешний вид</source><translation>Appearance</translation></message>
     <message><source>Тема оформления</source><translation>Color theme</translation></message>
@@ -967,7 +967,8 @@
     <message><source>Автоматически проверять обновления</source><translation>Check for updates automatically</translation></message>
     <message><source>Поведение</source><translation>Behavior</translation></message>
     <message><source>Сворачивать приложение в системный трей при закрытии окна</source><translation>Minimize to the system tray when closing the window</translation></message>
-    <message><source>Параметры уже сохраняются в прежние ключи QSettings. Системная тема Kirigami применяется автоматически; принудительные светлая и тёмная схемы и переключение языка будут подключены на следующем этапе.</source><translation>Settings are stored using the existing QSettings keys. Language changes are applied immediately. Forced light and dark themes will be connected in a later migration stage.</translation></message>
+    <message><source>Изменение применяется сразу. Системный режим следует настройкам рабочего стола; принудительная схема зависит от поддержки платформы.</source><translation>Changes are applied immediately. System mode follows desktop settings; forcing a color scheme depends on platform support.</translation></message>
+    <message><source>Параметры сохраняются в прежние ключи QSettings. Изменения темы и языка применяются сразу.</source><translation>Settings are stored using the existing QSettings keys. Theme and language changes are applied immediately.</translation></message>
   </context>
   <context>
     <name>ProfilesPage</name>
