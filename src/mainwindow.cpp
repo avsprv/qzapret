@@ -33,6 +33,8 @@ MainWindow::MainWindow(QWidget *parent)
     tabs->addTab(m_blockcheck, tr("Подбор стратегий"));
     m_update = new UpdatePage(m_backend, this);
     tabs->addTab(m_update, tr("Обновления"));
+    connect(m_blockcheck, &BlockcheckPage::busyChanged, m_update, &UpdatePage::setServiceBusy);
+    connect(m_update, &UpdatePage::busyChanged, m_blockcheck, &BlockcheckPage::setUpdateBusy);
     setCentralWidget(tabs);
 
     connect(m_backend, &ZapretBackend::stateChanged, this, &MainWindow::onStateChanged);
@@ -72,7 +74,7 @@ QWidget *MainWindow::buildStatusPage()
     m_guiCheck->setChecked(Autostart::isEnabled());
 
     connect(m_startBtn, &QPushButton::clicked, this, [this] {
-        if (m_blockcheck->isRunning()) {
+        if (m_blockcheck->isRunning() || m_update->isBusy()) {
             QMessageBox::information(this, tr("Идёт подбор"),
                                      tr("Дождитесь завершения подбора стратегий перед управлением сервисом."));
             return;
@@ -132,11 +134,11 @@ void MainWindow::buildTray()
 
     connect(show, &QAction::triggered, this, &MainWindow::toggleWindow);
     connect(m_trayStart, &QAction::triggered, this, [this] {
-        if (!m_blockcheck->isRunning())
+        if (!m_blockcheck->isRunning() && !m_update->isBusy())
             m_backend->start();
     });
     connect(m_trayStop, &QAction::triggered, this, [this] {
-        if (!m_blockcheck->isRunning())
+        if (!m_blockcheck->isRunning() && !m_update->isBusy())
             m_backend->stop();
     });
     connect(quitAct, &QAction::triggered, this, &MainWindow::quit);
