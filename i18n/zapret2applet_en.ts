@@ -1325,6 +1325,7 @@ If the service is running, it will be stopped for the duration of the update and
     <message><source>Содержимое пользовательского списка</source><translation>User list contents</translation></message>
     <message><source>Одна запись на строку. Допускаются домены ASCII или punycode, IP-адреса, CIDR и комментарии.</source><translation>One entry per line. ASCII or punycode domains, IP addresses, CIDR ranges, and comments are supported.</translation></message>
     <message><source>Несохранённые изменения</source><translation>Unsaved changes</translation></message>
+    <message><source>Текущий хостлист изменён. Отбросить изменения и перечитать его?</source><translation>The current hostlist has been modified. Discard changes and reload it?</translation></message>
     <message><source>Текущий хостлист изменён. Отбросить изменения и переключиться на другой список?</source><translation>The current hostlist has been modified. Discard changes and switch to another list?</translation></message>
     <message><source>Сохранить хостлист</source><translation>Save hostlist</translation></message>
     <message><source>Создать резервную копию и атомарно сохранить %1? Производные IP-списки будут обновлены штатными механизмами zapret2. Служба автоматически не перезапускается.</source><translation>Create a backup and atomically save %1? Derived IP lists will be updated by zapret2's normal mechanisms. The service is not restarted automatically.</translation></message>
