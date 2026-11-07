@@ -47,6 +47,22 @@ bool ApplicationController::serviceActive() const
     return m_state == ZapretBackend::State::Active;
 }
 
+QString ApplicationController::serviceStateCode() const
+{
+    switch (m_state) {
+    case ZapretBackend::State::Active: return QStringLiteral("active");
+    case ZapretBackend::State::Inactive: return QStringLiteral("inactive");
+    case ZapretBackend::State::Failed: return QStringLiteral("failed");
+    case ZapretBackend::State::Unknown:
+    default: return QStringLiteral("unknown");
+    }
+}
+
+bool ApplicationController::bootEnabled() const
+{
+    return m_bootEnabled;
+}
+
 QString ApplicationController::errorMessage() const
 {
     return m_errorMessage;
