@@ -11,6 +11,7 @@ RUNDIR=/run/zapret2applet
 URLBASE=https://github.com/bol-van/zapret2/releases/download
 PROTO='=https'
 NOSVC=0
+TEST_MODE=0
 
 # Переопределения ТОЛЬКО для тестов. Игнорируются, если хелпер установлен в системный
 # каталог; кроме того, pkexec сам очищает окружение вызывающего.
@@ -40,7 +41,6 @@ bc_pid() {
 
 need_arg() { [ "$1" -ge 2 ] || die "missing value for $2"; }
 
-TEST_MODE=0
 
 # Production paths must be controlled by root. The test harness uses private
 # temporary directories and explicitly bypasses these installation checks.
