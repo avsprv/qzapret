@@ -67,28 +67,7 @@ echo "ok: rejects writes to derived IP outputs"
 if dd if=/dev/zero bs=1048577 count=1 2>/dev/null | "$H" lists-write zapret-hosts-user.txt >/dev/null 2>&1; then
     echo "FAIL: oversized list was accepted"; exit 1
 fi
-grep -q '^192.0.2.1/24
-
-rm "$tmp/base/ipset/zapret-hosts-user.txt"
-ln -s /etc/passwd "$tmp/base/ipset/zapret-hosts-user.txt"
-if "$H" lists-read zapret-hosts-user.txt >/dev/null 2>&1; then
-    echo "FAIL: symlink list was accepted for reading"; exit 1
-fi
-if printf 'example.com\n' | "$H" lists-write zapret-hosts-user.txt >/dev/null 2>&1; then
-    echo "FAIL: symlink list was accepted for writing"; exit 1
-fi
-echo "ok: rejects symlink list for read and write"
-
-rm -rf "$tmp/base/ipset"
-ln -s "$tmp" "$tmp/base/ipset"
-if "$H" lists-read zapret-hosts-user.txt >/dev/null 2>&1; then
-    echo "FAIL: symlink ipset directory was accepted"; exit 1
-fi
-if printf 'example.com\n' | "$H" lists-write zapret-hosts-user.txt >/dev/null 2>&1; then
-    echo "FAIL: symlink ipset directory was accepted for writing"; exit 1
-fi
-echo "ok: rejects symlink ipset directory"
- "$tmp/base/ipset/zapret-hosts-user.txt"
+grep -q '^192.0.2.1/24$' "$tmp/base/ipset/zapret-hosts-user.txt"
 echo "ok: rejects lists larger than 1 MiB without replacing current data"
 
 rm "$tmp/base/ipset/zapret-hosts-user.txt"
