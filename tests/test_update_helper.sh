@@ -37,6 +37,9 @@ EOS
     : > "$W/src/$name/common/base.sh"
     chmod +x "$W/src/$name"/*.sh "$W/src/$name/init.d/sysv/zapret2" "$W/src/$name/binaries/linux-x86_64/"*
     [ "$4" = symlink ] && ln -s /etc/passwd "$W/src/$name/docs/evil-link"
+    if [ "$6" = oversized ]; then
+        dd if=/dev/zero of="$W/src/$name/oversized.bin" bs=1 count=0 seek=536870913 2>/dev/null
+    fi
     ( cd "$W/src" && sha256sum "$name/binaries/linux-x86_64/nfqws2" "$name/binaries/linux-x86_64/ip2net" "$name/binaries/linux-x86_64/mdig" > "$rel/sha256sum.txt" )
     if [ "$2" = bad_sums ]; then
         awk 'NR == 1 { first = substr($0, 1, 1); $0 = (first == "0" ? "1" : "0") substr($0, 2) } { print }' \
@@ -98,7 +101,13 @@ out=$(run_update v9.9.9); rc=$?
 [ $rc -eq 2 ] && echo "$out" | grep -q 'links' && ok "symlink in archive rejected" || bad "symlink rc=$rc: $out"
 expect_untouched "symlink"
 
-# --- 5. версия в архиве не совпадает с тегом
+# --- 5. распаковываемый объём ограничен до извлечения архива
+make_base; make_release v9.9.9 "" "" "" "" oversized
+out=$(run_update v9.9.9); rc=$?
+[ $rc -eq 2 ] && echo "$out" | grep -q "extraction limits" && ok "oversized archive rejected before extraction" || bad "oversized archive rc=$rc: $out"
+expect_untouched "oversized archive"
+
+# --- 6. версия в архиве не совпадает с тегом
 make_base; make_release v9.9.9; mkdir -p "$W/rel/v9.9.8"; cp "$W/rel/v9.9.9/"* "$W/rel/v9.9.8/"
 out=$(run_update v9.9.8); rc=$?
 [ $rc -eq 2 ] && ok "missing release rejected" || bad "missing release rc=$rc: $out"
