@@ -6,6 +6,7 @@
 #include <QCloseEvent>
 #include <QLabel>
 #include <QMenu>
+#include <QMenuBar>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QStyle>
@@ -14,6 +15,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 
+#include "appsettings.h"
 #include "aboutpage.h"
 #include "autostart.h"
 #include "backend/systemdbackend.h"
@@ -22,6 +24,7 @@
 #include "listsmanagerpage.h"
 #include "logmonitorpage.h"
 #include "profilepage.h"
+#include "settingsdialog.h"
 #include "updatepage.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -31,6 +34,13 @@ MainWindow::MainWindow(QWidget *parent)
 {
     setWindowTitle(QStringLiteral("zapret2applet"));
     resize(760, 640);
+
+    auto *appMenu = menuBar()->addMenu(tr("Приложение"));
+    auto *settingsAction = appMenu->addAction(tr("Настройки…"));
+    connect(settingsAction, &QAction::triggered, this, &MainWindow::openSettings);
+    appMenu->addSeparator();
+    auto *exitAction = appMenu->addAction(tr("Выход"));
+    connect(exitAction, &QAction::triggered, this, &MainWindow::quit);
 
     auto *tabs = new QTabWidget(this);
     tabs->addTab(buildStatusPage(), tr("Статус"));
@@ -86,8 +96,6 @@ QWidget *MainWindow::buildStatusPage()
     m_startBtn = new QPushButton(tr("Запустить"));
     m_stopBtn = new QPushButton(tr("Остановить"));
     m_bootCheck = new QCheckBox(tr("Запускать zapret2 при загрузке системы"));
-    m_guiCheck = new QCheckBox(tr("Запускать zapret2applet при входе в сеанс (в трей)"));
-    m_guiCheck->setChecked(Autostart::isEnabled());
 
     connect(m_startBtn, &QPushButton::clicked, this, [this] {
         if (m_blockcheck->isRunning() || m_update->isBusy()) {
@@ -107,13 +115,6 @@ QWidget *MainWindow::buildStatusPage()
     });
     // clicked, а не toggled: состояние чекбокса потом приводится к реальному через refresh()
     connect(m_bootCheck, &QCheckBox::clicked, m_backend, &ZapretBackend::setBootEnabled);
-    connect(m_guiCheck, &QCheckBox::clicked, this, [this](bool on) {
-        if (!Autostart::setEnabled(on)) {
-            QMessageBox::warning(this, tr("Ошибка"), tr("Не удалось изменить автозапуск zapret2applet."));
-            const QSignalBlocker block(m_guiCheck);
-            m_guiCheck->setChecked(Autostart::isEnabled());
-        }
-    });
 
     auto *page = new QWidget;
     auto *layout = new QVBoxLayout(page);
@@ -125,7 +126,6 @@ QWidget *MainWindow::buildStatusPage()
     layout->addLayout(row);
     layout->addSpacing(12);
     layout->addWidget(m_bootCheck);
-    layout->addWidget(m_guiCheck);
     layout->addStretch();
     return page;
 }
@@ -142,6 +142,8 @@ void MainWindow::buildTray()
 
     auto *menu = new QMenu(this);
     auto *show = menu->addAction(tr("Показать / скрыть окно"));
+    auto *settings = menu->addAction(tr("Настройки…"));
+    connect(settings, &QAction::triggered, this, &MainWindow::openSettings);
     menu->addSeparator();
     m_trayStart = menu->addAction(tr("Запустить zapret2"));
     m_trayStop = menu->addAction(tr("Остановить zapret2"));
@@ -194,6 +196,16 @@ void MainWindow::onStateChanged(ZapretBackend::State state)
     }
 }
 
+void MainWindow::openSettings()
+{
+    SettingsDialog dialog(m_tray && m_tray->isVisible(), this);
+    connect(&dialog, &SettingsDialog::languageRestartRequired, this, [this] {
+        QMessageBox::information(this, tr("Язык интерфейса"),
+                                 tr("Изменение языка будет применено после следующего запуска приложения."));
+    });
+    dialog.exec();
+}
+
 void MainWindow::toggleWindow()
 {
     if (isVisible() && !isMinimized()) {
@@ -225,8 +237,8 @@ void MainWindow::quit()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    // Есть трей — крестик сворачивает в трей, выход через меню трея.
-    if (m_tray && m_tray->isVisible() && !m_quitting) {
+    // Поведение закрытия управляется настройкой; по умолчанию сохраняется прежнее сворачивание в трей.
+    if (m_tray && m_tray->isVisible() && !m_quitting && AppSettings::closeToTray()) {
         hide();
         event->ignore();
         return;
@@ -243,5 +255,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         event->ignore();
         return;
     }
+    if (m_tray && !m_quitting)
+        QApplication::quit();
     event->accept();
 }
