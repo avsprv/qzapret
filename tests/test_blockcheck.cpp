@@ -129,11 +129,11 @@ private slots:
         const QString script = dir.filePath(QStringLiteral("fake-helper"));
         QFile f(script);
         QVERIFY(f.open(QIODevice::WriteOnly));
-        f.write("#!/bin/sh\\n"
-                "head -c 131072 /dev/zero | tr '\\000' 'x'\\n"
-                "printf '\\n'\\n"
-                "echo '!!!!! curl_test_http: working strategy found for ipv4 a.org : nfqws2 --valid !!!!!'\\n"
-                "exit 0\\n");
+        f.write("#!/bin/sh\n"
+                "head -c 131072 /dev/zero | tr '\\000' 'x'\n"
+                "printf '\\n'\n"
+                "echo '!!!!! curl_test_http: working strategy found for ipv4 a.org : nfqws2 --valid !!!!!'\n"
+                "exit 0\n");
         f.close();
         f.setPermissions(f.permissions() | QFileDevice::ExeUser);
 
