@@ -149,6 +149,7 @@ private slots:
     void restoreTimeoutKeepsBusyUntilLateResult();
     void ignoresLateVerificationFromPreviousOperation();
     void ignoresLateRestoreResultFromPreviousOperation();
+    void cancelDuringRestoreKeepsWaitingForServiceResult();
 };
 
 void BlockcheckControllerTest::clampsRepeatCount()
@@ -467,6 +468,29 @@ void BlockcheckControllerTest::ignoresLateVerificationFromPreviousOperation()
     emit backend.stateVerifiedForRequest(secondRequest, ZapretBackend::State::Inactive);
     QCOMPARE(runner.starts, 1);
     QVERIFY(!controller.busy());
+}
+
+void BlockcheckControllerTest::cancelDuringRestoreKeepsWaitingForServiceResult()
+{
+    FakeZapretBackend backend;
+    backend.state = ZapretBackend::State::Active;
+    backend.autoStart = false;
+    FakeBlockcheckRunner runner;
+    BlockcheckController controller(&backend, &runner, 100);
+
+    controller.start();
+    controller.confirmStop(true);
+    QCOMPARE(backend.startCalls, 1);
+    QVERIFY(controller.busy());
+
+    controller.cancel();
+    QVERIFY(controller.busy());
+    QCOMPARE(backend.startCalls, 1);
+    QVERIFY(controller.status().contains(QStringLiteral("нельзя прервать")));
+
+    backend.completeStart(ZapretBackend::State::Active, true);
+    QVERIFY(!controller.busy());
+    QCOMPARE(controller.statusType(), BlockcheckController::StatusType::Success);
 }
 
 void BlockcheckControllerTest::ignoresLateRestoreResultFromPreviousOperation()
