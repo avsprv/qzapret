@@ -111,8 +111,10 @@ Kirigami.ApplicationWindow {
                                 width: 12
                                 height: 12
                                 radius: width / 2
-                                color: appController.serviceActive ? Kirigami.Theme.positiveTextColor
-                                                                   : Kirigami.Theme.neutralTextColor
+                                color: appController.serviceStateCode === "active" ? Kirigami.Theme.positiveTextColor
+                                     : appController.serviceStateCode === "inactive" ? Kirigami.Theme.neutralTextColor
+                                     : appController.serviceStateCode === "failed" ? Kirigami.Theme.negativeTextColor
+                                     : Kirigami.Theme.neutralTextColor
                             }
                         }
 
@@ -121,6 +123,12 @@ Kirigami.ApplicationWindow {
                             text: qsTr("Управление системной службой zapret2")
                             opacity: 0.75
                             wrapMode: Text.WordWrap
+                        }
+
+                        Controls.CheckBox {
+                            text: qsTr("Запускать zapret2 при загрузке системы")
+                            checked: appController.bootEnabled
+                            onToggled: appController.setBootEnabled(checked)
                         }
 
                         RowLayout {
