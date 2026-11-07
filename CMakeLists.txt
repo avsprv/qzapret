@@ -132,6 +132,8 @@ install(PROGRAMS packaging/helper/zapret2applet-helper
 install(FILES ${CMAKE_BINARY_DIR}/org.zapret2applet.policy
         DESTINATION ${CMAKE_INSTALL_DATADIR}/polkit-1/actions)
 install(FILES data/zapret2applet.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+install(FILES data/org.avsprv.zapret2applet.metainfo.xml
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
 install(FILES data/icons/hicolor/scalable/apps/zapret2applet.svg
         DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
 
