@@ -97,6 +97,7 @@ private:
     bool m_busy = false, m_updateBusy = false;
     bool m_resumeService = false, m_cancelRequested = false, m_stopTimedOut = false;
     int m_found = 0;
+    quint64 m_operationId = 0;
     BlockcheckRunner::Options m_lastOptions;
     QString m_pendingFinalMessage;
     StatusType m_pendingFinalType = StatusType::Success;
