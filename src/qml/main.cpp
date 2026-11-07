@@ -5,6 +5,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QTranslator>
+#include <QStyleHints>
 
 #include "applicationcontroller.h"
 #include "configcontroller.h"
@@ -36,6 +37,17 @@ int main(int argc, char *argv[])
 
     ApplicationController controller;
     SettingsManager settingsManager;
+    const auto applyColorScheme = [&settingsManager] {
+        Qt::ColorScheme scheme = Qt::ColorScheme::Unknown;
+        if (settingsManager.theme() == QLatin1String("light"))
+            scheme = Qt::ColorScheme::Light;
+        else if (settingsManager.theme() == QLatin1String("dark"))
+            scheme = Qt::ColorScheme::Dark;
+        QGuiApplication::styleHints()->setColorScheme(scheme);
+    };
+    applyColorScheme();
+    QObject::connect(&settingsManager, &SettingsManager::themeChanged, &app, applyColorScheme);
+
     ConfigController configController;
     ProfileController profileController;
     LogsController logsController;
