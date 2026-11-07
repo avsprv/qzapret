@@ -275,6 +275,18 @@
         <source>Проверка состояния отменена. Диагностика не запускалась.</source>
         <translation>Service state check canceled. Diagnostics were not started.</translation>
     </message>
+    <message>
+        <source>Остановка не подтверждена: сервис остаётся активным. Диагностика не запущена.</source>
+        <translation>Stop was not confirmed: the service is still active. Diagnostics were not started.</translation>
+    </message>
+    <message>
+        <source>Сервис zapret2 снова активен.</source>
+        <translation>The zapret2 service is active again.</translation>
+    </message>
+    <message>
+        <source>Не удалось восстановить сервис zapret2. Проверьте состояние systemd.</source>
+        <translation>Could not restore the zapret2 service. Check the systemd state.</translation>
+    </message>
 </context>
 <context>
     <name>BlockcheckRunner</name>
