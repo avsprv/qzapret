@@ -82,7 +82,7 @@ QWidget *MainWindow::buildStatusPage()
         m_backend->start();
     });
     connect(m_stopBtn, &QPushButton::clicked, this, [this] {
-        if (m_blockcheck->isRunning()) {
+        if (m_blockcheck->isRunning() || m_update->isBusy()) {
             QMessageBox::information(this, tr("Идёт подбор"),
                                      tr("Дождитесь завершения подбора стратегий перед управлением сервисом."));
             return;
