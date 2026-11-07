@@ -491,7 +491,7 @@ install)
     if tar -tvzf "$tmp/z.tgz" | cut -c1 | grep -qv '[-d]'; then die "links or special files in archive"; fi
 
     [ -s "$tmp/sums.txt" ] || die "empty sha256sum.txt"
-    if grep -qvE "^[0-9a-f]{64}  $name/binaries/[A-Za-z0-9._/+-]+$" "$tmp/sums.txt"; then
+    if grep -qvE "^[0-9a-f]{64}  $name/binaries/[A-Za-z0-9._/+-]+\\$" "$tmp/sums.txt"; then
         die "unexpected sha256sum.txt format"
     fi
 
@@ -499,6 +499,8 @@ install)
     tar -xzf "$tmp/z.tgz" -C "$tmp/extract" --no-same-owner || die "extract failed"
     stage="$tmp/extract/$name"
     [ -d "$stage" ] && [ ! -L "$stage" ] || die "unexpected archive layout"
+    chmod -R ug-s "$stage"
+    chmod -R go-w "$stage"
     ( cd "$tmp/extract" && sha256sum -c --quiet "$tmp/sums.txt" ) || die "binary checksum mismatch"
     for required in config.default blockcheck2.sh install_bin.sh docs/changes.txt common/base.sh init.d/sysv/zapret2 init.d/systemd/zapret2.service; do
         [ -f "$stage/$required" ] && [ ! -L "$stage/$required" ] || die "archive is missing required file: $required"
