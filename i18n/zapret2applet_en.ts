@@ -171,6 +171,50 @@
         <source>Запускаю zapret2 обратно…</source>
         <translation>Starting zapret2 again…</translation>
     </message>
+    <message>
+        <source>Сводка диагностики:</source>
+        <translation>Diagnostic summary:</translation>
+    </message>
+    <message>
+        <source>Домены (%1): %2</source>
+        <translation>Domains (%1): %2</translation>
+    </message>
+    <message>
+        <source>Протоколы: %1</source>
+        <translation>Protocols: %1</translation>
+    </message>
+    <message>
+        <source>Уникальных стратегий: %1</source>
+        <translation>Unique strategies: %1</translation>
+    </message>
+    <message>
+        <source>Ошибок выполнения: %1</source>
+        <translation>Execution errors: %1</translation>
+    </message>
+    <message>
+        <source>Код завершения: %1</source>
+        <translation>Exit code: %1</translation>
+    </message>
+    <message>
+        <source>Статус: %1</source>
+        <translation>Status: %1</translation>
+    </message>
+    <message>
+        <source>Отменено</source>
+        <translation>Canceled</translation>
+    </message>
+    <message>
+        <source>Ошибка выполнения</source>
+        <translation>Execution failed</translation>
+    </message>
+    <message>
+        <source>Завершено: рабочие стратегии не найдены</source>
+        <translation>Completed: no working strategies found</translation>
+    </message>
+    <message>
+        <source>Завершено успешно</source>
+        <translation>Completed successfully</translation>
+    </message>
 </context>
 <context>
     <name>BlockcheckRunner</name>
