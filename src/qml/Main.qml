@@ -38,7 +38,7 @@ Kirigami.ApplicationWindow {
             Kirigami.Action {
                 text: qsTr("Списки")
                 icon.name: "view-list-text"
-                onTriggered: root.pageStack.push(placeholderPage, { pageTitle: text })
+                onTriggered: root.pageStack.push(listsPageComponent)
             },
             Kirigami.Action {
                 text: qsTr("Мониторинг")
@@ -197,6 +197,11 @@ Kirigami.ApplicationWindow {
     Component {
         id: logsPageComponent
         LogsPage {}
+    }
+
+    Component {
+        id: listsPageComponent
+        ListsPage {}
     }
 
     Component {
