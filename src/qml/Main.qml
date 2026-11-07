@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls as Controls
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
+import "pages"
 
 Kirigami.ApplicationWindow {
     id: root
@@ -57,7 +58,7 @@ Kirigami.ApplicationWindow {
             Kirigami.Action {
                 text: qsTr("Настройки")
                 icon.name: "settings-configure"
-                onTriggered: root.pageStack.push(placeholderPage, { pageTitle: text })
+                onTriggered: root.pageStack.push(settingsPageComponent)
             },
             Kirigami.Action {
                 text: qsTr("О программе")
@@ -163,6 +164,11 @@ Kirigami.ApplicationWindow {
                 }
             }
         }
+    }
+
+    Component {
+        id: settingsPageComponent
+        SettingsPage {}
     }
 
     Component {
