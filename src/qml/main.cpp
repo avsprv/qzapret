@@ -56,6 +56,10 @@ int main(int argc, char *argv[])
         blockcheckController.setUpdateBusy(updateController.busy());
         controller.setOperationsBusy(blockcheckController.busy() || updateController.busy());
     });
+    QObject::connect(&updateController, &UpdateController::operationFinished,
+                     &controller, &ApplicationController::refresh);
+    QObject::connect(&blockcheckController, &BlockcheckController::scanFinished,
+                     &controller, [&] { controller.refresh(); });
 
     const QLocale initialLocale = localeForLanguage(settingsManager.language());
     QLocale::setDefault(initialLocale);
