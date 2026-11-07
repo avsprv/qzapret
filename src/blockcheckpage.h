@@ -25,6 +25,10 @@ public:
 
 signals:
     void scanFinished(int found, bool canceled);
+    void busyChanged(bool busy);
+
+public slots:
+    void setUpdateBusy(bool busy);
 
 private:
     void onStartClicked();
@@ -45,6 +49,7 @@ private:
     bool m_resumeService = false;
     bool m_cancelRequested = false;
     bool m_scanStarted = false;
+    bool m_updateBusy = false;
     int m_found = 0;
     BlockcheckRunner::Options m_lastOptions;
 
