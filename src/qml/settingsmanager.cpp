@@ -1,6 +1,13 @@
 #include "settingsmanager.h"
 
-#include "appsettings.h"
+#include <QSettings>
+
+namespace {
+constexpr auto kThemeKey = "appearance/theme";
+constexpr auto kLanguageKey = "appearance/language";
+constexpr auto kAutoCheckKey = "update/autoCheck";
+constexpr auto kCloseToTrayKey = "tray/closeToTray";
+}
 
 SettingsManager::SettingsManager(QObject *parent)
     : QObject(parent)
@@ -9,74 +16,60 @@ SettingsManager::SettingsManager(QObject *parent)
 
 QString SettingsManager::theme() const
 {
-    switch (AppSettings::theme()) {
-    case AppSettings::Theme::Light: return QStringLiteral("light");
-    case AppSettings::Theme::Dark: return QStringLiteral("dark");
-    case AppSettings::Theme::System:
-    default: return QStringLiteral("system");
-    }
+    const QString value = QSettings().value(QLatin1String(kThemeKey), QStringLiteral("system")).toString();
+    return value == QLatin1String("light") || value == QLatin1String("dark")
+        ? value : QStringLiteral("system");
 }
 
 void SettingsManager::setTheme(const QString &value)
 {
-    AppSettings::Theme selected = AppSettings::Theme::System;
-    if (value == QLatin1String("light"))
-        selected = AppSettings::Theme::Light;
-    else if (value == QLatin1String("dark"))
-        selected = AppSettings::Theme::Dark;
-
-    if (AppSettings::theme() == selected)
+    const QString normalized = value == QLatin1String("light") || value == QLatin1String("dark")
+        ? value : QStringLiteral("system");
+    if (theme() == normalized)
         return;
-    AppSettings::setTheme(selected);
+    QSettings().setValue(QLatin1String(kThemeKey), normalized);
     emit themeChanged();
 }
 
 QString SettingsManager::language() const
 {
-    switch (AppSettings::language()) {
-    case AppSettings::Language::Russian: return QStringLiteral("ru");
-    case AppSettings::Language::English: return QStringLiteral("en");
-    case AppSettings::Language::System:
-    default: return QStringLiteral("system");
-    }
+    const QString value = QSettings().value(QLatin1String(kLanguageKey), QStringLiteral("system")).toString();
+    return value == QLatin1String("ru") || value == QLatin1String("en")
+        ? value : QStringLiteral("system");
 }
 
 void SettingsManager::setLanguage(const QString &value)
 {
-    AppSettings::Language selected = AppSettings::Language::System;
-    if (value == QLatin1String("ru"))
-        selected = AppSettings::Language::Russian;
-    else if (value == QLatin1String("en"))
-        selected = AppSettings::Language::English;
-
-    if (AppSettings::language() == selected)
+    const QString normalized = value == QLatin1String("ru") || value == QLatin1String("en")
+        ? value : QStringLiteral("system");
+    if (language() == normalized)
         return;
-    AppSettings::setLanguage(selected);
+    QSettings().setValue(QLatin1String(kLanguageKey), normalized);
     emit languageChanged();
 }
 
 bool SettingsManager::autoCheckUpdates() const
 {
-    return AppSettings::autoCheckUpdates();
+    return QSettings().value(QLatin1String(kAutoCheckKey), true).toBool();
 }
 
 void SettingsManager::setAutoCheckUpdates(bool enabled)
 {
-    if (AppSettings::autoCheckUpdates() == enabled)
+    if (autoCheckUpdates() == enabled)
         return;
-    AppSettings::setAutoCheckUpdates(enabled);
+    QSettings().setValue(QLatin1String(kAutoCheckKey), enabled);
     emit autoCheckUpdatesChanged();
 }
 
 bool SettingsManager::closeToTray() const
 {
-    return AppSettings::closeToTray();
+    return QSettings().value(QLatin1String(kCloseToTrayKey), true).toBool();
 }
 
 void SettingsManager::setCloseToTray(bool enabled)
 {
-    if (AppSettings::closeToTray() == enabled)
+    if (closeToTray() == enabled)
         return;
-    AppSettings::setCloseToTray(enabled);
+    QSettings().setValue(QLatin1String(kCloseToTrayKey), enabled);
     emit closeToTrayChanged();
 }
