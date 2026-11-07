@@ -105,6 +105,20 @@ esac
         QVERIFY(QFile::exists(m_configPath + QStringLiteral(".bak")));
     }
 
+    void removingAnotherProfilePreservesSelection()
+    {
+        ProfileController controller;
+        controller.read();
+        QTRY_VERIFY_WITH_TIMEOUT(!controller.busy(), 5000);
+        QVERIFY(controller.loaded());
+
+        controller.add({QStringLiteral("--filter-tcp=443")});
+        controller.setSelectedIndex(0);
+        controller.remove(1);
+        QCOMPARE(controller.selectedIndex(), 0);
+        QCOMPARE(controller.profiles().size(), 1);
+    }
+
     void confirmedReloadDiscardsUnsavedChanges()
     {
         ProfileController controller;
