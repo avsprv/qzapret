@@ -291,6 +291,10 @@
         <source>Дождитесь завершения обновления перед запуском диагностики.</source>
         <translation>Wait for the update to finish before starting diagnostics.</translation>
     </message>
+    <message>
+        <source>Установка zapret2 не прошла проверку совместимости. Отсутствуют или не поддерживаются компоненты:\n%1</source>
+        <translation>The zapret2 installation failed the compatibility check. Missing or unsupported components:\n%1</translation>
+    </message>
 </context>
 <context>
     <name>BlockcheckRunner</name>
