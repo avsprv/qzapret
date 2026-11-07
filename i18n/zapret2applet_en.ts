@@ -1304,4 +1304,180 @@
     <message><source>Обновление не выполнено (код %1). Подробности — в журнале.</source><translation>Update failed (exit code %1). See the log for details.</translation></message>
     <message><source>Установленная версия новее последнего релиза GitHub.</source><translation>The installed version is newer than the latest GitHub release.</translation></message>
   </context>
+
+<context>
+    <name>BlockcheckController</name>
+    <message>
+        <source>Не удалось получить подтверждённое состояние службы. Диагностика не запущена.</source>
+        <translation>Could not verify the service state. The diagnostic scan was not started.</translation>
+    </message>
+    <message>
+        <source>Операция остановки выполняется дольше ожидаемого. Новая команда запуска не отправляется до получения результата остановки.</source>
+        <translation>The stop operation is taking longer than expected. No start command will be sent until the stop result is received.</translation>
+    </message>
+    <message>
+        <source>Ожидание завершения операции остановки службы…</source>
+        <translation>Waiting for the service stop operation to complete…</translation>
+    </message>
+    <message>
+        <source>Не удалось подтвердить восстановление службы. Проверьте systemd.</source>
+        <translation>Could not confirm service restoration. Check systemd.</translation>
+    </message>
+    <message>
+        <source>Подбор недоступен во время другой операции.</source>
+        <translation>Scanning is unavailable while another operation is in progress.</translation>
+    </message>
+    <message>
+        <source>Укажите от 1 до 10 доменов.</source>
+        <translation>Enter between 1 and 10 domains.</translation>
+    </message>
+    <message>
+        <source>Некорректный домен: %1</source>
+        <translation>Invalid domain: %1</translation>
+    </message>
+    <message>
+        <source>Недопустимый протокол IP.</source>
+        <translation>Invalid IP version.</translation>
+    </message>
+    <message>
+        <source>Выберите хотя бы один тип проверки.</source>
+        <translation>Select at least one check type.</translation>
+    </message>
+    <message>
+        <source>Недопустимый уровень сканирования.</source>
+        <translation>Invalid scan level.</translation>
+    </message>
+    <message>
+        <source>Проверка состояния службы zapret2…</source>
+        <translation>Checking zapret2 service state…</translation>
+    </message>
+    <message>
+        <source>Служба zapret2 запущена</source>
+        <translation>The zapret2 service is running</translation>
+    </message>
+    <message>
+        <source>Для диагностики требуется временно остановить zapret2. После завершения приложение попытается восстановить работу службы. Продолжить?</source>
+        <translation>The zapret2 service must be stopped temporarily to run diagnostics. The application will attempt to restore the service afterwards. Continue?</translation>
+    </message>
+    <message>
+        <source>Не удалось достоверно определить состояние службы. Диагностика не запущена.</source>
+        <translation>Could not determine the service state reliably. The diagnostic scan was not started.</translation>
+    </message>
+    <message>
+        <source>Подбор отменён. Служба не изменена.</source>
+        <translation>Scan cancelled. The service was not changed.</translation>
+    </message>
+    <message>
+        <source>Остановка службы zapret2…</source>
+        <translation>Stopping the zapret2 service…</translation>
+    </message>
+    <message>
+        <source>Выполняется диагностика blockcheck2…</source>
+        <translation>Running blockcheck2 diagnostics…</translation>
+    </message>
+    <message>
+        <source>Запуск blockcheck2…</source>
+        <translation>Starting blockcheck2…</translation>
+    </message>
+    <message>
+        <source>Выберите локальный файл для сохранения журнала.</source>
+        <translation>Select a local file to save the log.</translation>
+    </message>
+    <message>
+        <source>Не удалось открыть файл журнала: %1</source>
+        <translation>Could not open the log file: %1</translation>
+    </message>
+    <message>
+        <source>Не удалось сохранить журнал: %1</source>
+        <translation>Could not save the log: %1</translation>
+    </message>
+    <message>
+        <source>Журнал сохранён: %1</source>
+        <translation>Log saved: %1</translation>
+    </message>
+    <message>
+        <source>Диагностика отменена до запуска.</source>
+        <translation>Diagnostics cancelled before launch.</translation>
+    </message>
+    <message>
+        <source>Отмена запрошена; ожидается подтверждение остановки службы.</source>
+        <translation>Cancellation requested; waiting for the service stop result.</translation>
+    </message>
+    <message>
+        <source>Операция остановки завершилась с активной службой. Диагностика не запускалась.</source>
+        <translation>The stop operation completed while the service was still active. Diagnostics were not started.</translation>
+    </message>
+    <message>
+        <source>Получен результат операции остановки после тайм-аута.</source>
+        <translation>Received the stop operation result after a timeout.</translation>
+    </message>
+    <message>
+        <source>Остановка службы заняла слишком много времени; диагностика не запускалась.</source>
+        <translation>Stopping the service took too long; diagnostics were not started.</translation>
+    </message>
+    <message>
+        <source>Подбор отменён. Служба восстановлена.</source>
+        <translation>Scan cancelled. The service has been restored.</translation>
+    </message>
+    <message>
+        <source>Остановка не подтверждена. Диагностика не запущена.</source>
+        <translation>The service stop could not be confirmed. Diagnostics were not started.</translation>
+    </message>
+    <message>
+        <source>Не удалось подтвердить остановку службы.</source>
+        <translation>Could not confirm that the service stopped.</translation>
+    </message>
+    <message>
+        <source>Не удалось подтвердить остановку; выполнена попытка восстановления службы.</source>
+        <translation>Could not confirm the service stop; an attempt was made to restore the service.</translation>
+    </message>
+    <message>
+        <source>Служба zapret2 снова активна.</source>
+        <translation>The zapret2 service is active again.</translation>
+    </message>
+    <message>
+        <source>Не удалось восстановить службу. Проверьте состояние systemd.</source>
+        <translation>Could not restore the service. Check the systemd state.</translation>
+    </message>
+    <message>
+        <source>Восстановление службы zapret2…</source>
+        <translation>Restoring the zapret2 service…</translation>
+    </message>
+    <message>
+        <source>Подбор отменён.</source>
+        <translation>Scan cancelled.</translation>
+    </message>
+    <message>
+        <source>Диагностика завершена с кодом %1.</source>
+        <translation>Diagnostics finished with exit code %1.</translation>
+    </message>
+    <message>
+        <source>Найдено стратегий: %1; ошибок: %2</source>
+        <translation>Strategies found: %1; errors: %2</translation>
+    </message>
+    <message>
+        <source>Диагностика завершилась с ошибкой (код %1). Служба восстановлена.</source>
+        <translation>Diagnostics failed with exit code %1. The service has been restored.</translation>
+    </message>
+    <message>
+        <source>Диагностика завершена. Служба восстановлена.</source>
+        <translation>Diagnostics completed. The service has been restored.</translation>
+    </message>
+    <message>
+        <source>Восстановление исходного состояния службы…</source>
+        <translation>Restoring the original service state…</translation>
+    </message>
+    <message>
+        <source>Диагностика завершилась с ошибкой (код %1).</source>
+        <translation>Diagnostics failed with exit code %1.</translation>
+    </message>
+    <message>
+        <source>Диагностика завершена.</source>
+        <translation>Diagnostics completed.</translation>
+    </message>
+    <message>
+        <source>Готово.</source>
+        <translation>Done.</translation>
+    </message>
+</context>
 </TS>
