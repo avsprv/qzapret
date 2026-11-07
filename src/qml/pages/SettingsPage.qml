@@ -91,7 +91,7 @@ Kirigami.ScrollablePage {
         Kirigami.InlineMessage {
             Layout.fillWidth: true
             type: Kirigami.MessageType.Information
-            text: qsTr("Настройки сохраняются в прежние ключи QSettings. Изменение языка будет применяться после реализации перезапуска интерфейса.")
+            text: qsTr("Параметры уже сохраняются в прежние ключи QSettings. Системная тема Kirigami применяется автоматически; принудительные светлая и тёмная схемы и переключение языка будут подключены на следующем этапе.")
         }
     }
 }
