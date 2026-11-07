@@ -32,7 +32,7 @@ Kirigami.ScrollablePage {
                     Controls.Label { Layout.fillWidth: true; text: modelData.name + " — " + modelData.arguments.join(" "); wrapMode: Text.Wrap; elide: Text.ElideRight }
                     Controls.Button { text: qsTr("Изменить"); onClicked: editor.openFor(modelData.index, modelData.arguments) }
                     Controls.Button { text: qsTr("Копировать"); enabled: profileController.profiles.length < 128; onClicked: profileController.copy(modelData.index) }
-                    Controls.Button { text: qsTr("Удалить"); enabled: profileController.profiles.length > 1; onClicked: deleteDialog.indexToDelete = modelData.index; deleteDialog.open() }
+                    Controls.Button { text: qsTr("Удалить"); enabled: profileController.profiles.length > 1; onClicked: { deleteDialog.indexToDelete = modelData.index; deleteDialog.open() } }
                 }
             }
         }
