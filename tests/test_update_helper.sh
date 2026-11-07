@@ -28,11 +28,11 @@ EOS
     else
         printf '#!/bin/sh\necho "nfqws2 %s"\n' "$ver" > "$W/src/$name/binaries/linux-x86_64/nfqws2"
     fi
-    printf '#!/bin/sh\\ncat\\n' > "$W/src/$name/binaries/linux-x86_64/ip2net"
-    printf '#!/bin/sh\\nexit 0\\n' > "$W/src/$name/binaries/linux-x86_64/mdig"
-    printf 'NFQWS2_ENABLE=0\\n' > "$W/src/$name/config.default"
-    printf '#!/bin/sh\\nexit 0\\n' > "$W/src/$name/init.d/sysv/zapret2"
-    printf '[Unit]\\nAfter=network-online.target\\n[Service]\\nType=forking\\nExecStart=/opt/zapret2/init.d/sysv/zapret2 start\\nExecStop=/opt/zapret2/init.d/sysv/zapret2 stop\\n[Install]\\nWantedBy=multi-user.target\\n' > "$W/src/$name/init.d/systemd/zapret2.service"
+    printf '#!/bin/sh\ncat\n' > "$W/src/$name/binaries/linux-x86_64/ip2net"
+    printf '#!/bin/sh\nexit 0\n' > "$W/src/$name/binaries/linux-x86_64/mdig"
+    printf 'NFQWS2_ENABLE=0\n' > "$W/src/$name/config.default"
+    printf '#!/bin/sh\nexit 0\n' > "$W/src/$name/init.d/sysv/zapret2"
+    printf '[Unit]\nAfter=network-online.target\n[Service]\nType=forking\nExecStart=/opt/zapret2/init.d/sysv/zapret2 start\nExecStop=/opt/zapret2/init.d/sysv/zapret2 stop\n[Install]\nWantedBy=multi-user.target\n' > "$W/src/$name/init.d/systemd/zapret2.service"
     : > "$W/src/$name/common/base.sh"
     chmod +x "$W/src/$name"/*.sh "$W/src/$name/binaries/linux-x86_64/"*
     [ "$4" = symlink ] && ln -s /etc/passwd "$W/src/$name/docs/evil-link"
@@ -133,7 +133,7 @@ expect_no_install() {
 prepare_install; make_release v9.9.9
 out=$(run_install v9.9.9); rc=$?
 [ $rc -eq 0 ] && ok "clean install succeeds" || bad "clean install rc=$rc: $out"
-grep -q '^NFQWS2_ENABLE=0 && ok "fresh config disables NFQWS2" || bad "fresh config is unsafe"
+grep -q 'NFQWS2_ENABLE=0' "$W/opt/zapret2/config" && ok "fresh config disables NFQWS2" || bad "fresh config is unsafe"
 [ -x "$W/opt/zapret2/nfq2/nfqws2" ] && [ -x "$W/opt/zapret2/ip2net/ip2net" ] \\
     && ok "compatible binaries linked" || bad "binary links missing"
 [ -f "$W/systemd/zapret2.service" ] && ok "systemd unit installed" || bad "systemd unit missing"
