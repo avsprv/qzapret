@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QStringList>
+#include <QProcess>
 #include <QQueue>
 #include <functional>
 
@@ -22,6 +23,10 @@ public:
     void stop() override;
     void stop(quint64 requestId) override;
     void setBootEnabled(bool enabled) override;
+
+protected:
+    virtual void startProcess(QProcess *process, const QString &program,
+                              const QStringList &arguments, bool privileged);
 
 private:
     struct PendingUnitAction {
