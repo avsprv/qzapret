@@ -107,6 +107,8 @@ qt_add_executable(zapret2applet-qml-preview
     src/qml/configcontroller.h
     src/qml/profilecontroller.cpp
     src/qml/profilecontroller.h
+    src/qml/logscontroller.cpp
+    src/qml/logscontroller.h
     src/profileanalyzer.cpp
     src/profileanalyzer.h
     src/backend/systemdbackend.cpp
