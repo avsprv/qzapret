@@ -36,6 +36,8 @@ set(QZAPRET_SOURCES
     src/backend/updatechecker.cpp
     src/backend/updatechecker.h
     src/backend/zapretpaths.h
+    src/backend/zapretcompatibility.cpp
+    src/backend/zapretcompatibility.h
     src/backend/zapretupdater.cpp
     src/backend/zapretupdater.h
     src/backend/zapretbackend.h
@@ -77,6 +79,14 @@ if(BUILD_TESTING)
     target_link_libraries(test_blockcheck PRIVATE Qt6::Test Qt6::Core)
     target_compile_definitions(test_blockcheck PRIVATE QZAPRET_HELPER_PATH="/nonexistent")
     add_test(NAME blockcheck COMMAND test_blockcheck)
+
+    qt_add_executable(test_zapretcompatibility tests/test_zapretcompatibility.cpp
+        src/backend/blockcheckrunner.cpp src/backend/blockcheckrunner.h
+        src/backend/zapretcompatibility.cpp src/backend/zapretcompatibility.h)
+    target_include_directories(test_zapretcompatibility PRIVATE src)
+    target_link_libraries(test_zapretcompatibility PRIVATE Qt6::Test Qt6::Core)
+    target_compile_definitions(test_zapretcompatibility PRIVATE QZAPRET_HELPER_PATH="/nonexistent")
+    add_test(NAME zapretcompatibility COMMAND test_zapretcompatibility)
 
     qt_add_executable(test_blockcheck_lifecycle tests/test_blockcheck_lifecycle.cpp
         src/blockcheckpage.cpp src/blockcheckpage.h
