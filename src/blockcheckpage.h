@@ -44,6 +44,7 @@ private:
     LifecyclePhase m_phase = LifecyclePhase::Idle;
     bool m_resumeService = false;
     bool m_cancelRequested = false;
+    bool m_scanStarted = false;
     int m_found = 0;
     BlockcheckRunner::Options m_lastOptions;
 
