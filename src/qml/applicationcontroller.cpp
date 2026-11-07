@@ -23,6 +23,7 @@ ApplicationController::ApplicationController(QObject *parent)
     connect(m_backend, &ZapretBackend::unitActionFinished, this,
             [this](const QString &, ZapretBackend::State state, bool) {
         setState(state);
+        setServiceActionBusy(false);
     });
     refresh();
 }
@@ -65,7 +66,7 @@ bool ApplicationController::bootEnabled() const
 
 bool ApplicationController::operationsBusy() const
 {
-    return m_operationsBusy;
+    return m_operationsBusy || m_serviceActionBusy;
 }
 
 void ApplicationController::setOperationsBusy(bool busy)
@@ -81,35 +82,46 @@ QString ApplicationController::errorMessage() const
     return m_errorMessage;
 }
 
+void ApplicationController::setServiceActionBusy(bool busy)
+{
+    if (m_serviceActionBusy == busy)
+        return;
+    m_serviceActionBusy = busy;
+    emit operationsBusyChanged();
+}
+
 void ApplicationController::refresh()
 {
-    if (m_operationsBusy)
+    if (operationsBusy())
         return;
     m_backend->refresh();
 }
 
 void ApplicationController::startService()
 {
-    if (m_operationsBusy)
+    if (operationsBusy())
         return;
     m_errorMessage.clear();
     emit errorMessageChanged();
+    setServiceActionBusy(true);
     m_backend->start();
 }
 
 void ApplicationController::stopService()
 {
-    if (m_operationsBusy)
+    if (operationsBusy())
         return;
     m_errorMessage.clear();
     emit errorMessageChanged();
+    setServiceActionBusy(true);
     m_backend->stop();
 }
 
 void ApplicationController::setBootEnabled(bool enabled)
 {
-    if (m_operationsBusy)
+    if (operationsBusy())
         return;
+    setServiceActionBusy(true);
     m_backend->setBootEnabled(enabled);
 }
 
