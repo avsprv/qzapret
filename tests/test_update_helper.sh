@@ -34,7 +34,7 @@ EOS
     printf '#!/bin/sh\nexit 0\n' > "$W/src/$name/init.d/sysv/zapret2"
     printf '[Unit]\nAfter=network-online.target\n[Service]\nType=forking\nExecStart=/opt/zapret2/init.d/sysv/zapret2 start\nExecStop=/opt/zapret2/init.d/sysv/zapret2 stop\n[Install]\nWantedBy=multi-user.target\n' > "$W/src/$name/init.d/systemd/zapret2.service"
     : > "$W/src/$name/common/base.sh"
-    chmod +x "$W/src/$name"/*.sh "$W/src/$name/binaries/linux-x86_64/"*
+    chmod +x "$W/src/$name"/*.sh "$W/src/$name/init.d/sysv/zapret2" "$W/src/$name/binaries/linux-x86_64/"*
     [ "$4" = symlink ] && ln -s /etc/passwd "$W/src/$name/docs/evil-link"
     ( cd "$W/src" && sha256sum "$name/binaries/linux-x86_64/nfqws2" "$name/binaries/linux-x86_64/ip2net" "$name/binaries/linux-x86_64/mdig" > "$rel/sha256sum.txt" )
     [ "$2" = bad_sums ] && sed -i 's/^./0/' "$rel/sha256sum.txt"
