@@ -1309,4 +1309,8 @@
     <message><source>Этот раздел будет перенесён на QML на следующем этапе миграции.</source><translation>This section will be migrated to QML in a later stage.</translation></message>
     <message><source>Предварительный интерфейс на QML и Kirigami. Он проходит поэтапную проверку; основная версия приложения пока использует стабильный интерфейс.</source><translation>Preview interface built with QML and Kirigami. It is being validated incrementally; the stable interface remains the production application.</translation></message>
   </context>
+  <context>
+    <name>ZapretUpdater</name>
+    <message><source>… [строка журнала сокращена]</source><translation>… [log line truncated]</translation></message>
+  </context>
 </TS>
