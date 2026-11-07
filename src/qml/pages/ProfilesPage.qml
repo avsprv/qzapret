@@ -59,7 +59,7 @@ Kirigami.ScrollablePage {
         ColumnLayout {
             width: 560
             Controls.Label { Layout.fillWidth: true; wrapMode: Text.WordWrap; text: qsTr("Один аргумент на строку. Не добавляйте --new, кавычки, shell-подстановки или пробелы внутри аргумента.") }
-            Controls.TextArea { id: argumentEditor; Layout.fillWidth: true; Layout.preferredHeight: 320; wrapMode: TextEdit.NoWrap; font.family: "monospace"; selectByMouse: true }
+            Controls.TextArea { id: argumentEditor; Layout.fillWidth: true; Layout.preferredHeight: 320; wrapMode: TextEdit.NoWrap; font.family: "monospace"; selectByMouse: true; Accessible.name: qsTr("Аргументы профиля"); Accessible.description: qsTr("Один аргумент на строку.") }
         }
     }
     Controls.Dialog {
