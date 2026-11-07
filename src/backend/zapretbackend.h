@@ -15,6 +15,11 @@ public:
     using QObject::QObject;
     ~ZapretBackend() override = default;
 
+    virtual QString displayName() const = 0;
+    virtual bool isAvailable() const { return true; }
+    virtual bool supportsJournalLogs() const { return false; }
+    virtual int refreshIntervalMs() const { return 3000; }
+
     virtual void refresh() = 0; // асинхронно, результат придёт в сигналах
     virtual void start() = 0;
     virtual void stop() = 0;

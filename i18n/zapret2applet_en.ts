@@ -553,7 +553,6 @@ If the service is running, it will be stopped for the duration of the update and
 </context>
 <context>
     <name>MainWindow</name>
-    <message><source>Списки</source><translation>Lists</translation></message>
 </context>
 <context>
     <name>ListsManagerPage</name>
