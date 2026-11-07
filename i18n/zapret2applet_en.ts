@@ -306,7 +306,6 @@
     <message><source>Лицензии</source><translation>Licenses</translation></message>
     <message><source>Код zapret2applet распространяется по лицензии MIT. Лицензии сторонних компонентов сохраняют собственную область действия. Подробности приведены в NOTICE и в документации upstream.</source><translation>zapret2applet code is distributed under the MIT License. Third-party components retain their own applicable licenses. See NOTICE and the upstream documentation for details.</translation></message>
     <message><source>Проект и документация</source><translation>Project and documentation</translation></message>
-    <message><source>Ссылки на проект и документацию</source><translation>Project and documentation links</translation></message>
     <message><source>zapret2applet — независимый проект и не связан с автором или сопровождающими upstream-проекта zapret2.</source><translation>zapret2applet is an independent project and is not affiliated with the zapret2 upstream author or maintainers.</translation></message>
     <message><source>Qt 6 — графическая платформа приложения.</source><translation>Qt 6 — the application's graphical platform.</translation></message>
     <message><source>Репозиторий zapret2applet</source><translation>zapret2applet repository</translation></message>
@@ -315,6 +314,7 @@
     <message><source>Сообщить об ошибке</source><translation>Report an issue</translation></message>
     <message><source>Уведомления о сторонних компонентах</source><translation>Third-party notices</translation></message>
     <message><source>Upstream-проект zapret2</source><translation>zapret2 upstream project</translation></message>
+    <message><source>Лицензия приложения (MIT)</source><translation>Application license (MIT)</translation></message>
 </context>
 <context>
     <name>BlockcheckRunner</name>
