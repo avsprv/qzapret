@@ -3,48 +3,81 @@
 ## Goals
 
 - Replace the Qt Widgets presentation layer with Qt Quick and KDE Kirigami 6.
-- Preserve the existing C++ service, helper, configuration, profile, blockcheck, and update logic.
+- Preserve existing C++ service, helper, configuration, profile, blockcheck, and update logic.
 - Keep privileged operations behind the existing Polkit-protected helper.
-- Follow KDE HIG and use the active KDE/Qt platform theme rather than hard-coded widget palettes.
-- Keep the current application buildable while the replacement UI is developed incrementally.
+- Follow KDE HIG and use the active KDE/Qt platform theme rather than hard-coded palettes.
+- Keep the production application functional while the replacement UI is developed incrementally.
 
 ## Migration strategy
 
-The migration starts with a separately built, non-installed QML preview target. The existing
-Qt Widgets executable remains the production target until feature parity and regression tests
-are complete. This avoids shipping an incomplete replacement or temporarily removing working
+The migration uses a separately built, non-installed QML preview target. The existing Qt Widgets
+executable remains the production target until feature parity and regression tests are complete.
+The preview is compiled and linted in CI but is not installed or packaged as the application.
+
+This separation is intentional: an incomplete QML implementation must not remove working
 features from release packages.
 
-The QML preview currently demonstrates the Kirigami application shell and the first C++ bridge
-for service status and start/stop operations. Navigation entries for the remaining sections are
-explicit placeholders, not implemented functionality.
+## Current implementation status
+
+The following areas have a QML/Kirigami implementation in the preview target:
+
+| Area | Status | Notes |
+| --- | --- | --- |
+| Application shell and dashboard | Implemented | Kirigami ApplicationWindow, navigation drawer, service status and service controls |
+| Configuration | Implemented | Read/edit/save, shell syntax validation, SHA-256 stale-write protection, privileged atomic write |
+| Profiles | Implemented | Add/edit/copy/remove, static analysis, validation and unsaved-change protection |
+| Lists | Implemented | All nine list files; only the three source user hostlists are writable |
+| Journal monitoring | Implemented | Read-only journal access, bounded output and optional refresh |
+| Blockcheck | Implemented | Domain/protocol options, confirmation before stopping the service, result copying and log export |
+| Settings | Partial | Language selection works at runtime; system theme is used; forced light/dark theme is not implemented |
+| About | Implemented | Version, dependencies, licensing, project separation and relevant links |
+| Update and clean install | Not migrated | Existing implementation remains in the Widgets application |
+| Tray and desktop lifecycle | Not migrated | Production Widgets behavior remains in use |
+
+“Implemented” means that the page and its current workflow exist in the preview target; it does
+not mean the entire application has reached production parity. The QML preview remains
+non-production and is not installed.
 
 ## Planned stages
 
-1. Establish the Qt Quick/Kirigami build and a minimal C++/QML application shell.
-2. Extract UI-independent operations from QWidget page classes into QObject controllers and
-   QAbstractItemModel models.
-3. Migrate configuration and profile management.
-4. Migrate lists and journal monitoring.
-5. Migrate blockcheck2 orchestration and strategy results.
-6. Migrate update/install workflows and application settings.
-7. Reimplement tray integration and desktop lifecycle for the QML application.
-8. Remove the legacy Widgets UI only after feature parity, tests, and package validation.
+1. Establish the Qt Quick/Kirigami build and application shell. **Complete**
+2. Extract and expose typed C++ controller APIs for the migrated workflows. **In progress**
+3. Migrate configuration and profile management. **Complete**
+4. Migrate lists and journal monitoring. **Complete**
+5. Migrate blockcheck2 orchestration and strategy results. **Implemented; reliability review continues**
+6. Migrate update checking, clean installation, update and recovery workflows. **Next**
+7. Complete settings behavior, theme integration, tray integration and desktop lifecycle.
+8. Remove the legacy Widgets UI only after feature parity, tests and package validation.
 
 ## Architectural boundaries
 
-- QML owns presentation, navigation, layouts, and user interaction.
-- C++ QObject controllers expose typed properties, invokable commands, and signals.
-- Existing backend classes remain responsible for systemd, helper invocation, blockcheck2,
-  update checking, and privileged operations.
+- QML owns presentation, navigation, layouts and user interaction.
+- C++ QObject controllers expose typed properties, invokable commands and signals.
+- Backend classes remain responsible for network checks, process management, systemd, blockcheck2
+  and helper invocation.
 - QML must never execute shell commands or invoke pkexec directly.
+- Privileged operations must use the fixed allowlisted helper actions.
 - Existing settings keys and user data formats must remain backward-compatible.
+- Potentially long operations must be asynchronous, bounded and cancellable where supported.
+- Failure to confirm a service state must never be treated as a successful transition.
 
-## Build notes
+## Update/install migration requirements
 
-The preview target is intentionally not installed or packaged as the application executable.
-It is compiled in CI to validate the QML module and C++ bridge. Production packaging continues
-to ship the proven Widgets executable until the migration is complete.
+The update page must preserve the behavior and safety properties of the current Widgets workflow:
+
+- Check the latest upstream release without blocking the GUI and validate the release redirect.
+- Preserve the existing update/lastCheck, update/notifiedTag and update/autoCheck settings.
+- Support clean installation when zapret2 is absent and update when a supported installation exists.
+- Require explicit confirmation before installation or update.
+- Keep download, archive-path validation, binary checksum verification, installation, backup and
+  rollback inside the privileged helper; do not duplicate these operations in QML.
+- Preserve user configuration and hostlists during updates.
+- Keep the clean-install default safe: NFQWS2_ENABLE=0, with the service neither started nor enabled.
+- Report cancellation, failure, rollback and service-restoration outcomes distinctly.
+- Prevent update/install while blockcheck or another conflicting operation is active.
+- Bound log output and ensure helper process completion is handled exactly once.
+- Cover version parsing, network failure, helper failure, checksum rejection, rollback and clean
+  installation with automated tests.
 
 ## Quality baseline
 
@@ -52,15 +85,28 @@ The migration follows the repository-wide [quality and engineering standards](QU
 which use the official KDE Kirigami documentation and KDE Human Interface Guidelines as their
 implementation baseline.
 
-In particular, each migrated page must have:
-- a C++ controller/model with a typed, testable API;
+Each migrated page must have:
+
+- a typed, testable C++ controller/model;
 - native Kirigami interaction patterns and platform theme integration;
 - complete Russian and English localization;
 - accessible keyboard and focus behavior;
-- loading, empty, success, cancellation, and failure states where applicable;
-- isolated regression tests for the controller and critical workflows;
+- loading, empty, success, cancellation and failure states where applicable;
+- isolated regression tests for critical workflows;
 - documentation and CI coverage.
 
-The QML preview is not considered production-ready while navigation placeholders remain, settings
-do not affect runtime behavior, or the About/localization/desktop integration work is incomplete.
-The final replacement gate is defined in QUALITY_STANDARDS.md.
+## Production replacement gate
+
+The QML preview must not replace the Widgets application until all of the following are true:
+
+- all existing user-visible features have functional parity;
+- no navigation placeholders remain;
+- settings, theme, language, tray and desktop lifecycle behavior work as documented;
+- update, clean-install, backup and recovery workflows are migrated and tested;
+- all QML and C++ tests pass, including security-sensitive helper tests;
+- the application builds and installs from supported packages on clean systems;
+- Russian and English translations are complete;
+- accessibility, keyboard navigation and responsive layouts have been reviewed;
+- CI and package validation pass on the candidate release commit.
+
+The Widgets executable remains the production application until this gate is satisfied.
