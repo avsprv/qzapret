@@ -9,11 +9,18 @@
 #include "backend/systemdbackend.h"
 
 BlockcheckController::BlockcheckController(QObject *parent)
+    : BlockcheckController(nullptr, nullptr, 30000, parent)
+{
+}
+
+BlockcheckController::BlockcheckController(ZapretBackend *backend, BlockcheckRunner *runner,
+                                           int lifecycleTimeoutMs, QObject *parent)
     : QObject(parent), m_lifecycleTimeout(new QTimer(this)),
-      m_backend(new SystemdBackend(this)), m_runner(new BlockcheckRunner(this))
+      m_backend(backend ? backend : new SystemdBackend(this)),
+      m_runner(runner ? runner : new BlockcheckRunner(this))
 {
     m_lifecycleTimeout->setSingleShot(true);
-    m_lifecycleTimeout->setInterval(30000);
+    m_lifecycleTimeout->setInterval(qMax(1, lifecycleTimeoutMs));
     connect(m_lifecycleTimeout, &QTimer::timeout, this, [this] {
         if (m_phase == Phase::Checking) finish(tr("Не удалось получить подтверждённое состояние службы. Диагностика не запущена."), StatusType::Error);
         else if (m_phase == Phase::WaitingForStop) {
@@ -170,25 +177,48 @@ void BlockcheckController::handleUnitAction(const QString &action, ZapretBackend
                 m_resumeService = false;
                 finish(tr("Операция остановки завершилась с активной службой. Диагностика не запускалась."), StatusType::Error);
             } else {
-                restoreService(tr("Получен результат операции остановки после тайм-аута."));
+                restoreService(tr("Получен результат операции остановки после тайм-аута."),
+                               tr("Остановка службы заняла слишком много времени; диагностика не запускалась."),
+                               StatusType::Warning);
             }
             return;
         }
         if (success && state==ZapretBackend::State::Inactive) {
-            if (m_cancelRequested) restoreService(tr("Диагностика отменена до запуска."));
-            else beginScan();
-        } else if (state==ZapretBackend::State::Active) { m_resumeService=false; finish(tr("Остановка не подтверждена. Диагностика не запущена."), StatusType::Error); }
-        else restoreService(tr("Не удалось подтвердить остановку службы."));
+            if (m_cancelRequested) {
+                restoreService(tr("Диагностика отменена до запуска."),
+                               tr("Подбор отменён. Служба восстановлена."), StatusType::Warning);
+            } else {
+                beginScan();
+            }
+        } else if (state==ZapretBackend::State::Active) {
+            m_resumeService=false;
+            finish(tr("Остановка не подтверждена. Диагностика не запущена."), StatusType::Error);
+        } else {
+            restoreService(tr("Не удалось подтвердить остановку службы."),
+                           tr("Не удалось подтвердить остановку; выполнена попытка восстановления службы."),
+                           StatusType::Warning);
+        }
     } else if (m_phase==Phase::WaitingForStart && action==QLatin1String("start")) {
         m_lifecycleTimeout->stop();
         m_resumeService=false;
-        finish(state==ZapretBackend::State::Active ? tr("Служба zapret2 снова активна.") : tr("Не удалось восстановить службу. Проверьте состояние systemd."),
-               state==ZapretBackend::State::Active ? StatusType::Success : StatusType::Error);
+        if (state == ZapretBackend::State::Active) {
+            const QString message = m_pendingFinalMessage.isEmpty()
+                ? tr("Служба zapret2 снова активна.") : m_pendingFinalMessage;
+            finish(message, m_pendingFinalType);
+        } else {
+            finish(tr("Не удалось восстановить службу. Проверьте состояние systemd."), StatusType::Error);
+        }
     }
 }
-void BlockcheckController::restoreService(const QString &reason) {
+void BlockcheckController::restoreService(const QString &reason, const QString &finalMessage,
+                                          StatusType finalType) {
     if (!reason.isEmpty()) appendLog(reason);
-    if (!m_resumeService) { finish(); return; }
+    if (!finalMessage.isEmpty()) m_pendingFinalMessage = finalMessage;
+    m_pendingFinalType = finalType;
+    if (!m_resumeService) {
+        finish(m_pendingFinalMessage, m_pendingFinalType);
+        return;
+    }
     m_phase=Phase::WaitingForStart; setStatus(tr("Восстановление службы zapret2…")); m_lifecycleTimeout->start(); m_backend->start();
 }
 void BlockcheckController::handleFinished(int exitCode, bool canceled) {
@@ -196,7 +226,13 @@ void BlockcheckController::handleFinished(int exitCode, bool canceled) {
     appendLog(canceled ? tr("Подбор отменён.") : tr("Диагностика завершена с кодом %1.").arg(exitCode));
     appendLog(tr("Найдено стратегий: %1; ошибок: %2").arg(m_found).arg(m_runner->errorCount()));
     if (m_resumeService) {
-        restoreService(tr("Восстановление исходного состояния службы…"));
+        const StatusType finalType = canceled ? StatusType::Warning
+            : (exitCode != 0 ? StatusType::Error : StatusType::Success);
+        const QString finalMessage = canceled ? tr("Подбор отменён. Служба восстановлена.")
+            : (exitCode != 0
+                ? tr("Диагностика завершилась с ошибкой (код %1). Служба восстановлена.").arg(exitCode)
+                : tr("Диагностика завершена. Служба восстановлена."));
+        restoreService(tr("Восстановление исходного состояния службы…"), finalMessage, finalType);
     } else if (!canceled && exitCode != 0) {
         finish(tr("Диагностика завершилась с ошибкой (код %1).").arg(exitCode), StatusType::Error);
     } else if (canceled) {
@@ -213,4 +249,6 @@ void BlockcheckController::finish(const QString &message, StatusType type) {
     setBusy(false);
     emit scanFinished(m_found,m_cancelRequested);
     m_cancelRequested=false;
+    m_pendingFinalMessage.clear();
+    m_pendingFinalType=StatusType::Success;
 }
