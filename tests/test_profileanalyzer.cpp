@@ -52,6 +52,45 @@ private slots:
         QVERIFY(result.ok());
         QCOMPARE(result.profiles.size(), 1);
     }
+    void replacesProfilesAndPreservesSurroundingConfig() {
+        const QString config = QStringLiteral(
+            "NFQWS2_ENABLE=1\n# keep this comment\n"
+            "NFQWS2_OPT=\"--filter-tcp=80 --payload=http_req\"\n"
+            "MODE_FILTER=hostlist\n");
+        auto parsed = ProfileAnalyzer::parse(config);
+        QVERIFY(parsed.ok());
+        Profile second;
+        second.allArguments = {QStringLiteral("--filter-tcp=443"),
+                               QStringLiteral("--payload=tls_client_hello")};
+        const auto edited = ProfileAnalyzer::replaceProfiles(
+            config, {parsed.profiles.first(), second});
+        QVERIFY2(edited.ok(), qPrintable(edited.error));
+        QVERIFY(edited.config.startsWith("NFQWS2_ENABLE=1\n# keep this comment\n"));
+        QVERIFY(edited.config.endsWith("\nMODE_FILTER=hostlist\n"));
+        const auto reparsed = ProfileAnalyzer::parse(edited.config);
+        QVERIFY2(reparsed.ok(), qPrintable(reparsed.error));
+        QCOMPARE(reparsed.profiles.size(), 2);
+        QCOMPARE(reparsed.profiles.at(1).allArguments, second.allArguments);
+    }
+    void rejectsUnsafeProfileArguments() {
+        auto parsed = ProfileAnalyzer::parse(
+            QStringLiteral("NFQWS2_OPT=\"--filter-tcp=80\"\n"));
+        QVERIFY(parsed.ok());
+        Profile unsafe;
+        unsafe.allArguments = {QStringLiteral("--filter-tcp=$PORT")};
+        QVERIFY(!ProfileAnalyzer::replaceProfiles(
+            QStringLiteral("NFQWS2_OPT=\"--filter-tcp=80\"\n"), {unsafe}).ok());
+        unsafe.allArguments = {QStringLiteral("--filter-tcp=80\nNFQWS2_ENABLE=0")};
+        QVERIFY(!ProfileAnalyzer::replaceProfiles(
+            QStringLiteral("NFQWS2_OPT=\"--filter-tcp=80\"\n"), {unsafe}).ok());
+    }
+    void rejectsEmptyReplacement() {
+        auto parsed = ProfileAnalyzer::parse(
+            QStringLiteral("NFQWS2_OPT=\"--filter-tcp=80\"\n"));
+        QVERIFY(parsed.ok());
+        QVERIFY(!ProfileAnalyzer::replaceProfiles(
+            QStringLiteral("NFQWS2_OPT=\"--filter-tcp=80\"\n"), {}).ok());
+    }
 };
 QTEST_GUILESS_MAIN(TestProfileAnalyzer)
 #include "test_profileanalyzer.moc"
